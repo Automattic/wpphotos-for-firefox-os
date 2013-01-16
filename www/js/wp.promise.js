@@ -1,0 +1,120 @@
+/*
+	wp.promise
+	Returns a promise object for use with asynchronous tasks. 
+	
+	ctor: none
+	
+	Usage:
+		Creating and fulfilling a promise:
+			var p = wp.promise(); // Create the promise. Return the promise at the end of the function that started the async task.
+				... asyncronous task does its thing.
+			p.resolve(result_of_async_task); // If the task was successful.
+			p.discard(failure_object_or_message); // If the task was unsuccessful. 
+
+		Callbacks:
+			var p = startAsyncTaskThatReturnsAPromise();
+			p.success(success_callback_function_reference); // Called when the asyc task is complete and p.resolve(result) is called.
+			p.fail(failure_callback_function_reference); // Called when the async task is complete and p.discard(result) is called.
+			p.always(callback_function_reference); // Called after then or fail callbacks have been called.
+			
+		Getting the result of the async task:
+			p.result();
+		
+		Getting the status of the promise (incomplete, complete, failed) :
+			p.status();
+			
+		You can also chain callbacks, and have multiple callbacks of the same type. 
+			p.then(a_callback).then(another_callback).fail(yet_another_callback).always(still_another_callback);
+			
+		Callbacks added after a promise is resolved or discarded are invoked immediately.
+*/
+
+'use strict';
+                     
+if(typeof(wp) == "undefined") { var wp = {} };
+
+wp.promise = function() {
+	 
+	 var _status = "incomplete"; // complete, failed
+	 var _result = null;
+	 var _fail = [];
+	 var _success = [];
+	 var _always = [];
+	 
+	 var perform = function(arr) {
+		if (!arr) return;
+		
+		for (var i = 0; i < arr.length; i++) {
+			var func = arr[i];
+			if (func instanceof Function) {
+				try {
+					func();
+				} catch(ignore) {};
+				
+			};
+	 	};
+	};
+	 
+	var p = {
+		 
+		success:function(f) {
+			if (f instanceof Function) {
+				if (_status != "incomplete") {
+					perform([f]);
+				} else {
+					_success.push(f);
+				};
+			};
+			return p;
+		},
+		 
+		fail:function(f) {
+			 if (f instanceof Function) {
+				if (_status != "incomplete") {
+					perform([f]);
+				} else {
+					_fail.push(f);
+				};
+			 	
+			 };
+			 return p;
+		},
+		
+		always:function(f) {
+		 	if (f instanceof Function) {
+				if (_status != "incomplete") {
+					perform([f]);
+				} else {
+				 	_always.push(f);
+				};
+		 	};
+			return p;
+		},
+		 
+		status:function() {
+			return _status;
+		},
+		 
+		result:function() {
+			return _result; 
+		},
+		
+		discard:function(obj) {
+			_result = obj;
+			_status = "failed";
+			 
+			perform(_fail);
+		 	perform(_always);
+		},
+		 
+		resolve:function(obj) {
+		 	_result = obj;
+		 	_status = "complete";
+		 	
+		 	perform(_success);
+		 	perform(_always);
+		}
+	};
+	
+	return p;
+};
