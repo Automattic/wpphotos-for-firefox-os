@@ -76,20 +76,21 @@ wp.XMLRPC.prototype.addParam = function(obj) {
 
 
 wp.XMLRPC.prototype.formatRequestBody = function() {
-	var params = "";
+	var str = "";
 	for (var i = 0; i < this.params.length; i++) {
-    	params += "<param><value>" + this.formatParam(this.params[i]) + "</value></param>\n";
+    	str += "<param><value>" + this.formatParam(this.params[i]) + "</value></param>\n";
     };
 
 	var xml = "<?xml version=\"1.0\"?>\n" +
     "<methodCall>\n<methodName>" + this.xmlrpcMethod + "</methodName>\n" +
-    "<params>\n" + params + "</params>\n</methodCall>";
+    "<params>\n" + str + "</params>\n</methodCall>";
     return xml;
 };
 
 
 wp.XMLRPC.prototype.formatParam = function(param){
-
+	if (param == null) param = "";
+	
 	// Arrays
 	if (param instanceof Array) {
 		var arr = "<array>\n<data>\n";
@@ -138,13 +139,16 @@ wp.XMLRPC.prototype.formatParam = function(param){
 
 wp.XMLRPC.prototype.parseResponseXML = function() {
 	var str = this.xhr.result;
-
+	try {
 	// clean response document
-	str = XMLRPC.cleanDocument(str);
+	str = wp.XMLRPC.cleanDocument(str);
 	
 	// clean the BOM
-	str = XMLRPC.cleanBOM(str);
-	
+
+	str = wp.XMLRPC.cleanBOM(str);
+	} catch(e) {
+		console.log(e);
+	}
 	// protect strings
 	// wrap the strings in <![CDATA[ ]]>
 	// We are treating all string values as potentially malformed XML. The parser will not attempt to process any of the

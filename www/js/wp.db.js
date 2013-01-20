@@ -8,6 +8,8 @@
 	Database operations are performed asynchronously. Methods that work with data return a wp.promise that is
 	fulfilled when the operation is complete.
 	
+	Provides an override for Backbone.sync so models can interact with IndexedDB.
+	
 	Requires: wp.promise
 	
 	ctor: none
@@ -24,8 +26,14 @@ if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.db = {
 	name:"com.wordpress.photos",
-	version:1,
 	idb:null,
+	
+	/*
+		Version of the database. Matches the number of migrations.
+	*/
+	getVersion:function() {
+		return wp.db.migrations.length;	
+	},
 	
 	/*
 		Deletes the database. Use with caution.
@@ -63,6 +71,7 @@ wp.db = {
 		Open a database connection, performing any pending migrations 
 	*/
 	open:function() {
+	
 		var p = wp.promise();
 		
 		if (this.idb) {
@@ -71,28 +80,39 @@ wp.db = {
 		};
 
 		try {
-			var request = window.indexedDB.open(this.name, this.version);
+			var success = function(event){
+				console.log("wp.db: opened");
+				
+				var db = event.currentTarget.result;
+				wp.db.idb = db;				
+				
+				if(typeof(Backbone) != "undefined") {
+					Backbone.ajaxSync = Backbone.sync
+					Backbone.sync = function(method, model, options) {
+						return wp.db.sync(method, model, options);
+					};
+				};
+
+				p.resolve(event.target.result);
+			};
+			
+			var request = window.indexedDB.open(this.name, this.getVersion());
 			request.onerror = function(event) {
 				console.log("wp.db: error opening database. " + event.target.errorCode);
 				p.discard(event.target.error);
 			};
 			
 			request.onupgradeneeded = function(event) {
-				console.log("wp.db: migrating");
-				var db = event.currentTarget.result;
-				wp.db.idb = db;
-				wp.db.migrate(event);
-				
-				p.resolve(event.target.result);
+				console.log("wp.db onupgrade: migrating");
+				var db = event.currentTarget.result; // indexeddb connection reference
+
+				for (var i = event.oldVersion; i < wp.db.migrations.length;  i++) {
+					console.log("onupgradeneeded: Migrating to version " + (i +1));
+					wp.db.migrations[i].up(db);
+				};
 			};
 			
-			request.onsuccess = function(event) {
-				console.log("wp.db: opened");
-				var db = event.currentTarget.result;
-				wp.db.idb = db;
-
-				p.resolve(event.target.result);
-			};
+			request.onsuccess = success;
 
 		} catch(e) {
 			console.log(err);
@@ -150,7 +170,7 @@ wp.db = {
 	*/
 	find:function(model, key) {
 		console.log("wp.db.find: " + arguments);
-		var p = wp.promose();
+		var p = wp.promise();
 		
 		try {
 			var store = this.getObjectStore(model);
@@ -254,6 +274,7 @@ wp.db = {
 				p.discard(event.target.error);
 			};
 		} catch(err) {
+			console.log(err);
 			p.discard(err);
 		};
 		return p;
@@ -288,22 +309,98 @@ wp.db = {
 	},
 	
 	/*
-		Migrations for the database. 
-		migrate may only be called in the context of an onupgradeneeded event, and passing in the event itself.
-	*/	
-	migrate:function(event) {
-		var db = wp.db.idb
-		if (event.newVersion == null ) {
-			// We're deleting. 
-			console.log("onupgradeneeded: newVersion was null");
-			return;
-		};
+		Backbone.sync override. http://backbonejs.org/#Sync 
+		Wired up in the call to open. 
 		
-		// Create the object stores.
-		var store;
-		if (event.oldVersion < 1) {
-			console.log("onupgradeneeded: Migrating to version 1");
+		options = {
+			where:{index:name, value:value}
+		}
+		
+	*/
+	sync:function(method, model, options) {
+		options = options || {};
+		var p = null;
+		
+		switch(method) {
+			
+			case "read" :
+				var id = model.id;
+				if (id) {
+					// Model
+					p = wp.db.find(model.store, id);
+					
+				} else {
+					// Collection
+					if (options.where) {
+						// Get all records for the model matching the where condition.
+						var w = options.where;
+						p = wp.db.findAll(model.store, w.index, w.value);
 	
+					} else {
+						// Get all records for the model.
+						p = wp.db.findAll(model.store);
+					};
+				};
+			
+				break;
+				
+			case "create" :
+			case "update" :
+				var data = model.attributes;
+				
+console.log(data);
+				p = wp.db.save(model.store, data);
+	
+				break;
+				
+			case "delete" :
+				p = wp.db.remove(model.store, model.id);
+				
+				break;
+				
+			default :
+				// Not supported.
+				break;
+		};
+	
+		if (!p) return;
+		
+		var success = options.success;
+		var error = options.error;
+		
+		p.success(function(){
+			if (success) {
+				// Backbone callback. 
+				// Updates the model or collection. Expected signature is: function(resp, status, xhr)
+				//success(p.result(), null, null); 
+				success(model, p.result(), options);
+			};
+			model.trigger('sync', model, p.result(), options);
+		});
+		
+		p.fail(function() {
+			if(error) {
+				error(model, p.result(), options);
+			};
+			model.trigger('error', model, p.result(), options);
+		});
+		
+		return p;
+	}
+
+};
+
+/*
+	Migrations for the database. 
+	An array of objects encapsulating a single migration. 
+	Run the migration by by calling up()
+	Migrations may only be called in the context of an onupgradeneeded event.
+*/
+wp.db.migrations = [
+	{
+		up:function(db){
+			
+			var store; 
 			// blogs
 			// key is autoincrementing integer
 			store = db.createObjectStore("blogs", {keyPath:"xmlrpc"});
@@ -322,7 +419,7 @@ wp.db = {
 			// key is an autoincrementing integer
 			store = db.createObjectStore("drafts", {keyPath:"key", autoIncrement:true});
 			store.createIndex("blogkey", "blogkey");
-		};
+			
+		}
 	}
-};
-
+];

@@ -17,13 +17,13 @@
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.api = {
-	currentBlog:null,
+	blog:null,
 	
 	getParams:function(){
 		var params = [
-			this.currentBlog.blog_id,
-			this.currentBlog.username,
-			this.currentBlog.password
+			this.blog.blog_id,
+			this.blog.username,
+			this.blog.password
 		];
 		for (var i = 0; i < arguments.length; i++) {
 			params.push(arguments[i]);
@@ -32,11 +32,11 @@ wp.api = {
 	},
 	
 	getUrl:function() {
-		return this.currentBlog.url;
+		return this.blog.url;
 	}, 
 	
 	setCurrentBlog:function(blog) {
-		this.currentBlog = blog;
+		this.blog = blog;
 		
 		// TODO: blog changed event?
 	}
@@ -44,46 +44,35 @@ wp.api = {
 
 
 /*
-	media: http://codex.wordpress.org/XML-RPC_WordPress_API/Media
-	wp.getMediaItem
-		int blog_id
-	    string username
-	    string password
-	    int attachment_id 
-	    
-	wp.uploadFile
-		int blogid
-	    string username
-	    string password
-	    struct data
-	        string name: Filename.
-	        string type: File MIME type.
-	        string bits: base64-encoded binary data.
-	        bool overwrite: Optional. Overwrite an existing attachment of the same name. (Added in WordPress 2.2) 
-
-		return:	        
-			string id (Added in WordPress 3.4)
-			string file: Filename.
-			string url
-			string type
-
+	user: http://codex.wordpress.org/XML-RPC_WordPress_API/Users
+	wp.getUsersBlogs
+		string username
+	    string password 
 */
-wp.api.getMediaItem = function(attachment_id) {
-	var params = wp.api.getParams(attachment_id);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaItem", "params":params, "url":wp.api.getUrl()})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
+wp.api.getUsersBlogs = function(url, username, password) {
+	var params = [
+		username,
+		password
+	];
+	
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getUsersBlogs", "params":params, "url":url});
 	rpc.execute();
 	return rpc;
 };
+
+
+/*
+	options: http://codex.wordpress.org/XML-RPC_WordPress_API/Options
+	wp.getOptions (featured image supported?)
+		int blog_id
+		string username
+		string password
+		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
+*/
+wp.api.getOptions = function(blog_id) {
+	var params = wp.api.getParams(blog_id);
 	
-wp.api.uploadFile = function(data) {
-	var params = wp.api.getParams(data);		
-	var rpc = wp.XMLRPC.get({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":wp.api.getUrl()})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":wp.api.getUrl()})
 	rpc.execute();
 	return rpc;
 };
@@ -135,7 +124,6 @@ wp.api.uploadFile = function(data) {
 		    string type 
 
 */
-
 wp.api.getPosts = function(offset) {
 	offset = offset || 0;
 
@@ -152,16 +140,13 @@ wp.api.getPosts = function(offset) {
 	];
 	
 	var filter = {
-		'number':20,
+		'number':50,
 		'offset':offset,
 		fields:fields	
 	};
 
 	var params = wp.api.getParams(filter);
 	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPosts", "params":params, "url":wp.api.getUrl()})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
 	rpc.execute();
 	return rpc;
 };
@@ -169,51 +154,48 @@ wp.api.getPosts = function(offset) {
 wp.api.newPost = function(content) {
 	var params = wp.api.getParams(content);
 	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.newPost", "params":params, "url":wp.api.getUrl()})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
 	rpc.execute();
 	return rpc;
 };
 
 
 /*
-user: http://codex.wordpress.org/XML-RPC_WordPress_API/Users
-wp.getUsersBlogs
-	string username
-    string password 
-
-*/
-wp.api.getUsersBlogs = function(url, username, password) {
-	var params = [
-		username,
-		password
-	];
-	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getUsersBlogs", "params":params, "url":url})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
-	rpc.execute();
-	return rpc;
-};
-
-
-/*
-	options: http://codex.wordpress.org/XML-RPC_WordPress_API/Options
-	wp.getOptions (featured image supported?)
+	media: http://codex.wordpress.org/XML-RPC_WordPress_API/Media
+	wp.getMediaItem
 		int blog_id
-		string username
-		string password
-		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
+	    string username
+	    string password
+	    int attachment_id 
+	    
+	wp.uploadFile
+		int blogid
+	    string username
+	    string password
+	    struct data
+	        string name: Filename.
+	        string type: File MIME type.
+	        string bits: base64-encoded binary data.
+	        bool overwrite: Optional. Overwrite an existing attachment of the same name. (Added in WordPress 2.2) 
+
+		return:	        
+			string id (Added in WordPress 3.4)
+			string file: Filename.
+			string url
+			string type
+
 */
-wp.api.getOptions = function(attachment_id) {
+wp.api.getMediaItem = function(attachment_id) {
 	var params = wp.api.getParams(attachment_id);
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaItem", "params":params, "url":wp.api.getUrl()})
+
+	rpc.execute();
+	return rpc;
+};
 	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":wp.api.getUrl()})
-	.success(function(){})
-	.fail(function(){})
-	.always(function(){});
+wp.api.uploadFile = function(data) {
+	var params = wp.api.getParams(data);		
+	var rpc = wp.XMLRPC.get({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":wp.api.getUrl()})
+
 	rpc.execute();
 	return rpc;
 };
