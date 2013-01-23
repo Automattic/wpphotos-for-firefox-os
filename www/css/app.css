@@ -1,6 +1,7 @@
 html {
   width: 100%;
   height: 100%;
+  font-size: 62.5%;
 }
 
 body {
@@ -8,26 +9,27 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color:#111;
+  background-color: #111;
   font-family: helvetica, arial, sans-serif;
   overflow: hidden;
 }
 
 h1 {
-	color:#eee;
-	font-size:17pt;
+	color: #eee;
+	font-size: 2.2rem;
 	font-weight: lighter;
-	letter-spacing: 1pt;
-	line-height: 20pt;
+	letter-spacing: 0.1rem;
+	line-height: 3rem;
+	text-shadow: 0 1px #333;
 }
 
 
 button.wide {
-	display:block;
-	height:40px;
-	width:200px;
-	border:1px;
-	font-size:12pt;
+	display: block;
+	height: 40px;
+	width: 200px;
+	border: 1px;
+	font-size: 1.5rem;
 	border-radius: 3px;
 	border-bottom-color: gray;
 	border-top-color: white;
@@ -38,35 +40,42 @@ button.wide {
 }
 
 button.blue {
-	color:rgb(0,84,134);
+	color: rgb(0,84,134);
 	background-color: rgb(177,227,242);
-
 }
 
 button.orange {
-	color:rgb(81,32,0);
-	background-color:rgb(254,121,0);
+	color: rgb(81,32,0);
+	background-color: rgb(254,121,0);
 	text-shadow: 0px 1px rgb(255,180,116);
 }
 
 input[type='text'], input[type="password"] {
-	display:block;
-	width:250px;
-	height:40px;
+	display: block;
+	width: 250px;
+	height: 40px;
 	padding-left: 10px;
-	margin-bottom:15px;
-	font-size: 12pt;
+	margin-bottom: 15px;
+	font-size: 1.5rem;
 	font-weight: lighter;
 	border-radius: 3px;
-	border:1px;
+	border: 1px;
 	box-shadow: 0px 1px 3px #333333 inset;
+}
+
+textarea {
+	font-family: helvetica, arial, sans-serif;
+	font-size:1.4rem;
+	line-height: 2.5rem;
+	resize: none;
+	padding: 10px;
+	overflow: hidden;
 }
 
 
 
-
 #background,#stage {
-  position:absolute;
+  position: absolute;
   width: 100%;
   height: 100%;
 }
@@ -76,16 +85,16 @@ input[type='text'], input[type="password"] {
 }
 
 .page {
-	position:relative;
-	width:100%;
-	height:100%;
-	overflow:hidden;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
 }
 
 
 section.content {
-	min-height:100%;
-	overflow:auto;
+	min-height: 100%;
+	overflow: auto;
 }
 
 /*
@@ -96,25 +105,29 @@ section.content {
 }
 
 .page-start header img {
-	width:200px;
-	height:60px;
-	display:block;
+	width: 200px;
+	height: 60px;
+	display: block;
 }
 
 .page-start header h1 {
-	margin-top:50px;
+	margin-top: 50px;
 }
 
 .page-start section.controls {
-	margin-top:40px;
+	margin-top: 40px;
 }
 
 section.by-line {
-	margin-top:55px;
-	color:#eee;
+	margin-top: 55px;
+	color: #eee;
 	font-weight: lighter;
-	font-size: 10pt;
-	line-height: 14pt;
+	font-size: 1.2rem;
+	line-height: 1.5rem;
+}
+
+section.by-line div {
+	margin-bottom: 2px;
 }
 
 /*
@@ -127,23 +140,23 @@ section.by-line {
 }
 
 .page-login section.content {
-	padding:0 30px;
+	padding: 0 30px;
 }
 
 /*
 	Posts page
 */
 .page-posts header {
-	position:relative;
+	position: relative;
 	z-index: 10;
 	box-shadow: 0px 1px 5px #333333;
 	padding: 0 20px;
 	height: 60px;
-	background-color:black;
+	background-color: black;
 }
 
 .page-posts section.content {
-	position:relative;
+	position: relative;
 	z-index: 5;
 	background-color: #000;
 }
@@ -153,32 +166,32 @@ section.by-line {
 }
 
 .page-posts .photo {
-	position:relative;
+	position: relative;
 	z-index: 10;
 	
 	display:block;
-	height:212px;
+	height: 212px;
 	
 	box-shadow: 0 1px 5px #333333;
 
 }
 .page-posts .photo img {
-	width:100%;
-	height:100%;
+	width: 100%;
+	height: 100%;
 	box-shadow: 0px 1px 3px #333333 inset;
 }
 
 .page-posts .photo div {
-	position:absolute;
-	bottom:0;
-	right:0;
-	width:66%;
-	max-height:50%;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 66%;
+	max-height: 50%;
 	
 	text-align: right;
 	text-overflow: ellipsis;
 	font-style: italic;
-	color:#fff;
+	color: #fff;
 	text-shadow: 0 1px #333;
 	margin-right: 10px;
 	margin-bottom: 10px;
@@ -186,43 +199,127 @@ section.by-line {
 }
 
 .page-posts .post-body {
-	margin:0 5px 5px 5px;
-	padding:10px;
+	margin: 0 5px 5px 5px;
+	padding: 10px;
 	background-color: rgb(242,242,242);
 	overflow: hidden;
-	color:rgb(34,34,34);
+	color: rgb(34,34,34);
 	text-transform: capitalize;
 }
 
 .post-body span {
-	float:right;
-	color:#ccc;
-	font-size:11pt;
+	float: right;
+	color: #ccc;
+	font-size: 1.3rem;
 	font-weight: lighter;
 }
 
 .post-body h3 {
-	padding:0;
-	margin-top:5px;
+	padding: 0;
+	margin-top: 5px;
 	margin-bottom: 0;
 	font-weight: lighter;
-	font-size:14pt;
+	font-size: 1.8rem;
 }
 
 .page-posts .post-body p {
-	display:block;
-	height:80px;
+	display: block;
+	height: 80px;
 	overflow: hidden;
 	margin-bottom: 0;
-	margin-top:10px;
+	margin-top: 10px;
 
 	text-overflow: ellipsis;
-	line-height: 14.4pt;
+	line-height: 2rem;
 	font-weight: lighter;
-	font-size:10pt;
-	color:#000;
+	font-size: 1.3rem;
+	color: #000;
 	opacity: 0.75;	
 }
 
+
+/*
+	Editor page
+*/
+.page-editor header {
+	position:relative;
+	z-index: 10;
+	box-shadow: 0px 1px 5px #333333;
+	padding: 0 20px;
+	height: 60px;
+	background-color:black;
+}
+
+.page-editor section.content {
+	position:relative;
+	z-index: 5;
+	background-color: #000;
+}
+
+.page-editor .post {
+	padding-bottom: 1px;
+}
+
+.page-editor .photo {
+	position: relative;
+	z-index: 10;
+	
+	display: block;
+	height: 212px;
+	
+	box-shadow: 0 1px 5px #333333;
+}
+
+.page-editor .photo img {
+	width: 100%;
+	height: 100%;
+	box-shadow: 0px 1px 3px #333333 inset;
+}
+
+.page-editor .photo div{
+	position: absolute;
+	bottom: 10px;
+	text-align: center;
+	width: 100%;
+}
+.page-editor .photo input[type="text"] {
+	margin: 0;
+	font-size: 1.4rem;
+	font-weight: lighter;
+	color: #666666;
+	display: inline;
+	opacity: .7;
+	text-align: center;
+}
+
+.page-editor .post-body {
+	margin: 0 5px 5px 5px;
+	background-color: rgb(242,242,242);
+	overflow: hidden;
+	color: rgb(34,34,34);
+	text-transform: capitalize;
+}
+
+.page-editor .post-body textarea  {
+	border-left: 0px solid black;
+	border-right: 0px solid black;
+	border-top: 0px solid black;
+	border-bottom: 1px solid #eee;
+	width: calc(100% - 20px);
+	box-shadow: none;
+	height: 20px;
+	margin: 0;
+	font-weight: lighter;
+	color: #888;
+}
+
+.page-editor .post-body textarea.post-title {
+	font-size: 1.8rem;
+	height:22px;
+}
+
+.page-editor .post-body textarea.post-content {
+	height: 72px;
+}
 
 @import "wp.nav.css";
