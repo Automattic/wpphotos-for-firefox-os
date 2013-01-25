@@ -7,17 +7,17 @@
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.app = {
+	currentBlog:null, // model
+	posts:null,
 	blogs:null,
-	currentBlog:null,
-	nav:null,
 	routes:null,
 	
 	init:function() {
 console.log("wp.app.run");
+		// Clear any location hash so the router doesn't pick it up by mistake. 
 		if(location.hash.length > 0) {
 			location.href = location.href.substr(0,location.href.indexOf(location.hash));
 		};
-
 
 		this.routes = new wp.Routes();
 		Backbone.history.start();
@@ -89,21 +89,19 @@ console.log("wp.app.onfetched");
 		if (!blog) {
 			blog = this.blogs.at(0);
 		}
-		
+
 		this.setCurrentBlog(blog);
-		
+
+		// Route to the blog's posts page :P
+		this.routes.navigate("posts", {trigger:true});
 	},
 	
 	setCurrentBlog:function(blog) {
 console.log("wp.app.setCurretnBlog");
 console.log(blog);
-
-		this.currentBlog = blog;
+		wp.api.setCurrentBlog(blog.attributes);
 		localStorage["blogKey"] = blog.id;
-		
-		// Route to the blog's posts page :P
-		this.routes.navigate("posts", {trigger:true});
-
+		this.currentBlog = blog;
 	}
 
 };

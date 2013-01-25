@@ -134,6 +134,9 @@ wp.promiseQueue = function() {
 				return;
 			};
 		};
+		while(arr.pop() != null) {
+			continue;
+		};
 		p.resolve();
 	};
 	

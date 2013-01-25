@@ -71,7 +71,7 @@ wp.db = {
 		Open a database connection, performing any pending migrations 
 	*/
 	open:function() {
-	
+
 		var p = wp.promise();
 		
 		if (this.idb) {
@@ -80,7 +80,9 @@ wp.db = {
 		};
 
 		try {
-			var success = function(event){
+			var request = window.indexedDB.open(this.name, this.getVersion());
+			
+			request.onsuccess = function(event){
 				console.log("wp.db: opened");
 				
 				var db = event.currentTarget.result;
@@ -95,13 +97,7 @@ wp.db = {
 
 				p.resolve(event.target.result);
 			};
-			
-			var request = window.indexedDB.open(this.name, this.getVersion());
-			request.onerror = function(event) {
-				console.log("wp.db: error opening database. " + event.target.errorCode);
-				p.discard(event.target.error);
-			};
-			
+
 			request.onupgradeneeded = function(event) {
 				console.log("wp.db onupgrade: migrating");
 				var db = event.currentTarget.result; // indexeddb connection reference
@@ -111,10 +107,13 @@ wp.db = {
 					wp.db.migrations[i].up(db);
 				};
 			};
-			
-			request.onsuccess = success;
 
-		} catch(e) {
+			request.onerror = function(event) {
+				console.log("wp.db: error opening database. " + event.target.errorCode);
+				p.discard(event.target.error);
+			};			
+
+		} catch(err) {
 			console.log(err);
 			p.discard(err);
 		};

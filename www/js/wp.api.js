@@ -17,13 +17,13 @@
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.api = {
-	blog:null,
-	
+	blog:null,  // hash: {username:'', password:'', xmlrpc:'', blog_id:''}
 	getParams:function(){
+		var blog = this.blog;
 		var params = [
-			this.blog.blog_id,
-			this.blog.username,
-			this.blog.password
+			blog.blog_id,
+			blog.username,
+			blog.password
 		];
 		for (var i = 0; i < arguments.length; i++) {
 			params.push(arguments[i]);
@@ -32,13 +32,17 @@ wp.api = {
 	},
 	
 	getUrl:function() {
-		return this.blog.url;
-	}, 
+		return this.blog.xmlrpc;
+	},
 	
 	setCurrentBlog:function(blog) {
-		this.blog = blog;
+		// blog.attributes handles backbone objects vs a hash
+		this.blog = blog.attributes || blog;
 		
-		// TODO: blog changed event?
+		// if the object passed specified a url instead of an xmlrpc property, reassign
+		if (!this.blog.xmlrpc && this.blog.url)
+			this.blog.xmlrpc = this.blog.url;
+		
 	}
 };
 
@@ -70,9 +74,9 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
 */
 wp.api.getOptions = function(blog_id) {
-	var params = wp.api.getParams(blog_id);
+	var params = this.getParams(blog_id);
 	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":wp.api.getUrl()})
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":this.getUrl()})
 	rpc.execute();
 	return rpc;
 };
@@ -125,7 +129,7 @@ wp.api.getOptions = function(blog_id) {
 
 */
 wp.api.getPosts = function(offset) {
-	offset = offset || 0;
+	offset = Math.floor(offset) || 0;
 
 // TODO: How can we limit what we get back to just a few fields?
 	var fields = [
@@ -146,14 +150,14 @@ wp.api.getPosts = function(offset) {
 	};
 
 	var params = wp.api.getParams(filter);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPosts", "params":params, "url":wp.api.getUrl()})
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPosts", "params":params, "url":this.getUrl()})
 	rpc.execute();
 	return rpc;
 };
 
 wp.api.newPost = function(content) {
 	var params = wp.api.getParams(content);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.newPost", "params":params, "url":wp.api.getUrl()})
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.newPost", "params":params, "url":this.getUrl()})
 	rpc.execute();
 	return rpc;
 };
@@ -186,7 +190,7 @@ wp.api.newPost = function(content) {
 */
 wp.api.getMediaItem = function(attachment_id) {
 	var params = wp.api.getParams(attachment_id);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaItem", "params":params, "url":wp.api.getUrl()})
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaItem", "params":params, "url":this.getUrl()})
 
 	rpc.execute();
 	return rpc;
@@ -194,7 +198,7 @@ wp.api.getMediaItem = function(attachment_id) {
 	
 wp.api.uploadFile = function(data) {
 	var params = wp.api.getParams(data);		
-	var rpc = wp.XMLRPC.get({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":wp.api.getUrl()})
+	var rpc = wp.XMLRPC.get({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":this.getUrl()})
 
 	rpc.execute();
 	return rpc;

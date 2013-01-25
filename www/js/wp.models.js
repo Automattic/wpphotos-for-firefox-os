@@ -63,16 +63,8 @@ wp.models.Blog = Backbone.Model.extend({
 			self.set("options", result);
 			self.save();
 		});
-	},
-	
-	getApiIdentity:function() {
-		return {
-			blog_id:this.get("blogid"),
-			username:this.get("username"),
-			password:this.get("password"),
-			url:this.get("xmlrpc")
-		};
 	}
+	
 }, {});
 
 wp.models.Blogs = Backbone.Collection.extend({
@@ -94,13 +86,13 @@ wp.models.Blogs = Backbone.Collection.extend({
 					var model = collection.models[idx];
 					model.set("username", username);
 					model.set("password", password);
-					model.save();
+					// Fetching only, don't save. Let the caller decide whether to save.
 				};
 				console.log("resolving");
 				p.resolve(collection);
 				
 			} catch(e) {
-				console.log(e)
+				console.log(e);
 			}
 		});
 		
@@ -111,6 +103,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 
 		return p;
 	}
+	
 });
 
 
@@ -186,14 +179,15 @@ wp.models.Posts = Backbone.Collection.extend({
 	model:wp.models.Post
 }, {
 
-	fetchRemotePosts:function(blog, offset) {
+	fetchRemotePosts:function(offset) {
 	
-		var p = wp.promise(offset);
+		var p = wp.promise();
 		var rpc = wp.api.getPosts(offset)
 		
 		rpc.success(function(){
 			var res = rpc.result;
 			var collection = new wp.models.Posts(res);
+			var blog = wp.app.currentBlog;
 			for( var idx in collection.models) {
 				var model = collection.models[idx];
 				model.set("blogkey", blog.id);

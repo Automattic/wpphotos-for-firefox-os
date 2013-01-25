@@ -1,6 +1,7 @@
 {
   "version": "1.0",
   "name": "WordPress Photos",
+  "type": "privileged",
   "description": "Publish and share photos and galleries to your WordPress blog.",
   "launch_path": "/index.html",
   "icons": {
@@ -18,7 +19,7 @@
 	"network-http": {},
 	"network-tcp": {}
   },
-  "type": "privileged",
+  "default_locale": "en-US",
   "locales": {
     "es": {
       "description": "Publicar y compartir fotos y galerías para tu blog de WordPress.",
@@ -32,6 +33,5 @@
         "url": "http://automattic.com"
       }
     }
-  },
-  "default_locale": "en"
+  }
 }
