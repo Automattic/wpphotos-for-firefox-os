@@ -20,8 +20,6 @@
 
   </head>
   <body>
-  	<a href="templates/start.html">start</a>
-  	<a href="templates/login.html">login</a>
   	<div id="background"></div>
 	<div id="stage"></div>
 	 
@@ -34,7 +32,30 @@
 	 <script src="js/wp.promise.js"></script>
 	 <script src="js/wp.db.js"></script>
 	 <script src="js/wp.models.js"></script>
+	 <script src="js/wp.views.js"></script>
 	 <script src="js/wp.nav.js"></script>
+	 <script src="js/wp.routes.js"></script>
 	 <script src="js/wp.app.js"></script>
+	 
+	 <script>
+	 	var templates = [];
+	 function teest() {
+	 	var template_names = ["editor", "login", "posts", "start"];
+
+	 	var xhrs = [];
+	 	for(var idx in template_names) {
+	 		var url = "templates/" + template_names[idx] + ".html";
+		 	var xhr = wp.XHR.get({"url":url});
+		 	xhr.success(function(res) {
+			 	templates.push(res.response);
+		 	})
+		 	xhr.fail(function(err){
+			 	console.log(err);
+		 	})
+		 	xhrs.push(xhr);
+	 	}
+}
+
+	 </script>
   </body>
 </html>

@@ -1,6 +1,3 @@
-//Wrapped in an outer function to preserve global this
-(function (root) { var amdExports; define([], function () { (function () {
-
 /* Zepto v1.0rc1 - polyfill zepto event detect fx ajax form touch - zeptojs.com/license */
 ;(function(undefined){
   if (String.prototype.trim === undefined) // fix for iOS 3.2
@@ -1356,10 +1353,3 @@ window.Zepto = Zepto
     $.fn[m] = function(callback){ return this.bind(m, callback) }
   })
 })(Zepto)
-
-
-amdExports = Zepto;
-
-}.call(root));
-    return amdExports;
-}); }(this));

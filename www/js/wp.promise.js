@@ -28,13 +28,11 @@
 			
 		Callbacks added after a promise is resolved or discarded are invoked immediately.
 */
-
-'use strict';
                      
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.promise = function() {
-	 
+	'use strict';	 
 	 var _status = "incomplete"; // complete, failed
 	 var _result = null;
 	 var _fail = [];
@@ -116,5 +114,35 @@ wp.promise = function() {
 		}
 	};
 	
+	return p;
+};
+
+
+/*
+	A promise that managed a queue of promises.  
+	The queue is resolved when all promises in the queue have been resolved or revoked. 
+*/
+wp.promiseQueue = function() {
+	
+	var p = wp.promise();
+	var arr = [];
+	
+	function checkQueue() {
+		for (var i = 0; i < arr.length; i++) {
+			var promise = arr[i];
+			if (promise.status() == "incomplete") {
+				return;
+			};
+		};
+		p.resolve();
+	};
+	
+	p.add = function(promise) {
+		promise.always(function() {
+			checkQueue();
+		});
+		arr.push(promise);
+	};
+
 	return p;
 };

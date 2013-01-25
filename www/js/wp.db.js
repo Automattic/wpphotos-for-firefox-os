@@ -348,7 +348,6 @@ wp.db = {
 			case "update" :
 				var data = model.attributes;
 				
-console.log(data);
 				p = wp.db.save(model.store, data);
 	
 				break;

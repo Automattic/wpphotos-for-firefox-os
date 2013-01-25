@@ -89,6 +89,7 @@ wp.XHR.prototype.abort = function() {
 
 
 wp.XHR.prototype.execute = function() {
+	'use strict';
 	var self = this;	
 	var xhr = new XMLHttpRequest({mozSystem: true});
 	this.xhr = xhr;
