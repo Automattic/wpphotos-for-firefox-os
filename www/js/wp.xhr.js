@@ -15,7 +15,7 @@
 			.always(Function);
 		req.execute();
 */
-'use strict';
+"use strict";
 
 if(typeof(wp) == "undefined") { var wp = {} };
 
@@ -28,6 +28,7 @@ wp.XHR = function(options) {
 	this.data 	= options["data"] || null;
 	this.format = options["format"] || null;
 	this.httpMethod = options["httpMethod"] || "GET";
+	this.headers = options["headers"] || false;
 
 	this._callbacks = {
 		success:[],
@@ -88,10 +89,11 @@ wp.XHR.prototype.abort = function() {
 };
 
 
-wp.XHR.prototype.execute = function() {
-	'use strict';
+wp.XHR.prototype.execute = function(headers) {
+	"use strict";
 	var self = this;	
 	var xhr = new XMLHttpRequest({mozSystem: true});
+	
 	this.xhr = xhr;
 	
 	var docallbacks = function(event, arr) {
@@ -103,6 +105,12 @@ wp.XHR.prototype.execute = function() {
 	};
 	
 	xhr.open(this.httpMethod, this.url, true);
+
+	if(this.headers) {
+		for(var key in this.headers) {
+			xhr.setRequestHeader(key, this.headers[key]);
+		};
+	};
 	
 	if(this.format) {
 		xhr.responseType = this.format;

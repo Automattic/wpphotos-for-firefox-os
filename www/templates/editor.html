@@ -16,20 +16,22 @@
 		<div id="template"> 		
 			<div class="page page-editor">
 				<header>
-					<button class="settings"></button>
-					<button class="save" data-l10n-id="control-save">sAve</button>
+					<button class="settings left"></button>
+					<button class="save right" data-l10n-id="control-save">sAve</button>
 				</header>
 				<section class="content">
-	
 					<div class="post">
 						<div class="photo">
-							<img src="../img/bg.jpg"> <!-- wp logo placeholder while image loads or if missing image -->
-							<div><input type="text" data-l10n-id="control-caption" placeholder="tAp to caption" ></div>
+							<img id="photo" src="../img/bg.jpg"> <!-- TODO wp logo placeholder while image loads or if missing image -->
+							<div><input id="caption" type="text" data-l10n-id="control-caption" placeholder="tAp to caption" ></div>
 						</div>
 						<div class="post-body">
-							<textarea class="post-title" type="text" data-l10n-id="control-post-title" placeholder="pOst title (optional)" ></textarea>
-							<textarea class="post-content" type="text" data-l10n-id="control-tap-here" placeholder="tAp here to type post (optional)" rows="3" ></textarea>
-							<textarea type="text" data-l10n-id="control-tags" placeholder="tAgs (comma separated, optional)" ></textarea>
+							<textarea id="post-title" class="post-title" type="text" data-l10n-id="control-post-title" placeholder="pOst title (optional)" ></textarea>
+							<textarea id="post-content" class="post-content" type="text" data-l10n-id="control-tap-here" placeholder="tAp here to type post (optional)" rows="3" ></textarea>
+							<textarea id="post-tags" type="text" data-l10n-id="control-tags" placeholder="tAgs (comma separated, optional)" ></textarea>
+						</div>
+						<div class="canvas-wrapper">
+							<canvas id="photo-canvas"></canvas>
 						</div>
 					</div>
 				</section>

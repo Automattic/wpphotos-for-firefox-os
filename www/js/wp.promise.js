@@ -124,7 +124,7 @@ wp.promise = function() {
 */
 wp.promiseQueue = function() {
 	
-	var p = wp.promise();
+	var q = wp.promise();
 	var arr = [];
 	
 	function checkQueue() {
@@ -137,15 +137,15 @@ wp.promiseQueue = function() {
 		while(arr.pop() != null) {
 			continue;
 		};
-		p.resolve();
+		q.resolve();
 	};
 	
-	p.add = function(promise) {
+	q.add = function(promise) {
 		promise.always(function() {
 			checkQueue();
 		});
 		arr.push(promise);
 	};
 
-	return p;
+	return q;
 };

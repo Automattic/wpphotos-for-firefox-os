@@ -12,7 +12,7 @@
 
 */
 
-'use strict';
+"use strict";
 
 if(typeof(wp) == "undefined") { var wp = {} };
 
@@ -26,6 +26,8 @@ wp.api = {
 			blog.password
 		];
 		for (var i = 0; i < arguments.length; i++) {
+			if (arguments[i] == null)  continue;
+			
 			params.push(arguments[i]);
 		};
 		return params;
@@ -73,8 +75,9 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		string password
 		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
 */
-wp.api.getOptions = function(blog_id) {
-	var params = this.getParams(blog_id);
+wp.api.getOptions = function(options) {
+
+	var params = this.getParams(options);
 	
 	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":this.getUrl()})
 	rpc.execute();
@@ -127,6 +130,21 @@ wp.api.getOptions = function(blog_id) {
 		    int length
 		    string type 
 
+
+	wp.getPostFormats
+		int blog_id
+		string username
+		string password
+		array filter: Optional.
+			bool show-supported 
+	
+	
+	wp.getPostStatusList
+		int blog_id
+		string username
+		string password
+
+
 */
 wp.api.getPosts = function(offset) {
 	offset = Math.floor(offset) || 0;
@@ -162,14 +180,42 @@ wp.api.newPost = function(content) {
 	return rpc;
 };
 
+wp.api.getPost = function(post_id) {
+	var params = wp.api.getParams(post_id);
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPost", "params":params, "url":this.getUrl()})
+	rpc.execute();
+	return rpc;
+};
+
+wp.api.getPostFormats = function(filter) {
+	var params = wp.api.getParams(filter);
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPostFormats", "params":params, "url":this.getUrl()})
+	rpc.execute();
+	return rpc;
+
+};
+
+wp.api.getPostStatusList = function() {
+	var params = wp.api.getParams();
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPostStatusList", "params":params, "url":this.getUrl()})
+	rpc.execute();
+	return rpc;
+};
+
+
+
 
 /*
 	media: http://codex.wordpress.org/XML-RPC_WordPress_API/Media
-	wp.getMediaItem
+	wp.getMediaLibrary
 		int blog_id
 	    string username
 	    string password
-	    int attachment_id 
+	    struct filter
+	    	int number
+	    	int offset
+	    	parent_id
+	    	mime_type
 	    
 	wp.uploadFile
 		int blogid
@@ -188,17 +234,17 @@ wp.api.newPost = function(content) {
 			string type
 
 */
-wp.api.getMediaItem = function(attachment_id) {
-	var params = wp.api.getParams(attachment_id);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaItem", "params":params, "url":this.getUrl()})
-
+wp.api.getMediaLibrary = function(filter) {
+	var params = wp.api.getParams(filter);
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaLibrary", "params":params, "url":this.getUrl()});
+	
 	rpc.execute();
 	return rpc;
-};
+}
 	
 wp.api.uploadFile = function(data) {
 	var params = wp.api.getParams(data);		
-	var rpc = wp.XMLRPC.get({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":this.getUrl()})
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":this.getUrl()});
 
 	rpc.execute();
 	return rpc;

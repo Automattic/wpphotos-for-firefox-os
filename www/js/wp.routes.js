@@ -3,7 +3,7 @@
 
 */
 
-'use strict';
+"use strict";
 
 if(typeof(wp) == "undefined") { var wp = {} };
 

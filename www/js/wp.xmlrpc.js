@@ -20,13 +20,15 @@
 		rpc.execute();
 	
 */
-'use strict';
+"use strict";
 
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.XMLRPC = function(options) {
 	var self = this;
 	var options = options || {};
+	options.headers  = options.headers || {};
+	options.headers["Content-Type"] = "text/xml";
 	
 	this.result = null;
 	this.fault = false;	
@@ -40,6 +42,12 @@ wp.XMLRPC = function(options) {
 	});	
 };
 
+wp.XMLRPC.Base64 = function(value, encode) {
+	if (encode) {
+		value = btoa(value);
+	};
+	this.value = value;
+};
 
 // Add a callback for success.
 wp.XMLRPC.prototype.success = function(f) {
@@ -119,6 +127,10 @@ wp.XMLRPC.prototype.formatParam = function(param){
 	// String
 	if (typeof(param) == "string") {
 		return "<string><![CDATA[" + param + "]]></string>\n";
+	};
+	
+	if (param instanceof wp.XMLRPC.Base64) {
+		return "<base64>" + param.value + "</base64>";	
 	};
 	
 	// Functions

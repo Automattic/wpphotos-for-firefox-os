@@ -3,7 +3,7 @@
 	wp.db
 	Responsible for managing and interacting with the app's IndexedDB. IndexedDB references are at
 		http://www.w3.org/TR/IndexedDB/
-		https://developer.mozilla.org/en-US/docs/IndexedDB	
+		https://developer.mozilla.org/en-US/docs/IndexedDB
 
 	Database operations are performed asynchronously. Methods that work with data return a wp.promise that is
 	fulfilled when the operation is complete.
@@ -20,7 +20,7 @@
 
 */
 
-'use strict';
+"use strict";
                      
 if(typeof(wp) == "undefined") { var wp = {} };
 
@@ -196,7 +196,7 @@ wp.db = {
 		Get all the objects for the specified model, optionally filtered by the specified index and key value.
 	*/
 	findAll:function(model, index, key) {
-		console.log("wp.db.findAll: " + arguments);
+		console.log("wp.db.findAll: ", model, index, key);
 		var p = wp.promise();
 		
 		try {
@@ -231,11 +231,15 @@ wp.db = {
 			req.onsuccess = function(event){
 				var cursor = event.target.result;
 				if(cursor) {
-					arr.push(cursor.value);
+					// WTF: If we push cursor.value its keys can be undefined!? Closure issue maybe? 
+					// Make a copy and push it instead.
+					var obj = {};
+					for(var key in cursor.value){
+						obj[key] = cursor.value[key];
+					};
+					arr.push(obj);
 					cursor.continue();
-					
 				} else {
-					console.log(arr);
 					p.resolve(arr);
 				};
 			};
@@ -256,7 +260,7 @@ wp.db = {
 		Saves an object to the object store for the specified model. 
 	*/
 	save:function(model, object) {
-		console.log("wp.db.save: " + arguments);
+		console.log("wp.db.save: ", model, object);
 		var p = wp.promise();
 		
 		try {
@@ -264,18 +268,19 @@ wp.db = {
 			var req = store.put(object);
 	
 			req.onsuccess = function(event) {
-				console.log("wp.db.save: " + event.target.result);
+				console.log("wp.db.save: onsuccess ", event.target.result);
 				p.resolve(event.target.result);
 			};
 			
 			req.onerror = function(event) {
-				console.log("wp.db.save: " + event.target.error);
+				console.log("wp.db.save: onerror ", event.target.error);
 				p.discard(event.target.error);
 			};
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
 		};
+		
 		return p;
 	},
 	
@@ -319,7 +324,7 @@ wp.db = {
 	sync:function(method, model, options) {
 		options = options || {};
 		var p = null;
-		
+
 		switch(method) {
 			
 			case "read" :
@@ -334,7 +339,7 @@ wp.db = {
 						// Get all records for the model matching the where condition.
 						var w = options.where;
 						p = wp.db.findAll(model.store, w.index, w.value);
-	
+
 					} else {
 						// Get all records for the model.
 						p = wp.db.findAll(model.store);
@@ -368,9 +373,7 @@ wp.db = {
 		
 		p.success(function(){
 			if (success) {
-				// Backbone callback. 
-				// Updates the model or collection. Expected signature is: function(resp, status, xhr)
-				//success(p.result(), null, null); 
+				// Backbone callback.
 				success(model, p.result(), options);
 			};
 			model.trigger('sync', model, p.result(), options);
@@ -404,20 +407,10 @@ wp.db.migrations = [
 			store = db.createObjectStore("blogs", {keyPath:"xmlrpc"});
 			
 			// posts
-			store = db.createObjectStore("posts", {keyPath:"post_link"});
+			store = db.createObjectStore("posts", {keyPath:"id", autoIncrement:true});
 			store.createIndex("blogkey", "blogkey");
-			
-			// media
-			// key can be either a link for uploaded media, or an int for local media belonging to a draft
-			store = db.createObjectStore("media", {keyPath:"link", autoIncrement:true});
-			store.createIndex("postkey", "postkey");
-			store.createIndex("blogkey", "blogkey");
-			
-			// local drafts
-			// key is an autoincrementing integer
-			store = db.createObjectStore("drafts", {keyPath:"key", autoIncrement:true});
-			store.createIndex("blogkey", "blogkey");
-			
+			store.createIndex("link", "link", {unique:true} );
+
 		}
 	}
 ];

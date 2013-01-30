@@ -10,14 +10,25 @@
   <body>
 	<div id="background"></div>
   	<div id="stage">
-		<div id="template">
+		<div>
 			<div class="page page-posts">
 				<header>
-					<button class="settings left"></button>
+					<button class="settings"></button>
 					<button class="logo" data-l10n-id="title-photos">pHotos</button>
-					<button class="add right"></button>
+					<button class="add"></button>
 				</header>
-				<section class="content">
+				<section class="content" id="template">
+					<div class="post">
+						<div class="photo">
+							<img src=""> <!-- wp logo placeholder while image loads or if missing image -->
+							<div class="caption">caption</div>
+						</div>
+						<div class="post-body">
+							<span>1d</span>
+							<h3>title</h3>
+							<p>body</p>
+						</div>
+					</div>
 				</section>
 			</div>
 		</div>
