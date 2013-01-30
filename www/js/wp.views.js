@@ -110,7 +110,7 @@ wp.views.StartPage = wp.views.Page.extend({
 	},
 	
 	showCreate:function() {
-		alert("TODO");
+		window.open("https://signup.wordpress.com/signup/", "", "resizable=yes,scrollbars=yes,status=yes");
 	}
 	
 });
@@ -346,7 +346,33 @@ wp.views.EditorPage = Backbone.View.extend({
 		this.render();
 		
 		// This is where we need to launch the mozactivity for the picker.
-		
+		try {
+			if(typeof(MozActivity) == "undefined") {
+				return;
+			}
+		} catch(e) {
+			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
+			// just pass thru.
+			return; 
+		}
+
+		var self = this;
+		// Start a Moz picker activity for the user to select an image to upload
+		// either from the gallery or the camera. 
+		var activity = new MozActivity({
+			name: 'pick',
+			data: {
+				type: 'image/jpeg'
+			}
+		});
+				
+		activity.onsuccess = function() {
+			self.onImageSelected(activity.result.blob);
+		};
+
+		activity.onerror = function() {
+			//TODO
+		};
 	},
 	
 	events:{
@@ -360,6 +386,11 @@ wp.views.EditorPage = Backbone.View.extend({
 		this.$el.html( template );
 
 		return this;
+	},
+	
+	onImageSelected:function(blob) {
+		var img = this.el.querySelector("#photo");
+		img.src = URL.createObjectURL(blob);
 	},
 	
 	saveDraft:function() {
