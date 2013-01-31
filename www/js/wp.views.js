@@ -63,6 +63,8 @@ wp.views = {
 
 
 wp.views.Page = Backbone.View.extend({
+	className:"page",
+	
 	events: {
 		"click button.back" : "goBack"
 	},
