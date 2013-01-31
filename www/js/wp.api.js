@@ -49,6 +49,29 @@ wp.api = {
 };
 
 
+wp.api.build = function(method, params, url) {
+	
+	var p = wp.promise();
+	
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":method, "params":params, "url":url});
+	rpc.success(function(xhr, event){
+		
+		if(rpc.fault) {
+			p.discard(rpc.result);
+			
+		} else {
+			p.resolve(rpc.result);		
+		};
+		
+	});
+	rpc.fail(function(xhr, event){
+		p.discard({"status":xhr.status(), "event":event});
+	});
+	rpc.execute();
+	return p;
+}
+
+
 /*
 	user: http://codex.wordpress.org/XML-RPC_WordPress_API/Users
 	wp.getUsersBlogs
@@ -60,10 +83,7 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		username,
 		password
 	];
-	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getUsersBlogs", "params":params, "url":url});
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getUsersBlogs ", params, url);
 };
 
 
@@ -76,13 +96,10 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
 */
 wp.api.getOptions = function(options) {
-
 	var params = this.getParams(options);
-	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getOptions", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getOptions", params, this.getUrl());
 };
+
 
 /*
 	posts: http://codex.wordpress.org/XML-RPC_WordPress_API/Posts
@@ -149,60 +166,35 @@ wp.api.getOptions = function(options) {
 wp.api.getPosts = function(offset) {
 	offset = Math.floor(offset) || 0;
 
-// TODO: How can we limit what we get back to just a few fields?
-	var fields = [
-		"guid",
-		"link", 
-		"post_date",
-		"post_date_gmt",
-		"post_id",
-		"post_name",
-		"post_thumbnail",
-		"post_title"
-	];
-	
 	var filter = {
 		'number':50,
-		'offset':offset,
-		fields:fields	
+		'offset':offset
 	};
 
 	var params = wp.api.getParams(filter);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPosts", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getPosts", params, this.getUrl());
 };
 
 wp.api.newPost = function(content) {
-	var params = wp.api.getParams(content);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.newPost", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	var params = wp.api.getParams(content);	
+	return wp.api.build("wp.newPost", params, this.getUrl());
 };
 
 wp.api.getPost = function(post_id) {
 	var params = wp.api.getParams(post_id);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPost", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getPost", params, this.getUrl());
 };
 
 wp.api.getPostFormats = function(filter) {
 	var params = wp.api.getParams(filter);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPostFormats", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getPostFormats", params, this.getUrl());
 
 };
 
 wp.api.getPostStatusList = function() {
 	var params = wp.api.getParams();
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getPostStatusList", "params":params, "url":this.getUrl()})
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getPostStatusList", params, this.getUrl());
 };
-
-
 
 
 /*
@@ -236,16 +228,10 @@ wp.api.getPostStatusList = function() {
 */
 wp.api.getMediaLibrary = function(filter) {
 	var params = wp.api.getParams(filter);
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.getMediaLibrary", "params":params, "url":this.getUrl()});
-	
-	rpc.execute();
-	return rpc;
+	return wp.api.build("wp.getMediaLibrary", params, this.getUrl());
 }
 	
 wp.api.uploadFile = function(data) {
-	var params = wp.api.getParams(data);		
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":"wp.uploadFile", "params":params, "url":this.getUrl()});
-
-	rpc.execute();
-	return rpc;
+	var params = wp.api.getParams(data);
+	return wp.api.build("wp.uploadFile", params, this.getUrl());
 };

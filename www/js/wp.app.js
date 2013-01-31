@@ -21,6 +21,7 @@ wp.app = {
 		this.routes = new wp.Routes();
 		Backbone.history.start();
 
+		// Queue up some our async tasks and load blogs when they are done.
 		var q = wp.promiseQueue();
 		q.success(function() {
 			wp.app.loadBlogs();	
@@ -64,8 +65,8 @@ wp.app = {
 	
 	
 	blogsLoaded:function() {
-console.log("blogs loaded");
-try {
+		console.log("blogs loaded");
+
 		if (this.blogs.length == 0) {
 			// no blogs, show start/signup
 			// wp.routes....
@@ -87,12 +88,9 @@ try {
 		};
 		this.setCurrentBlog(blog);
 
-		// Route to the blog's posts page :P
+		// Route to the blog's posts page
 		this.routes.navigate("posts", {trigger:true});
 		
-} catch(e){
-	console.log(e);
-}
 	},
 	
 	setCurrentBlog:function(blog) {

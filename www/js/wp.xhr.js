@@ -88,6 +88,9 @@ wp.XHR.prototype.abort = function() {
 	};
 };
 
+wp.XHR.prototype.status = function() {
+	return this.xhr.status;	
+};
 
 wp.XHR.prototype.execute = function(headers) {
 	"use strict";

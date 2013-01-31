@@ -69,10 +69,13 @@ wp.models.Blog = Backbone.Model.extend({
 			"large_size_h"
 		];
 
-		var rpc = wp.api.getOptions(ops);
-		rpc.success(function(result) {
-			self.set("options", result);
+		var p = wp.api.getOptions(ops);
+		p.success(function() {
+			self.set("options", p.result());
 			self.save();
+		});
+		p.fail(function(){
+			// TODO
 		});
 	},
 	
@@ -93,10 +96,10 @@ wp.models.Blogs = Backbone.Collection.extend({
 
 		var rpc = wp.api.getUsersBlogs(url, username, password)
 		
-		rpc.success(function(result){
+		rpc.success(function(){
 			console.log("blogs rpc success");
 			try {
-				var res = rpc.result;
+				var res = rpc.result();
 				var collection = new wp.models.Blogs(res);
 				for(var idx in collection.models){
 					var model = collection.models[idx];
@@ -113,6 +116,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 		});
 		
 		rpc.fail(function(){
+			// TODO:
 			console.log("failed");
 			p.discard();
 		});
@@ -234,8 +238,8 @@ wp.models.Post = Backbone.Model.extend({
 		};
 		var rpc = wp.api.getMediaLibrary(filter);
 		
-		rpc.success(function(res){
-			var res = rpc.result;
+		rpc.success(function(){
+			var res = rpc.result();
 			
 			if ((res instanceof Array) && (res.length > 0)){
 				self.set({media:res[0]});
@@ -259,21 +263,20 @@ wp.models.Post = Backbone.Model.extend({
 		
 		var rpc = wp.api.newPost(content);
 		
-		rpc.success(function(xhr) {
-			var post_id = rpc.result;
+		rpc.success(function() {
+			var post_id = rpc.result();
 		
 			// Since we only get the post ID back from a save make a request
 			// for the full post content.
 			var rpc = wp.api.getPost(post_id);
-			rpc.success(function(xhr) {
-				
-				var res = rpc.result;
+			rpc.success(function() {
+
+				var res = rpc.result();
 				self.set(res); // update all attributes.
 				self.save();
 				
 				p.resolve(self);
 			});
-
 		});
 		
 		return p;
@@ -283,7 +286,6 @@ wp.models.Post = Backbone.Model.extend({
 		return this.get("pending_photo") || this.get("post_thumbnail") || this.get("photo");
 	},
 	
-	
 	uploadPhoto:function() {
 		var pending_photo = this.get("pending_photo");
 		if(!pending_photo) return;
@@ -291,33 +293,33 @@ wp.models.Post = Backbone.Model.extend({
 		var filename = "image_"+ Date.now() + ".png";
 		
 		var data = pending_photo.link.slice(",")[1]; // Grab the data portion of the dataurl.
-		var bits = new wp.XMLRPC.Base64(data, false);
+		var bits = new wp.XMLRPC.Base64(data, false); // Its already base64 encoded, so just wrap it, don't encode again.
 
 		var data = {
 			"name":filename,
 			"type":"image/png",
 			"bits":bits
 		};
-		
+
 		var self = this;
 		var rpc = wp.api.uploadFile(data);
-		rpc.success(function(res) {
-			console.log(rpc.result);
-			
-			var result = rpc.result; // Should be the attachment
-			var url = result.url;
-			var content = this.get("post_content");
+		rpc.success(function() {
 
+			var result = rpc.result(); // the attachment
+			var url = result.url;
+
+			var content = self.get("post_content");
 			content = "<a href=" + url + "><img src=" + url + " /></a><br><br>" + content;
 			
-			// Update content adn clear the pending_photo.
+			// Update content and clear the pending_photo.
 			self.set({post_content:content, pending_photo:null});
-			var p = this.save();
-			p.success(function() {
+			var p1 = self.save();
+			p1.success(function() {
 				self.saveRemote();
 			});
-			
-			return p;
+			p1.fail(function(){
+				//TODO
+			});
 		});
 		rpc.fail(function(res) {
 			console.log("Upload Failed");
@@ -327,12 +329,7 @@ wp.models.Post = Backbone.Model.extend({
 	}
 
 }, {
-	GUID:function() {
-	    var S4 = function () {
-	        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-	    };
-	    return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
-	}
+
 });
 
 wp.models.Posts = Backbone.Collection.extend({
@@ -354,9 +351,9 @@ wp.models.Posts = Backbone.Collection.extend({
 			p.resolve(collection);
 		});
 		
-		var rpc = wp.api.getPosts(offset)
-		rpc.success(function(result){
-			var res = rpc.result;
+		var rpc = wp.api.getPosts(offset);
+		rpc.success(function(){
+			var res = rpc.result();
 			
 			collection = new wp.models.Posts(res, {parse:true});
 
@@ -380,11 +377,11 @@ wp.models.Posts = Backbone.Collection.extend({
 					};
 
 					p.success(function() {
-
+						//TODO
 					});
 
 					p.fail(function(){
-
+						//TODO
 					});
 
 					// Add the save promise to the promise queue.
@@ -396,6 +393,7 @@ wp.models.Posts = Backbone.Collection.extend({
 		});
 		
 		rpc.fail(function(){
+			// TODO
 			p.discard();
 		});
 
