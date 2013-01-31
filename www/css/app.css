@@ -212,7 +212,7 @@ section.by-line div {
 .page-login .scroll {
 	overflow-y:scroll;
 	height:100%;
-	width:calc(100% + 15px);
+
 }
 
 
@@ -239,7 +239,7 @@ section.by-line div {
 	background-color: #000;
 	height:100%;
 	overflow:scroll;
-	width:calc(100% + 15px);
+
 }
 
 .page-posts .post {

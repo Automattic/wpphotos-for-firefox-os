@@ -436,9 +436,10 @@ wp.views.EditorPage = Backbone.View.extend({
 		};
 	},
 	
-	events:{
-		"click button.save": "saveDraft"
-	},
+	events:_.extend({
+		"click button.save": "saveDraft",
+		"click button.back": "goBack"
+	}),
 	
 	render:function() {
 		var template = wp.views.templates[this.template_name].text;
@@ -488,6 +489,12 @@ wp.views.EditorPage = Backbone.View.extend({
 		});
 
 		wp.app.posts.add(post, {at:0});
+	},
+	
+	goBack:function() {
+		if(confirm("Cancel editing?")) {
+			window.history.back();
+		};
 	}
 	
 });
