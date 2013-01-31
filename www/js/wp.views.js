@@ -70,7 +70,7 @@ wp.views.Page = Backbone.View.extend({
 	},
 	
 	goBack:function() {
-		window.history.back();
+		wp.app.routes.navigate("goBack", {trigger:true});
 	}
 
 });
@@ -485,7 +485,7 @@ wp.views.EditorPage = Backbone.View.extend({
 		var p = post.setPendingPhoto(image_data, caption.value); // saves		
 
 		p.success(function(){
-			wp.routes.navigate("posts");
+			wp.app.routes.navigate("posts");
 		});
 
 		wp.app.posts.add(post, {at:0});
@@ -493,7 +493,7 @@ wp.views.EditorPage = Backbone.View.extend({
 	
 	goBack:function() {
 		if(confirm("Cancel editing?")) {
-			window.history.back();
+			wp.app.routes.navigate("goBack", {trigger:true});
 		};
 	}
 	

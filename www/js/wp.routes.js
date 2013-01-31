@@ -21,7 +21,8 @@ wp.Routes = Backbone.Router.extend({
 		"about":"about",
 		"settings":"settings",
 		"posts":"posts",
-		"editor":"editor"
+		"editor":"editor",
+		"goBack":"goBack"
 	},
 	
 	start:function() {
@@ -60,6 +61,10 @@ console.log("wp.routes.editor");
 		this.setView(view);
 	},
 	
+	goBack:function() {
+		window.history.go(-2);
+	},
+	
 	setView:function(view) {
 console.log("wp.routes.setView");
 		while (stage.firstChild) {
@@ -67,6 +72,6 @@ console.log("wp.routes.setView");
 		};
 		
 		this.stage.appendChild(view.el);
-	}
+	}	
 
 });
