@@ -190,7 +190,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 */
 wp.models.Post = Backbone.Model.extend({
 	store:"posts",
-	idAttribute:"post_link",
+	idAttribute:"id",
 	defaults:{
 		blogkey:"",
 		post_id:"",
@@ -215,16 +215,6 @@ wp.models.Post = Backbone.Model.extend({
 		};
 		
 		return attr;
-	},
-	
-	setPendingPhoto:function(data, caption) {
-		caption = caption || null;
-		var obj = {
-			data:data,
-			caption:caption
-		};
-		this.set({'pending_photo':obj});
-		return this.save();
 	},
 	
 	fetchRemoteMedia:function() {
@@ -286,13 +276,48 @@ wp.models.Post = Backbone.Model.extend({
 		return this.get("pending_photo") || this.get("post_thumbnail") || this.get("photo");
 	},
 	
-	uploadPhoto:function() {
+	uploadAndSave:function(image_data, caption) {
+		// Save the image data and caption to be uploaded.
+		if(image_data) {
+			caption = caption || null;
+			var obj = {
+				link:image_data,
+				caption:caption
+			};
+			this.set({'pending_photo':obj});
+			
+		} else if (!this.get("pending_photo")) {
+			// No photo provided, and no photo pending. 
+			// Badness. 
+			return;
+		};
+	
+		// The trick here is we need to return one promise to the caller, but each of the 
+		// network and db actions return their own promise. A queue won't work since they happen 
+		// in order, not concurrently. 
+		// We'll keep a reference to the upload promise, and the individual promises will pass through
+		// their results as progress objects:  Uploading..., Saving..., Syncing..., Success...
+		// If something goes wrong, we can call uploadAndSave_Retry to try to intelligently pick up where
+		// we left off. 
+		this.upload_promise = wp.promise();
+		
+		this.uploadAndSave_Upload();
+		
+		return this.upload_promise;
+	},
+		
+	uploadAndSave_Upload:function() {
+
+		// Upload the image.
+		// Progress is reported to the upload_promise.
+		
+		this.upload_promise.notify({"status":"uploading", "percent":1});
+		
 		var pending_photo = this.get("pending_photo");
 		if(!pending_photo) return;
 		
 		var filename = "image_"+ Date.now() + ".png";
-		
-		var data = pending_photo.link.slice(",")[1]; // Grab the data portion of the dataurl.
+		var data = pending_photo.link.split(",")[1]; // Grab the data portion of the dataurl.
 		var bits = new wp.XMLRPC.Base64(data, false); // Its already base64 encoded, so just wrap it, don't encode again.
 
 		var data = {
@@ -302,34 +327,169 @@ wp.models.Post = Backbone.Model.extend({
 		};
 
 		var self = this;
-		var rpc = wp.api.uploadFile(data);
-		rpc.success(function() {
-
-			var result = rpc.result(); // the attachment
+		var p = wp.api.uploadFile(data);
+		p.success(function() {
+			// Update content here while we have it just in case there is 
+			// an error saving to the db in the next step. 
+			var result = p.result();
 			var url = result.url;
-
-			var content = self.get("post_content");
-			content = "<a href=" + url + "><img src=" + url + " /></a><br><br>" + content;
 			
+			var html = "";
+			var img = '<a href="' + url + '"><img src="' + url + '" /></a>';
+			if (pending_photo.caption) {
+				html = '[caption id="attachment_"' + result.id + ' align="alignnone" width="300"]';
+				html += "<a href=" + url + "><img src=" + url + " /></a>";
+				html += pending_photo.caption;
+				html += '[/caption]';				
+			} else {
+				html = img + "<br /><br />";
+			};
+			
+			var content = self.get("post_content");
+			content = html + content;
+
 			// Update content and clear the pending_photo.
 			self.set({post_content:content, pending_photo:null});
-			var p1 = self.save();
-			p1.success(function() {
-				self.saveRemote();
-			});
-			p1.fail(function(){
-				//TODO
-			});
+
+			self.uploadAndSave_SaveContent(p.result());
 		});
-		rpc.fail(function(res) {
+		p.progress(function(obj){
+			// obj will be a progress event. 
+			var percent = Math.floor((obj.loaded / obj.total) * 100);
+			self.upload_promise.notify({"status":"uploading", "percent":percent});
+		});
+		p.fail(function() {
 			console.log("Upload Failed");
+			self.upload_promise.discard();
+			self.upload_promise = null;
 		});
 		
-		return rpc;
+	},
+	
+	uploadAndSave_SaveContent:function() {
+		this.upload_promise.notify({"status":"saving"});
+
+		var self = this;
+		if (!this.get("link")) {
+			this.set({"link":wp.models.Post.GUID()});
+		};
+		var p = this.save();
+		p.success(function() {
+			self.uploadAndSave_SaveRemote();
+		});
+		p.fail(function(){
+			self.upload_promise.discard();
+			self.upload_promise = null;
+		});
+	},
+	
+	uploadAndSave_SaveRemote:function() {
+		this.upload_promise.notify({"status":"saving"});
+		
+		var self = this;
+		var content = this.toJSON();
+		delete content.blogkey; // No need to send up blogkey.
+		
+		var p = wp.api.newPost(content);
+		p.success(function() {
+			var post_id = p.result();
+			self.uploadAndSave_SyncRemote(post_id);
+		});
+		p.fail(function() {
+			self.upload_promise.discard();
+			self.upload_promise = null;
+		});
+		
+		return p;
+	},
+	
+	uploadAndSave_SyncRemote:function(post_id) {
+		this.upload_promise.notify({"status":"syncing"});
+		
+		// Since we only get the post ID back from a save make a request
+		// for the full post content. Its cannonical after all. 
+		// We'll use a promise queue to also get the updated media library
+		// which should have the media item for the photo we uploaded.
+
+		var self = this;
+		var q = wp.promiseQueue();
+
+		// Fetch the cannonical post.
+		var p = wp.api.getPost(post_id);
+		p.success(function() {
+			self.set(p.result()); // update all attributes.
+		});
+		p.fail(function() {
+			self.upload_promise.discard();
+			self.upload_promise = null;
+		});
+		
+		q.add(p);
+
+		// Fetch the media library
+		var filter = {
+			number:1,
+			parent_id:this.get("post_id"),			
+			mime_type:"image/*"
+		};
+		var p1 = wp.api.getMediaLibrary(filter);
+		p1.success(function(){
+			var res = p1.result();
+			if ((res instanceof Array) && (res.length > 0)){
+				self.set({photo:res[0]});
+			};
+		});
+		
+		q.add(p1);
+		
+		
+		q.success(function(){
+			self.uploadAndSave_SaveFinal();
+		});
+		q.fail(function(){
+			self.upload_promise.discard();
+			self.upload_promise = null;
+		});
+	},
+	
+	uploadAndSave_SaveFinal:function() {
+		var self = this;
+		var p = this.save();
+		p.success(function() {
+			// Yay! Finally all done!
+			this.upload_promise.notify({"status":"success"});
+			self.upload_promise.resolve(self);
+		});
+		p.fail(function() {
+			//OMG ORLY?
+			self.upload_promise.discard();
+			self.upload_promise = null;			
+		});
+	},
+	
+	
+	// Call try again if there was a problem after the image was uploaded. 
+	uploadAndSave_Retry:function() {
+		// Try try again...
+		this.upload_promise = wp.promise();
+		if(this.get("pending_photo")) {
+			// start from the beginning.
+			this.uploadAndSave_Upload();
+		} else {
+			// The photo uploaded, pick up with saving content.
+			this.uploadAndSave_SaveContent();	
+		};
+		return self.upload_promise();
 	}
+	
 
 }, {
-
+	GUID:function() {
+		var S4 = function () {
+			return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+		};
+		return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+	}
 });
 
 wp.models.Posts = Backbone.Collection.extend({

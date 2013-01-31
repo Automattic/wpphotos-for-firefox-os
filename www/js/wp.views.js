@@ -473,7 +473,6 @@ wp.views.EditorPage = Backbone.View.extend({
 		ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
 	
 		var image_data = canvas.toDataURL("image/png", 0.80);
-		image_data = image_data.split(',')[1]; // trim off the data url prefix
 		
 		var attrs = {
 			"blogkey":wp.app.currentBlog.id,
@@ -482,13 +481,12 @@ wp.views.EditorPage = Backbone.View.extend({
 		};
 
 		var post = new wp.models.Post(attrs);
-		var p = post.setPendingPhoto(image_data, caption.value); // saves		
-
-		p.success(function(){
-			wp.app.routes.navigate("posts");
-		});
-
 		wp.app.posts.add(post, {at:0});
+		
+		var p = post.uploadAndSave(image_data, caption.value); // saves
+		wp.app.routes.navigate("posts");
+
+		return p;
 	},
 	
 	goBack:function() {

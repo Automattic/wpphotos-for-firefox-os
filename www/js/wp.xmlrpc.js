@@ -70,6 +70,13 @@ wp.XMLRPC.prototype.always = function(f) {
 };
 
 
+// Add a callback that will trigger on a progress event
+wp.XMLRPC.prototype.progress = function(f) {
+	this.xhr.progress(f);
+	return this;
+};
+
+
 // Execute the request.
 wp.XMLRPC.prototype.execute = function() {
 	this.xhr.data = this.formatRequestBody();

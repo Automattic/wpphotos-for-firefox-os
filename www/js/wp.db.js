@@ -269,7 +269,9 @@ wp.db = {
 	
 			req.onsuccess = function(event) {
 				console.log("wp.db.save: onsuccess ", event.target.result);
-				p.resolve(event.target.result);
+				// When saving an id is returned. The model won't know how to parse that so
+				// resolve as an object we can check and update the model accordingly.
+				p.resolve({"__id__":event.target.result});
 			};
 			
 			req.onerror = function(event) {
@@ -374,7 +376,16 @@ wp.db = {
 		p.success(function(){
 			if (success) {
 				// Backbone callback.
-				success(model, p.result(), options);
+				var result = p.result();
+				
+				// If this was a save we need to format the id in 
+				// a way the model can parse.
+				if(typeof(result["__id__"]) != "undefined"){
+					var obj = {};
+					obj[model.idAttribute] = result["__id__"];
+					result = obj;
+				};
+				success(model, obj, options);
 			};
 			model.trigger('sync', model, p.result(), options);
 		});

@@ -33,7 +33,8 @@ wp.XHR = function(options) {
 	this._callbacks = {
 		success:[],
 		fail:[],
-		always:[]
+		always:[],
+		progress:[]
 	};
 };
 
@@ -75,6 +76,12 @@ wp.XHR.prototype.always = function(f) {
 };
 
 
+wp.XHR.prototype.progress = function(f) {
+	this._callbacks.progress.push(f);
+	return this;
+};
+
+
 wp.XHR.prototype.clean = function() {
 	this._callbacks.success = [];
 	this._callbacks.fail = [];
@@ -95,7 +102,7 @@ wp.XHR.prototype.status = function() {
 wp.XHR.prototype.execute = function(headers) {
 	"use strict";
 	var self = this;	
-	var xhr = new XMLHttpRequest({mozSystem: true});
+	var xhr = new XMLHttpRequest({mozSystem: true, mozAnon:true});
 	
 	this.xhr = xhr;
 	
@@ -118,6 +125,12 @@ wp.XHR.prototype.execute = function(headers) {
 	if(this.format) {
 		xhr.responseType = this.format;
 	};
+	
+	
+	xhr.addEventListener("progress", function(event){
+		docallbacks(event, self._callbacks.progress);
+	}, false);
+	
 	
 	xhr.onabort = function(event) {
 		// TODO: Do we need to call always?

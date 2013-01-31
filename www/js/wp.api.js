@@ -67,6 +67,9 @@ wp.api.build = function(method, params, url) {
 	rpc.fail(function(xhr, event){
 		p.discard({"status":xhr.status(), "event":event});
 	});
+	rpc.progress(function(xhr, event){
+		p.notify(event);
+	});
 	rpc.execute();
 	return p;
 }

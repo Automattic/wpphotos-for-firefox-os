@@ -38,15 +38,16 @@ wp.promise = function() {
 	 var _fail = [];
 	 var _success = [];
 	 var _always = [];
+	 var _progress = [];
 	 
-	 var perform = function(arr) {
+	 var perform = function(arr, obj) {
 		if (!arr) return;
 		
 		for (var i = 0; i < arr.length; i++) {
 			var func = arr[i];
 			if (func instanceof Function) {
 				try {
-					func();
+					func(obj);
 				} catch(ignore) {};
 				
 			};
@@ -88,7 +89,14 @@ wp.promise = function() {
 		 	};
 			return p;
 		},
-		 
+		
+		progress:function(f) {
+		 	if (f instanceof Function) {
+			 	_progress.push(f);
+		 	};
+			return p;
+		},
+		
 		status:function() {
 			return _status;
 		},
@@ -111,6 +119,10 @@ wp.promise = function() {
 		 	
 		 	perform(_success);
 		 	perform(_always);
+		},
+		
+		notify:function(obj) {
+			perform(_progress, obj);
 		}
 	};
 	
