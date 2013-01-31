@@ -83,7 +83,7 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		username,
 		password
 	];
-	return wp.api.build("wp.getUsersBlogs ", params, url);
+	return wp.api.build("wp.getUsersBlogs", params, url);
 };
 
 

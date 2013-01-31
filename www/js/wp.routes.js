@@ -13,13 +13,13 @@ wp.Routes = Backbone.Router.extend({
 
 	initialize:function(options) {
 		this.stage = document.getElementById("stage");
-console.log("wp.routes.initalize");
-console.log(this.stage);
 	},
 		
 	routes: {
 		"start":"start",
 		"login":"login",
+		"about":"about",
+		"settings":"settings",
 		"posts":"posts",
 		"editor":"editor"
 	},
@@ -33,6 +33,18 @@ console.log("wp.routes.start");
 	login:function() {
 console.log("wp.routes.login");
 		var view = new wp.views.LoginPage();
+		this.setView(view);
+	},
+	
+	about:function() {
+console.log("wp.routes.about");
+		var view = new wp.views.AboutPage();
+		this.setView(view);
+	},
+
+	settings:function() {
+console.log("wp.routes.settings");
+		var view = new wp.views.SettingsPage();
 		this.setView(view);
 	},
 	

@@ -76,6 +76,32 @@ wp.views.Page = Backbone.View.extend({
 });
 
 
+
+/* 
+
+
+*/
+wp.views.SettingsPage = wp.views.Page.extend({
+	template_name:"settings",
+	
+	initialize:function() {
+		this.render();
+	},
+
+	
+	render:function() {
+		
+		var template = wp.views.templates[this.template_name].text;
+
+
+		this.$el.html( template );
+
+		return this;
+	}	
+});
+wp.views.registerTemplate("settings");
+
+
 /* 
 
 
@@ -87,10 +113,10 @@ wp.views.StartPage = wp.views.Page.extend({
 		this.render();
 	},
 
-	events: {
+	events: _.extend({
 		"click button.login": "showLogin",
 		"click button.createblog": "showCreate"
-	},
+	}),
 	
 	render:function() {
 		// Underscore's templates flag a CSP warning due to their use of "new Function". 
@@ -126,9 +152,9 @@ wp.views.registerTemplate("start");
 wp.views.LoginPage = wp.views.Page.extend({
 	template_name:"login",
 	
-	events: {
+	events: _.extend({
 		"click button.login": "performLogin"
-	},
+	}),
 	
 	initialize:function() {
 		this.render();
@@ -201,15 +227,42 @@ wp.views.registerTemplate("login");
 
 
 */
+wp.views.AboutPage = wp.views.Page.extend({
+	template_name:"about",
+	
+	initialize:function() {
+		this.render();
+	},
+
+	
+	render:function() {
+		
+		var template = wp.views.templates[this.template_name].text;
+
+
+		this.$el.html( template );
+
+		return this;
+	}	
+});
+wp.views.registerTemplate("about");
+
+
+/* 
+
+
+*/
 wp.views.PostsPage = wp.views.Page.extend({
 	template_name:"posts",
 	
-	events:{
-		"click button.add": "showEditor"
-	},
+	events:_.extend({
+		"click button.add": "showEditor",
+		"click button.settings": "showSettings",
+		"click button.logo" : "showAbout"
+	}),
 	
 	initialize:function() {
-try {
+
 		var self = this;
 		
 		var blog = wp.app.currentBlog;
@@ -222,9 +275,7 @@ try {
 		p.fail(function(err) {
 			alert(err);
 		});
-} catch(e) {
-	console.log(e);
-}
+
 	},
 	
 	render:function() {
@@ -246,6 +297,14 @@ try {
 	
 	showEditor:function() {
 		wp.app.routes.navigate("editor", {trigger:true}); 
+	},
+
+	showAbout:function() {
+		wp.app.routes.navigate("about", {trigger:true}); 
+	},
+	
+	showSettings:function() {
+		wp.app.routes.navigate("settings", {trigger:true}); 
 	}
 	
 });
@@ -257,9 +316,9 @@ wp.views.Post = Backbone.View.extend({
 	
 	template_name:"post",
 	
-	events: {
+	events: _.extend({
 		"click div.post": "showPost"
-	},
+	}),
 	
 	initialize:function(options) {
 		this.model = options.model;
