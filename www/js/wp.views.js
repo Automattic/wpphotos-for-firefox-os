@@ -153,7 +153,8 @@ wp.views.LoginPage = wp.views.Page.extend({
 	template_name:"login",
 	
 	events: _.extend({
-		"click button.login": "performLogin"
+		"click button.login": "performLogin",
+		"click button.back": "goBack"
 	}),
 	
 	initialize:function() {
@@ -176,9 +177,13 @@ wp.views.LoginPage = wp.views.Page.extend({
 		var url = $("#url").val();
 		
 		// Validation
-		
+		if (!this.validateField(username) || !this.validateField(password) || !this.validateField(url)) {
+			alert('Please fill out all fields');
+			return;
+		}
 		
 		// if all's good. 
+		url = this.normalizeUrl(url);
 		
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
 		
@@ -191,6 +196,26 @@ wp.views.LoginPage = wp.views.Page.extend({
 		});
 		
 		
+	},
+	
+	validateField: function(field) {
+		if (field != '')
+			return true;
+		
+		return false;
+	},
+	
+	normalizeUrl:function(url) { 
+		// make sure it has a protocol
+		if(!(/^https?:\/\//i).test(url)) url = 'http://' + url;
+		// add the /xmlrpc.php
+		if (!(/\/xmlrpc\.php$/i).test(url)) url = url + '/xmlrpc.php';
+		
+		return url;
+	},
+	
+	goBack:function() {
+		wp.app.routes.navigate("goBack", {trigger:true});
 	},
 	
 	// Result is a blogs collection
