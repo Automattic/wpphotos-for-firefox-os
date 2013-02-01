@@ -211,13 +211,12 @@ wp.views.LoginPage = wp.views.Page.extend({
 		wp.app.setCurrentBlog(blog);
 
 		var p = wp.models.Posts.fetchRemotePosts();
-		p.success(function(result) {
-			wp.app.posts = result;
+		p.success(function() {
+			wp.app.posts = p.result();
 		});
 		p.always(function() {
 			wp.app.routes.navigate("posts", {trigger:true});
 		});
-
 	}
 });
 wp.views.registerTemplate("login");

@@ -190,7 +190,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 */
 wp.models.Post = Backbone.Model.extend({
 	store:"posts",
-	idAttribute:"id",
+	idAttribute:"link",
 	defaults:{
 		blogkey:"",
 		post_id:"",
@@ -219,58 +219,34 @@ wp.models.Post = Backbone.Model.extend({
 	
 	fetchRemoteMedia:function() {
 		var self = this;
-		
+
 		var p = wp.promise();
 		var filter = {
 			number:1,
 			parent_id:this.get("post_id"),			
 			mime_type:"image/*"
 		};
-		var rpc = wp.api.getMediaLibrary(filter);
 		
+		var rpc = wp.api.getMediaLibrary(filter);
 		rpc.success(function(){
 			var res = rpc.result();
 			
 			if ((res instanceof Array) && (res.length > 0)){
 				self.set({media:res[0]});
 			};
-			
+
 			var p1 = self.save();
 			p1.success(function(){
 				p.resolve();
 			});
-		});
-		
-		return p;
-	},
-	
-	saveRemote:function(){
-		var self = this;
-		var content = this.toJSON();
-		delete content.blogkey; // No need to send up blogkey.
-		
-		var p = wp.promise();
-		
-		var rpc = wp.api.newPost(content);
-		
-		rpc.success(function() {
-			var post_id = rpc.result();
-		
-			// Since we only get the post ID back from a save make a request
-			// for the full post content.
-			var rpc = wp.api.getPost(post_id);
-			rpc.success(function() {
-
-				var res = rpc.result();
-				self.set(res); // update all attributes.
-				self.save();
-				
-				p.resolve(self);
+			p1.fail(function() {
+				console.log("Failed saving from remote media")
 			});
 		});
-		
+
 		return p;
 	},
+
 	
 	image:function(){
 		return this.get("pending_photo") || this.get("post_thumbnail") || this.get("photo");
@@ -351,7 +327,7 @@ wp.models.Post = Backbone.Model.extend({
 			// Update content and clear the pending_photo.
 			self.set({post_content:content, pending_photo:null});
 
-			self.uploadAndSave_SaveContent(p.result());
+			self.uploadAndSave_SaveRemote();
 		});
 		p.progress(function(obj){
 			// obj will be a progress event. 
@@ -364,23 +340,6 @@ wp.models.Post = Backbone.Model.extend({
 			self.upload_promise = null;
 		});
 		
-	},
-	
-	uploadAndSave_SaveContent:function() {
-		this.upload_promise.notify({"status":"saving"});
-
-		var self = this;
-		if (!this.get("link")) {
-			this.set({"link":wp.models.Post.GUID()});
-		};
-		var p = this.save();
-		p.success(function() {
-			self.uploadAndSave_SaveRemote();
-		});
-		p.fail(function(){
-			self.upload_promise.discard();
-			self.upload_promise = null;
-		});
 	},
 	
 	uploadAndSave_SaveRemote:function() {
@@ -410,7 +369,6 @@ wp.models.Post = Backbone.Model.extend({
 		// for the full post content. Its cannonical after all. 
 		// We'll use a promise queue to also get the updated media library
 		// which should have the media item for the photo we uploaded.
-
 		var self = this;
 		var q = wp.promiseQueue();
 
@@ -442,7 +400,6 @@ wp.models.Post = Backbone.Model.extend({
 		
 		q.add(p1);
 		
-		
 		q.success(function(){
 			self.uploadAndSave_SaveFinal();
 		});
@@ -458,7 +415,7 @@ wp.models.Post = Backbone.Model.extend({
 		p.success(function() {
 			// Yay! Finally all done!
 			this.upload_promise.notify({"status":"success"});
-			self.upload_promise.resolve(self);
+			self.upload_promise.resolve(self);	
 		});
 		p.fail(function() {
 			//OMG ORLY?
@@ -474,7 +431,7 @@ wp.models.Post = Backbone.Model.extend({
 		this.upload_promise = wp.promise();
 		if(this.get("pending_photo")) {
 			// start from the beginning.
-			this.uploadAndSave_Upload();
+			this.uploadAndSave_SaveRemote();
 		} else {
 			// The photo uploaded, pick up with saving content.
 			this.uploadAndSave_SaveContent();	
@@ -510,7 +467,7 @@ wp.models.Posts = Backbone.Collection.extend({
 		q.success(function(){
 			p.resolve(collection);
 		});
-		
+
 		var rpc = wp.api.getPosts(offset);
 		rpc.success(function(){
 			var res = rpc.result();

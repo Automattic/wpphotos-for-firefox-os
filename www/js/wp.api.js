@@ -71,6 +71,7 @@ wp.api.build = function(method, params, url) {
 		p.notify(event);
 	});
 	rpc.execute();
+	
 	return p;
 }
 
