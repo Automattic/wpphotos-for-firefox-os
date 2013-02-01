@@ -97,6 +97,13 @@ wp.app = {
 		wp.api.setCurrentBlog(blog.attributes);
 		localStorage.blogKey = blog.id;
 		this.currentBlog = blog;
+	},
+	
+	isNetworkAvailable:function(){
+		try {
+			return (window.navigator.mozConnection.bandwidth > 0);
+		} catch(ignore) {};
+		return false;
 	}
 
 };
