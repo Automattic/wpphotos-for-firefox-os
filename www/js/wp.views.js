@@ -238,7 +238,6 @@ wp.views.AboutPage = wp.views.Page.extend({
 		
 		var template = wp.views.templates[this.template_name].text;
 
-
 		this.$el.html( template );
 
 		return this;
@@ -261,29 +260,38 @@ wp.views.PostsPage = wp.views.Page.extend({
 	}),
 	
 	initialize:function() {
-
+try {
 		var self = this;
-		
+
 		var blog = wp.app.currentBlog;
 		var posts = new wp.models.Posts();
+		this.posts = posts;
+		wp.app.posts = posts;
+				
+		this.listenTo(posts, "add", this.render);
+		this.listenTo(posts, "remove", this.render);
+		
 		var p = posts.fetch({where:{index:"blogkey", value:blog.id}});
-		p.success(function(result) {
-			wp.app.posts = posts;
+		p.success(function() {
 			self.render();
 		});
 		p.fail(function(err) {
 			alert(err);
 		});
-
+		
+}catch(e){
+	console.log(e)
+}
 	},
 	
 	render:function() {
+try {
 		var template = wp.views.templates[this.template_name].text;
 
 		// update the dom.
 		this.$el.html( template );
 				
-		var collection = wp.app.posts;
+		var collection = this.posts;
 
 		var content = this.el.querySelector(".content");
 		for(var i = 0; i < collection.length; i++) {
@@ -291,6 +299,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 			var view = new wp.views.Post({model:post});
 			content.appendChild(view.el);
 		};
+} catch(e) {
+	console.log(e);
+}
+console.log("rendered posts list", this);
 		return this;
 	},
 	
@@ -316,16 +328,22 @@ wp.views.Post = Backbone.View.extend({
 	template_name:"post",
 	
 	events: _.extend({
-		"click div.post": "showPost"
+		"click div.post-body": "showPost",
+		"click div.photo": "showPost",
+		"click button.upload": "upload"
 	}),
 	
 	initialize:function(options) {
 		this.model = options.model;
+		
+		// TODO: Listen to progress events on the model. 
+		this.listenTo(this.model, 'progress', this.render);
+		
 		this.render();
 	},
 	
-	render:function() {
-
+	render:function(progress) {
+try {
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text; 
 
@@ -359,8 +377,45 @@ wp.views.Post = Backbone.View.extend({
 		str = str + " [...]";
 		content.innerHTML = str;
 
+		//if local draft
+		var mask = div.querySelector(".upload-mask");
+		if (this.model.isLocalDraft()) {
+			$(mask).removeClass("hidden");
+			
+			var progressDiv = post.querySelector(".progress");
+			var buttonDiv = post.querySelector("div.upload");
+			
+			if(this.model.isSyncing()) {
+				// If we're syncing show progress.
+				$(buttonDiv).addClass("hidden");
+				$(progressDiv).removeClass("hidden");
+				
+				if(progress) {				
+					el = post.querySelector(".progress span");
+					
+					var progressStr = progress.status;
+					if(progress.percent ) {
+						progressStr += (" " + progress.percent + "%");
+					}
+					el.innerHTML = progressStr;
+				};
+				
+			} else {
+				// Else show the upload button.
+				$(progressDiv).addClass("hidden");
+				$(buttonDiv).removeClass("hidden");
+			};
+			
+		} else {
+			$(mask).addClass("hidden");
+		};
+		
 		this.$el.html(div.querySelector("div"));
+} catch(e) {
+	console.log(e);
+}
 
+console.log("rendered post", this);
 		return this;
 	},
 	
@@ -389,6 +444,10 @@ wp.views.Post = Backbone.View.extend({
 		
 		// If this is published ...
 		window.open(this.model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
+	},
+	
+	upload:function() {
+		
 	}
 	
 });
@@ -436,7 +495,7 @@ wp.views.EditorPage = Backbone.View.extend({
 	},
 	
 	events:_.extend({
-		"click button.save": "saveDraft",
+		"click button.save": "save",
 		"click button.back": "goBack"
 	}),
 	
@@ -454,9 +513,7 @@ wp.views.EditorPage = Backbone.View.extend({
 		img.src = URL.createObjectURL(blob);
 	},
 	
-	saveDraft:function() {
-		// save a local draft, store the image data on the post. 
-		// We'll try to upload the image when we have connectivity.
+	save:function() {
 		
 		var img = this.el.querySelector("#photo");
 		var caption = this.el.querySelector("#caption");
@@ -482,15 +539,22 @@ wp.views.EditorPage = Backbone.View.extend({
 		var post = new wp.models.Post(attrs);
 		wp.app.posts.add(post, {at:0});
 		
-		var p = post.uploadAndSave(image_data, caption.value); // saves
-		wp.app.routes.navigate("posts");
+		// Save a local draft or sync to the server?
+		var p;
+		if(confirm("Tap OK to publish now, or cancel to publish later")) {
+			p = post.save();
+		} else {
+			p = post.uploadAndSave(image_data, caption.value); // saves
 
+		};
+		
+		wp.app.routes.navigate("posts", {trigger:true});
 		return p;
 	},
 	
 	goBack:function() {
 		if(confirm("Cancel editing?")) {
-			wp.app.routes.navigate("goBack", {trigger:true});
+			wp.app.routes.navigate("posts");
 		};
 	}
 	

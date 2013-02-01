@@ -191,6 +191,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 wp.models.Post = Backbone.Model.extend({
 	store:"posts",
 	idAttribute:"link",
+	_syncing:false,
 	defaults:{
 		blogkey:"",
 		post_id:"",
@@ -204,8 +205,26 @@ wp.models.Post = Backbone.Model.extend({
 		pending_photo:null // image data awaiting upload
 	},
 	
+	intialize:function(){
+		var obj = {};
+		if (this.get("link") == "") {
+			obj.link = wp.models.Post.GUID();
+		};
+		if(this.get("post_date") == null) {
+			obj.post_date = new Date();
+		};
+		if (this.get("blogkey") == "") {
+			obj.blogkey = wp.app.currentBlog.id;
+		};
+		this.set(obj);
+	},
+	
 	isLocalDraft:function(){
 		return (this.get("link").indexOf("http") == -1);
+	},
+	
+	isSyncing:function() {
+		return this._isSyncing;	
 	},
 	
 	parse:function(attr) {
@@ -246,7 +265,6 @@ wp.models.Post = Backbone.Model.extend({
 
 		return p;
 	},
-
 	
 	image:function(){
 		return this.get("pending_photo") || this.get("post_thumbnail") || this.get("photo");
@@ -261,33 +279,28 @@ wp.models.Post = Backbone.Model.extend({
 				caption:caption
 			};
 			this.set({'pending_photo':obj});
-			
-		} else if (!this.get("pending_photo")) {
-			// No photo provided, and no photo pending. 
-			// Badness. 
-			return;
-		};
-	
-		// The trick here is we need to return one promise to the caller, but each of the 
-		// network and db actions return their own promise. A queue won't work since they happen 
-		// in order, not concurrently. 
-		// We'll keep a reference to the upload promise, and the individual promises will pass through
-		// their results as progress objects:  Uploading..., Saving..., Syncing..., Success...
-		// If something goes wrong, we can call uploadAndSave_Retry to try to intelligently pick up where
-		// we left off. 
+		}; 
+
+		this._isSyncing = true;
+
 		this.upload_promise = wp.promise();
 		
-		this.uploadAndSave_Upload();
-		
+		if (!this.get("pending_photo")) {
+			// No photo provided, and no photo pending, so save. 
+			this.uploadAndSave_SaveRemote();
+		} else {
+			this.uploadAndSave_Upload();		
+		};
+	
 		return this.upload_promise;
 	},
 		
 	uploadAndSave_Upload:function() {
 
 		// Upload the image.
-		// Progress is reported to the upload_promise.
-		
-		this.upload_promise.notify({"status":"uploading", "percent":1});
+		// And report progress
+		this.trigger("progress", {"status":"uploading", "percent":1});
+//		this.upload_promise.notify({"status":"uploading", "percent":1});
 		
 		var pending_photo = this.get("pending_photo");
 		if(!pending_photo) return;
@@ -332,18 +345,19 @@ wp.models.Post = Backbone.Model.extend({
 		p.progress(function(obj){
 			// obj will be a progress event. 
 			var percent = Math.floor((obj.loaded / obj.total) * 100);
-			self.upload_promise.notify({"status":"uploading", "percent":percent});
+			self.trigger("progress", {"status":"uploading", "percent":percent});
+//			self.upload_promise.notify({"status":"uploading", "percent":percent});
 		});
 		p.fail(function() {
 			console.log("Upload Failed");
-			self.upload_promise.discard();
-			self.upload_promise = null;
+			self.onErrorSaving();
 		});
 		
 	},
 	
 	uploadAndSave_SaveRemote:function() {
-		this.upload_promise.notify({"status":"saving"});
+//		this.upload_promise.notify({"status":"saving"});
+		this.trigger("progress", {"status":"saving"});
 		
 		var self = this;
 		var content = this.toJSON();
@@ -355,16 +369,16 @@ wp.models.Post = Backbone.Model.extend({
 			self.uploadAndSave_SyncRemote(post_id);
 		});
 		p.fail(function() {
-			self.upload_promise.discard();
-			self.upload_promise = null;
+			self.onErrorSaving();
 		});
 		
 		return p;
 	},
 	
 	uploadAndSave_SyncRemote:function(post_id) {
-		this.upload_promise.notify({"status":"syncing"});
-		
+//		this.upload_promise.notify({"status":"syncing"});
+		this.trigger("progress", {"status":"syncing"});
+
 		// Since we only get the post ID back from a save make a request
 		// for the full post content. Its cannonical after all. 
 		// We'll use a promise queue to also get the updated media library
@@ -375,11 +389,14 @@ wp.models.Post = Backbone.Model.extend({
 		// Fetch the cannonical post.
 		var p = wp.api.getPost(post_id);
 		p.success(function() {
-			self.set(p.result()); // update all attributes.
+			// Save the guid used as a temporary link. We'll want to delete this record after we save.
+			self.temp_link = self.get("link");
+			
+			// update all attributes.
+			self.set(p.result()); 
 		});
 		p.fail(function() {
-			self.upload_promise.discard();
-			self.upload_promise = null;
+			self.onErrorSaving();
 		});
 		
 		q.add(p);
@@ -404,8 +421,7 @@ wp.models.Post = Backbone.Model.extend({
 			self.uploadAndSave_SaveFinal();
 		});
 		q.fail(function(){
-			self.upload_promise.discard();
-			self.upload_promise = null;
+			self.onErrorSaving();
 		});
 	},
 	
@@ -414,29 +430,32 @@ wp.models.Post = Backbone.Model.extend({
 		var p = this.save();
 		p.success(function() {
 			// Yay! Finally all done!
-			this.upload_promise.notify({"status":"success"});
-			self.upload_promise.resolve(self);	
+			
+			// this.upload_promise.notify({"status":"success"});
+			self.trigger("progress", {"status":"success"});
+			self.upload_promise.resolve(self);
+			
+			// We saved after updating the link.  Since this is also the db key, 
+			// we need to remove the old record.
+			if (self.temp_link) {
+				if(self.temp_link != self.get("link")) {
+					wp.db.remove(self.store, self.temp_link);
+				};
+			};
 		});
 		p.fail(function() {
 			//OMG ORLY?
-			self.upload_promise.discard();
-			self.upload_promise = null;			
+			self.onErrorSaving();
 		});
 	},
 	
-	
-	// Call try again if there was a problem after the image was uploaded. 
-	uploadAndSave_Retry:function() {
-		// Try try again...
-		this.upload_promise = wp.promise();
-		if(this.get("pending_photo")) {
-			// start from the beginning.
-			this.uploadAndSave_SaveRemote();
-		} else {
-			// The photo uploaded, pick up with saving content.
-			this.uploadAndSave_SaveContent();	
-		};
-		return self.upload_promise();
+	onErrorSaving:function(){
+
+		this._isSyncing = false;
+		this.trigger("progress", {"status":"failed"});
+		this.upload_promise.discard();
+		this.upload_promise = null;	
+
 	}
 	
 

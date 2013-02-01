@@ -324,7 +324,6 @@ section.by-line div {
 
 
 .post .upload-mask {
-	display:none;
 	position:absolute;
 	top:0;
 	left:0;
@@ -345,9 +344,6 @@ section.by-line div {
 	vertical-align:middle;	
 }
 
-.post div.upload {
-	display:none;
-}
 
 .post button.upload {
 	height:100px;
@@ -365,7 +361,6 @@ section.by-line div {
 }
 
 .uploader div.progress {
-	display:none;
 	text-align: center;
 	color:#fff;	
 
@@ -465,4 +460,6 @@ section.by-line div {
 }
 
 
-@import "wp.nav.css";
+.hidden {
+	display:none !important;
+}
