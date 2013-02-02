@@ -6,6 +6,28 @@
 
 "use strict";
 
+/*
+	Convenience method for localizing strings in code. Pass the identifier of the sting in the localization files.
+	Supports variables in strings. 
+	For more info on webL10n localization see: https://github.com/fabi1cazenave/webL10n
+	
+	Usage:
+		Assuming localization strings are defined as follows:
+			welcome = Welcome!
+			welcome-user = Welcome {{user}}!
+
+		Then you can translate them like so: 
+			_s('welcome');
+			_s('welcome-user', { user: "John" });
+*/
+var _s = function() {
+	if(navigator && navigator.mozL10n) {
+		return navigator.mozL10n.get.apply(null, arguments);
+	};
+	return text;
+};
+
+
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.views = {
@@ -184,7 +206,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 		
 		// Validation
 		if (!this.validateField(username) || !this.validateField(password) || !this.validateField(url)) {
-			alert('Please fill out all fields');
+			alert(_s('prompt-fill-out-all-fields'));
 			return;
 		}
 		
@@ -353,7 +375,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 					var $el = $(el);
 					if ($el.hasClass("loading")){
 						$el.removeClass("loading");
-						$el.find("scroll-refresh-label").text("Pull down to refresh...");
+						$el.find("scroll-refresh-label").text(_s("control-pull-to-refresh"));
 					};
 				},
 				onScrollMove: function () {
@@ -361,11 +383,11 @@ wp.views.PostsPage = wp.views.Page.extend({
 					var $el = $(el);
 					if (this.y > 5 && !$el.hasClass("flip")){
 						$el.addClass("flip");
-						$el.find(".scroll-refresh-label").text("Release to refresh...");
+						$el.find(".scroll-refresh-label").text(_s("control-release-to-refresh"));
 						this.minScrollY = 0;
 					} else if (this.y < 5 && $el.hasClass("flip")) {
 						$el.removeClass("flip");
-						$el.find(".scroll-refresh-label").text("Pull down to refresh...");
+						$el.find(".scroll-refresh-label").text(_s("control-pull-to-refresh"));
 						this.minScrollY = -refreshOffset;
 					};
 				},
@@ -375,7 +397,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 					if ($el.hasClass("flip")) {
 						$el.removeClass("flip");
 						$el.addClass("loading");
-						$el.find(".scroll-refresh-label").text("Loading...");
+						$el.find(".scroll-refresh-label").text(_("control-loading"));
 						self.sync();
 					};
 				}
@@ -590,7 +612,7 @@ wp.views.Post = Backbone.View.extend({
 	},
 	
 	discard:function(){
-		if(confirm("Are you sure you want to discard this post?")){
+		if(confirm(_s("prompt-discard-post?"))){
 			this.model.destroy();
 		};
 	},
@@ -650,6 +672,9 @@ wp.views.EditorPage = wp.views.Page.extend({
 		// update the dom
 
 		this.$el.html( template );
+		
+		// webLi0n doesn't pickup placeholders on inputs so we need to do this manually
+		this.el.querySelector("#caption").placeholder = _s("control-caption");
 
 		return this;
 	},
@@ -686,7 +711,7 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		// Save a local draft or sync to the server?
 		var p;
-		if(confirm("Tap OK to publish now, or cancel to publish later")) {
+		if(confirm(_s("prompt-publish-now"))) {
 			p = post.uploadAndSave(image_data, caption.value); // saves
 		} else {
 			post.setPendingPhoto(image_data, caption.value);
@@ -699,7 +724,7 @@ wp.views.EditorPage = wp.views.Page.extend({
 	},
 	
 	goBack:function() {
-		if(confirm("Cancel editing?")) {
+		if(confirm(_s("prompt-cancel-editing?"))) {
 			wp.app.routes.navigate("posts", {trigger:true});
 		};
 	}
