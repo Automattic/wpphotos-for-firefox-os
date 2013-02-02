@@ -227,7 +227,7 @@ section.by-line div {
 */
 .page-posts header {
 	position: relative;
-	z-index: 10;
+	z-index: 110;
 	box-shadow: 0px 1px 5px #333333;
 	padding: 0 20px;
 	height: 60px;
@@ -237,6 +237,7 @@ section.by-line div {
 .page-posts .scroll {
 	overflow:hidden;
 	height:calc(100% - 45px);
+	background-color: #000;
 }
 
 .page-posts section.content {
@@ -328,7 +329,6 @@ section.by-line div {
 	opacity: 0.75;	
 }
 
-
 .post .upload-mask {
 	position:absolute;
 	top:0;
@@ -385,6 +385,14 @@ section.by-line div {
 	font-size:2rem;
 }
 
+
+.pull-down {
+	color: #888;
+    font-size: 1.2rem;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+}
 
 /*
 	Editor page

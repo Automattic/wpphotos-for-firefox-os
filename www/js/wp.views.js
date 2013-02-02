@@ -278,6 +278,9 @@ wp.views.registerTemplate("about");
 wp.views.PostsPage = wp.views.Page.extend({
 	template_name:"posts",
 	
+	rendered:false,
+	dragging:false,
+	
 	events:_.extend({
 		"click button.add": "showEditor",
 		"click button.settings": "showSettings",
@@ -288,11 +291,11 @@ wp.views.PostsPage = wp.views.Page.extend({
 
 		var self = this;
 
-		var fetch = false;
+		var refresh = false;
 		var blog = wp.app.currentBlog;
 		var posts;
 		if (!wp.app.posts) {
-			fetch = true;
+			refresh = true;
 			posts = new wp.models.Posts();
 			wp.app.posts = posts;
 		} else {
@@ -300,41 +303,129 @@ wp.views.PostsPage = wp.views.Page.extend({
 		};
 		
 		this.posts = posts;
-				
+
+		this.listenTo(posts, "selected", this.viewPost);
 		this.listenTo(posts, "add", this.render);
 		this.listenTo(posts, "remove", this.render);
 		
-		if(fetch) {
-			var p = posts.fetch({where:{index:"blogkey", value:blog.id}});
-			p.success(function() {
-				self.render();
-			});
-			p.fail(function(err) {
-				alert(err);
-			});
+		if(refresh) {
+			this.refresh();
 		} else {
 			this.render();
-		}
+		};
 
 	},
 	
 	render:function() {
 
-		var template = wp.views.templates[this.template_name].text;
+		if(!this.rendered) {
+			this.rendered = true;
 
-		// update the dom.
-		this.$el.html( template );
-				
+			var template = wp.views.templates[this.template_name].text;
+	
+			// update the dom.
+			this.$el.html( template );
+						
+			var el = this.$el.find(".scroll")[0];
+
+			var self = this;
+			var refreshOffset = 50;
+			this.iscroll = new iScroll(el, {
+				useTransition: true,
+				hScroll:false,
+				vScroll:true,
+				hScrollbar:false,
+				vScrollbar:true,
+				fixedScrollbar:true,
+				fadeScrollbar:false,
+				hideScrollbar:false,
+				bounce:true,
+				momentum:true,
+				lockDirection:true,
+				topOffset: refreshOffset,
+				onRefresh: function () {
+					var $el = $(el);
+					if ($el.hasClass("loading")){
+						$el.removeClass("loading");
+						$el.find("scroll-refresh-label").text("Pull down to refresh...");
+					};
+				},
+				onScrollMove: function () {
+					self.dragging = true;
+					var $el = $(el);
+					if (this.y > 5 && !$el.hasClass("flip")){
+						$el.addClass("flip");
+						$el.find(".scroll-refresh-label").text("Release to refresh...");
+						this.minScrollY = 0;
+					} else if (this.y < 5 && $el.hasClass("flip")) {
+						$el.removeClass("flip");
+						$el.find(".scroll-refresh-label").text("Pull down to refresh...");
+						this.minScrollY = -refreshOffset;
+					};
+				},
+				onScrollEnd: function () {
+					self.dragging = false;
+					var $el = $(el);
+					if ($el.hasClass("flip")) {
+						$el.removeClass("flip");
+						$el.addClass("loading");
+						$el.find(".scroll-refresh-label").text("Loading...");
+						self.sync();
+					};
+				}
+			});
+		}
+
 		var collection = this.posts;
-
 		var content = this.el.querySelector(".content");
+		content.innerHTML = "";
 		for(var i = 0; i < collection.length; i++) {
 			var post = collection.at(i);
 			var view = new wp.views.Post({model:post});
 			content.appendChild(view.el);
 		};
-
+	
 		return this;
+	},
+	
+	viewPost:function(model) {
+	
+		// if we are not pulling to refresh...
+		if(this.dragging) return;
+		
+		window.open(model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
+		
+	},
+	
+	refresh:function() {
+
+		var self = this;
+		var p = this.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
+		p.success(function() {
+			self.render();
+		});
+		p.fail(function(err) {
+			// TODO:
+			alert(err);
+		});
+		
+		return p;
+	},
+	
+	sync:function() {
+
+		var self = this;
+		var p = wp.models.Posts.fetchRemotePosts();
+		p.success(function() {
+			self.iscroll.refresh();
+			self.refresh();
+		});
+		p.fail(function() {
+			// TODO:
+			self.iscroll.refresh();
+		});
+
+		return p;
 	},
 	
 	showEditor:function() {
@@ -368,7 +459,6 @@ wp.views.Post = Backbone.View.extend({
 	initialize:function(options) {
 		this.model = options.model;
 		
-		// TODO: Listen to progress events on the model. 
 		this.listenTo(this.model, 'progress', this.render);
 		this.listenTo(this.model, "destroy", this.remove);
 		this.render();
@@ -481,12 +571,12 @@ wp.views.Post = Backbone.View.extend({
 		return d;
 	},
 	
-	showPost:function() {
-		// If this is a draft ...
-		
-		
-		// If this is published ...
-		window.open(this.model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
+	showPost:function(evt) {
+		if (this.model.isLocalDraft()) {
+			return;
+		};
+		this.model.collection.trigger("selected", this.model);
+//		window.open(this.model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
 	},
 	
 	upload:function() {
