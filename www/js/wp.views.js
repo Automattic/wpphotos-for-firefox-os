@@ -40,6 +40,12 @@ wp.views = {
 
 				var div = document.createElement("div");
 				div.innerHTML = res.response;
+				
+				// Translate locales.
+				if(navigator && navigator.mozL10n) {
+					navigator.mozL10n.translate(div);
+				};
+				
 				var text = div.querySelector("#template").innerHTML;
 				wp.views.templates[key].text = text
 				isFinishedLoading();

@@ -17,7 +17,8 @@
   "permissions": {
 	"systemXHR": {},
 	"network-http": {},
-	"network-tcp": {}
+	"network-tcp": {},
+	"settings":{ "access": "readonly" }
   },
   "default_locale": "en-US",
   "locales": {
