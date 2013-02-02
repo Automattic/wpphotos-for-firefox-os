@@ -490,7 +490,16 @@ wp.models.Post = Backbone.Model.extend({
 
 wp.models.Posts = Backbone.Collection.extend({
 	store:"posts",
-	model:wp.models.Post
+	model:wp.models.Post,
+	
+	comparator:function(post) {
+		try{
+			return 0 - post.get("post_date_gmt").valueOf();
+		} catch(e) {
+			return 0;
+		};
+	}
+	
 }, {
 
 	fetchRemotePosts:function(offset) {

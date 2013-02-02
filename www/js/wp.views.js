@@ -361,7 +361,8 @@ wp.views.Post = Backbone.View.extend({
 	events: _.extend({
 		"click div.post-body": "showPost",
 		"click div.photo": "showPost",
-		"click button.upload": "upload"
+		"click button.upload": "upload",
+		"click button.discard": "discard"
 	}),
 	
 	initialize:function(options) {
@@ -369,7 +370,7 @@ wp.views.Post = Backbone.View.extend({
 		
 		// TODO: Listen to progress events on the model. 
 		this.listenTo(this.model, 'progress', this.render);
-		
+		this.listenTo(this.model, "destroy", this.remove);
 		this.render();
 	},
 	
@@ -489,8 +490,14 @@ wp.views.Post = Backbone.View.extend({
 	},
 	
 	upload:function() {
-		
-	}
+		this.model.uploadAndSave();		
+	},
+	
+	discard:function(){
+		if(confirm("Are you sure you want to discard this post?")){
+			this.model.destroy();
+		};
+	},
 	
 });
 wp.views.registerTemplate("post");
@@ -500,7 +507,7 @@ wp.views.registerTemplate("post");
 
 
 */
-wp.views.EditorPage = Backbone.View.extend({
+wp.views.EditorPage = wp.views.Page.extend({
 	template_name:"editor",
 	
 	initialize:function() {
@@ -586,7 +593,7 @@ wp.views.EditorPage = Backbone.View.extend({
 		if(confirm("Tap OK to publish now, or cancel to publish later")) {
 			p = post.uploadAndSave(image_data, caption.value); // saves
 		} else {
-			
+			post.setPendingPhoto(image_data, caption.value);
 			p = post.save();
 		};
 		

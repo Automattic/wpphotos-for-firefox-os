@@ -130,6 +130,9 @@ wp.db = {
 		try {		
 			var mode = (true == write) ? 'readwrite' : 'readonly';
 			var tx = this.idb.transaction(model.toLowerCase(), mode);
+			if(mode){
+				console.log(mode);
+			}
 			return tx.objectStore(model);
 			
 		} catch(e) {
@@ -288,27 +291,28 @@ wp.db = {
 		Removes the object for the specified key from the object store for the specified model.
 	*/
 	remove:function(model, key) {
-		console.log("wp.db.remove: " + arguments);
+		console.log("wp.db.remove: ", arguments);
 		var p = wp.promise();
 		
 		try {
-			var store = this.getObjectStore(model);
+			var store = this.getObjectStore(model, true);
 			var req = store.delete(key);
 			
 			req.onsuccess = function(event) {
-				console.log("wp.db.remove: " + event.target.result);
+				console.log("wp.db.remove: ", event.target.result);
 				p.resolve(event.target.result);
 			};
 			
 			req.onerror = function(event) {
-				console.log("wp.db.remove: " + event.target.error);
+				console.log("wp.db.remove: ", event.target.error);
 				p.discard(event.target.error);
 			};
 		
 		} catch(err) {
+			console.log(err);
 			p.discard(err);
 		};
-		
+
 		return p;
 	},
 	

@@ -52,6 +52,12 @@ button.orange {
 	text-shadow: 0px 1px rgb(255,180,116);
 }
 
+button.red {
+	color: rgb(150,0,0);
+	background-color: rgb(254,121,121);
+	text-shadow: 0px 1px rgb(255,180,116);
+}
+
 input[type='text'], input[type="password"] {
 	display: block;
 	width: 250px;
@@ -239,11 +245,11 @@ section.by-line div {
 	background-color: #000;
 	height:100%;
 	overflow:scroll;
-
 }
 
 .page-posts .post {
 	padding-bottom: 1px;
+	position:relative;
 }
 
 .page-posts .photo {
@@ -349,8 +355,7 @@ section.by-line div {
 	height:100px;
 	width:200px;
 	margin-left:calc(50% - 100px);
-	margin-top:100;
-	
+
 	border: 1px;
 	font-size: 1.8rem;
 	border-radius: 3px;
@@ -360,16 +365,31 @@ section.by-line div {
 	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;
 }
 
+.post button.discard {
+	height:50px;
+	width:200px;
+	margin-left:calc(50% - 100px);
+	margin-bottom:0;
+	border: 1px;
+	font-size: 1.8rem;
+	border-radius: 3px;
+	border-bottom-color: gray;
+	border-top-color: white;
+	text-shadow: 0px 1px #ffffff;
+	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;	
+}
+
 .uploader div.progress {
 	text-align: center;
 	color:#fff;	
-
+	font-size:2rem;
 }
 
 
 /*
 	Editor page
 */
+
 .page-editor header {
 	position:relative;
 	z-index: 10;
@@ -379,10 +399,17 @@ section.by-line div {
 	background-color:black;
 }
 
+.page-editor .scroll {
+	overflow:hidden;
+	height:calc(100% - 45px);
+}
+
 .page-editor section.content {
 	position:relative;
 	z-index: 5;
 	background-color: #000;
+	height:100%;
+	overflow:scroll;
 }
 
 .page-editor .post {
@@ -450,7 +477,7 @@ section.by-line div {
 	height: 72px;
 }
 
-.page-editor #canvas-wapper {
+.page-editor .canvas-wrapper {
 	position: absolute;
 	top: 0;
 	right: 0;
