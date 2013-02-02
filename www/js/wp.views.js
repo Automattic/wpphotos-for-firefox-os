@@ -285,32 +285,41 @@ wp.views.PostsPage = wp.views.Page.extend({
 	}),
 	
 	initialize:function() {
-try {
+
 		var self = this;
 
+		var fetch = false;
 		var blog = wp.app.currentBlog;
-		var posts = new wp.models.Posts();
+		var posts;
+		if (!wp.app.posts) {
+			fetch = true;
+			posts = new wp.models.Posts();
+			wp.app.posts = posts;
+		} else {
+			posts = wp.app.posts;
+		};
+		
 		this.posts = posts;
-		wp.app.posts = posts;
 				
 		this.listenTo(posts, "add", this.render);
 		this.listenTo(posts, "remove", this.render);
 		
-		var p = posts.fetch({where:{index:"blogkey", value:blog.id}});
-		p.success(function() {
-			self.render();
-		});
-		p.fail(function(err) {
-			alert(err);
-		});
-		
-}catch(e){
-	console.log(e)
-}
+		if(fetch) {
+			var p = posts.fetch({where:{index:"blogkey", value:blog.id}});
+			p.success(function() {
+				self.render();
+			});
+			p.fail(function(err) {
+				alert(err);
+			});
+		} else {
+			this.render();
+		}
+
 	},
 	
 	render:function() {
-try {
+
 		var template = wp.views.templates[this.template_name].text;
 
 		// update the dom.
@@ -324,10 +333,7 @@ try {
 			var view = new wp.views.Post({model:post});
 			content.appendChild(view.el);
 		};
-} catch(e) {
-	console.log(e);
-}
-console.log("rendered posts list", this);
+
 		return this;
 	},
 	
@@ -368,7 +374,7 @@ wp.views.Post = Backbone.View.extend({
 	},
 	
 	render:function(progress) {
-try {
+
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text; 
 
@@ -388,27 +394,36 @@ try {
 		title.innerHTML = this.model.get("post_title");
 
 		var date = div.querySelector(".post-body span");
-		var postDate = this.model.get("post_date");
-		date.innerHTML = this.formatDate(postDate);
+		var postDateGmt = this.model.get("post_date_gmt");
+		date.innerHTML = this.formatGMTDate(postDateGmt);
 
 		var content = div.querySelector(".post-body p");
 				
 		var ele = document.createElement("div");
 		ele.innerHTML = this.model.get("post_content");
-						
+
 		var str = ele.textContent;
-		str = str.substr(0, 160);
-		str = str.substr(0, str.lastIndexOf(" "));
-		str = str + " [...]";
+		
+		if(str.indexOf("[/caption]") != -1) {
+			var pos = str.indexOf("[/caption]") + 10;
+			str = str.substr(pos);
+		};
+		
+		if (str.length > 160) {
+			str = str.substr(0, 160);
+			str = str.substr(0, str.lastIndexOf(" "));
+			str = str + " [...]";
+		};
+
 		content.innerHTML = str;
 
 		//if local draft
 		var mask = div.querySelector(".upload-mask");
-		if (this.model.isLocalDraft()) {
+		if (this.model.isLocalDraft() || this.model.isSyncing()) {
 			$(mask).removeClass("hidden");
 			
-			var progressDiv = post.querySelector(".progress");
-			var buttonDiv = post.querySelector("div.upload");
+			var progressDiv = div.querySelector(".progress");
+			var buttonDiv = div.querySelector("div.upload");
 			
 			if(this.model.isSyncing()) {
 				// If we're syncing show progress.
@@ -416,7 +431,7 @@ try {
 				$(progressDiv).removeClass("hidden");
 				
 				if(progress) {				
-					el = post.querySelector(".progress span");
+					var el = div.querySelector(".progress span");
 					
 					var progressStr = progress.status;
 					if(progress.percent ) {
@@ -434,18 +449,20 @@ try {
 		} else {
 			$(mask).addClass("hidden");
 		};
-		
-		this.$el.html(div.querySelector("div"));
-} catch(e) {
-	console.log(e);
-}
 
-console.log("rendered post", this);
+		this.$el.html(div.querySelector("div"));
+	
 		return this;
 	},
 	
-	formatDate:function(date) {
-		var diff = Date.now() - date.getTime();
+	formatGMTDate:function(date) {
+		// Fix the gmt time.
+		var gmt = new Date();
+		var offset = date.getTimezoneOffset() * 60000;
+		gmt = new Date(gmt.valueOf() + offset);
+				
+		var diff = gmt - date.valueOf();
+		
 		var d = "";
 		if (diff < 60000) {
 		    // seconds
@@ -493,29 +510,30 @@ wp.views.EditorPage = Backbone.View.extend({
 		try {
 			if(typeof(MozActivity) == "undefined") {
 				return;
-			}
+			};
+			
+			var self = this;
+			// Start a Moz picker activity for the user to select an image to upload
+			// either from the gallery or the camera. 
+			var activity = new MozActivity({
+				name: 'pick',
+				data: {
+					type: 'image/jpeg'
+				}
+			});
+					
+			activity.onsuccess = function() {
+				self.onImageSelected(activity.result.blob);
+			};
+	
+			activity.onerror = function() {
+				//TODO
+			};
+			
 		} catch(e) {
 			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
 			// just pass thru.
 			return; 
-		}
-
-		var self = this;
-		// Start a Moz picker activity for the user to select an image to upload
-		// either from the gallery or the camera. 
-		var activity = new MozActivity({
-			name: 'pick',
-			data: {
-				type: 'image/jpeg'
-			}
-		});
-				
-		activity.onsuccess = function() {
-			self.onImageSelected(activity.result.blob);
-		};
-
-		activity.onerror = function() {
-			//TODO
 		};
 	},
 	
@@ -562,24 +580,24 @@ wp.views.EditorPage = Backbone.View.extend({
 		};
 
 		var post = new wp.models.Post(attrs);
-		wp.app.posts.add(post, {at:0});
 		
 		// Save a local draft or sync to the server?
 		var p;
 		if(confirm("Tap OK to publish now, or cancel to publish later")) {
-			p = post.save();
-		} else {
 			p = post.uploadAndSave(image_data, caption.value); // saves
-
+		} else {
+			
+			p = post.save();
 		};
 		
+		wp.app.posts.add(post, {at:0});
 		wp.app.routes.navigate("posts", {trigger:true});
 		return p;
 	},
 	
 	goBack:function() {
 		if(confirm("Cancel editing?")) {
-			wp.app.routes.navigate("posts");
+			wp.app.routes.navigate("posts", {trigger:true});
 		};
 	}
 	

@@ -128,7 +128,9 @@ wp.XMLRPC.prototype.formatParam = function(param){
 	
 	// Dates
 	if (param instanceof Date || param.__proto__ instanceof Date || param.__proto__.constructor.name == 'Date') {
-		return "<dateTime.iso8601>" + param.toISOString() + "</dateTime.iso8601>\n";
+		var d = param.toISOString();
+		d = d.split("-").join("");
+		return "<dateTime.iso8601>" + d + "</dateTime.iso8601>\n";
 	};
 	
 	// String

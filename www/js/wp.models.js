@@ -191,27 +191,28 @@ wp.models.Blogs = Backbone.Collection.extend({
 wp.models.Post = Backbone.Model.extend({
 	store:"posts",
 	idAttribute:"link",
-	_syncing:false,
+	_isSyncing:false,
 	defaults:{
 		blogkey:"",
 		post_id:"",
 		post_title:"",
 		post_date_gmt:null,
 		post_date:null,
-		post_status:"",
+		post_status:"publish",
 		link:"",
 		post_thumbnail:null,
 		photo:null, // Saved item from wp.getMediaLibrary
 		pending_photo:null // image data awaiting upload
 	},
-	
-	intialize:function(){
+
+	initialize:function(){
 		var obj = {};
 		if (this.get("link") == "") {
 			obj.link = wp.models.Post.GUID();
 		};
 		if(this.get("post_date") == null) {
 			obj.post_date = new Date();
+			obj.post_date_gmt = new Date(obj.post_date.valueOf() - (obj.post_date.getTimezoneOffset() * 60000));
 		};
 		if (this.get("blogkey") == "") {
 			obj.blogkey = wp.app.currentBlog.id;
@@ -251,7 +252,8 @@ wp.models.Post = Backbone.Model.extend({
 			var res = rpc.result();
 			
 			if ((res instanceof Array) && (res.length > 0)){
-				self.set({media:res[0]});
+				// Clear pending media here just incase something bad happened during an upload.
+				self.set({photo:res[0], pending_photo:null}); 
 			};
 
 			var p1 = self.save();
@@ -269,16 +271,20 @@ wp.models.Post = Backbone.Model.extend({
 	image:function(){
 		return this.get("pending_photo") || this.get("post_thumbnail") || this.get("photo");
 	},
+
+	setPendingPhoto:function(image_data, caption) {
+		caption = caption || null;
+		var obj = {
+			link:image_data,
+			caption:caption
+		};
+		this.set({'pending_photo':obj});
+	},
 	
 	uploadAndSave:function(image_data, caption) {
 		// Save the image data and caption to be uploaded.
 		if(image_data) {
-			caption = caption || null;
-			var obj = {
-				link:image_data,
-				caption:caption
-			};
-			this.set({'pending_photo':obj});
+			this.setPendingPhoto(image_data, caption);
 		}; 
 
 		this._isSyncing = true;
@@ -326,10 +332,10 @@ wp.models.Post = Backbone.Model.extend({
 			var html = "";
 			var img = '<a href="' + url + '"><img src="' + url + '" /></a>';
 			if (pending_photo.caption) {
-				html = '[caption id="attachment_"' + result.id + ' align="alignnone" width="300"]';
-				html += "<a href=" + url + "><img src=" + url + " /></a>";
+				html = '[caption id="attachment_' + result.id + '" align="alignnone" width="300"]';
+				html += '<a href="' + url + '"><img src="' + url + '" /></a>';
 				html += pending_photo.caption;
-				html += '[/caption]';				
+				html += '[/caption]\n';
 			} else {
 				html = img + "<br /><br />";
 			};
@@ -337,8 +343,8 @@ wp.models.Post = Backbone.Model.extend({
 			var content = self.get("post_content");
 			content = html + content;
 
-			// Update content and clear the pending_photo.
-			self.set({post_content:content, pending_photo:null});
+			// Update content. Hang onto the pending photo until we've finished synching.
+			self.set({post_content:content});
 
 			self.uploadAndSave_SaveRemote();
 		});
@@ -360,10 +366,7 @@ wp.models.Post = Backbone.Model.extend({
 		this.trigger("progress", {"status":"saving"});
 		
 		var self = this;
-		var content = this.toJSON();
-		delete content.blogkey; // No need to send up blogkey.
-		
-		var p = wp.api.newPost(content);
+		var p = wp.api.newPost(this.getUploadHash());
 		p.success(function() {
 			var post_id = p.result();
 			self.uploadAndSave_SyncRemote(post_id);
@@ -391,9 +394,9 @@ wp.models.Post = Backbone.Model.extend({
 		p.success(function() {
 			// Save the guid used as a temporary link. We'll want to delete this record after we save.
 			self.temp_link = self.get("link");
-			
+
 			// update all attributes.
-			self.set(p.result()); 
+			self.set(self.parse(p.result()));
 		});
 		p.fail(function() {
 			self.onErrorSaving();
@@ -404,14 +407,14 @@ wp.models.Post = Backbone.Model.extend({
 		// Fetch the media library
 		var filter = {
 			number:1,
-			parent_id:this.get("post_id"),			
+			parent_id:post_id,
 			mime_type:"image/*"
 		};
 		var p1 = wp.api.getMediaLibrary(filter);
 		p1.success(function(){
 			var res = p1.result();
 			if ((res instanceof Array) && (res.length > 0)){
-				self.set({photo:res[0]});
+				self.set({photo:res[0], pending_photo:null});
 			};
 		});
 		
@@ -431,6 +434,7 @@ wp.models.Post = Backbone.Model.extend({
 		p.success(function() {
 			// Yay! Finally all done!
 			
+			self._isSyncing = false;
 			// this.upload_promise.notify({"status":"success"});
 			self.trigger("progress", {"status":"success"});
 			self.upload_promise.resolve(self);
@@ -456,6 +460,22 @@ wp.models.Post = Backbone.Model.extend({
 		this.upload_promise.discard();
 		this.upload_promise = null;	
 
+	},
+	
+	getUploadHash:function() {
+		var obj = {};
+		var hash = this.attributes;
+		for (var key in hash) {
+			if(hash[key] != "" && hash[key] != null) {
+				obj[key] = hash[key];
+			};
+		};
+		delete obj["blogkey"];
+		delete obj["photo"];
+		delete obj["pending"];
+		delete obj["link"];
+		
+		return obj;
 	}
 	
 
