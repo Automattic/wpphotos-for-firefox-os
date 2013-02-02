@@ -225,6 +225,10 @@ section.by-line div {
 /*
 	Posts page
 */
+.page-posts .iscroller {
+	height:100%;
+}
+
 .page-posts header {
 	position: relative;
 	z-index: 110;

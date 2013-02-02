@@ -493,8 +493,13 @@ wp.models.Posts = Backbone.Collection.extend({
 	model:wp.models.Post,
 	
 	comparator:function(post) {
+		// Sorts the list from newest to oldest.
+		// Local drafts should always be first so we return the negative of the current date.
 		try{
-			return 0 - post.get("post_date_gmt").valueOf();
+			if(post.isLocalDraft()){
+				return -Date.now();
+			};
+			return -post.get("post_date_gmt").valueOf();
 		} catch(e) {
 			return 0;
 		};
