@@ -496,18 +496,6 @@ wp.views.Post = Backbone.View.extend({
 
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text; 
-
-		var img = div.querySelector(".photo img");
-		var caption = div.querySelector(".caption");
-		
-		var image = this.model.image();
-		if(image) {
-			img.src = image.link;
-			caption.innerHTML = image.caption;
-		} else {
-			img.src = "";
-			caption.innerHTML = "No Photo";
-		};
 		
 		var title = div.querySelector(".post-body h3");
 		title.innerHTML = this.model.get("post_title");
@@ -517,14 +505,18 @@ wp.views.Post = Backbone.View.extend({
 		date.innerHTML = this.formatGMTDate(postDateGmt);
 
 		var content = div.querySelector(".post-body p");
-				
+
 		var ele = document.createElement("div");
 		ele.innerHTML = this.model.get("post_content");
 
+		var caption_str = "";
 		var str = ele.textContent;
-		
 		if(str.indexOf("[/caption]") != -1) {
 			var pos = str.indexOf("[/caption]") + 10;
+			
+			caption_str = str.substring(0, str.indexOf("[/caption]"));
+			caption_str = caption_str.substring(caption_str.lastIndexOf(">")).trim();
+			
 			str = str.substr(pos);
 		};
 		
@@ -535,6 +527,25 @@ wp.views.Post = Backbone.View.extend({
 		};
 
 		content.innerHTML = str;
+
+		var img = div.querySelector(".photo img");
+		var caption = div.querySelector(".caption");
+		
+		var image = this.model.image();
+		if(image) {
+			img.src = image.link;
+			
+			if (image.caption.length > 0) {
+				caption.innerHTML = image.caption;				
+			} else {
+				caption.innerHTML - caption_str;
+			};
+
+		} else {
+			img.src = "";
+			caption.innerHTML = "No Photo";
+		};
+		
 
 		//if local draft
 		var mask = div.querySelector(".upload-mask");
