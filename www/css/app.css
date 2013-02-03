@@ -102,6 +102,13 @@ section.content {
 	overflow: auto;
 }
 
+.hidden {
+	display:none !important;
+}
+
+/*
+	headers
+*/
 
 header {
 	text-align: center;
@@ -160,6 +167,7 @@ header button.logo {
 header button.save {
 	width:60px;
 }
+
 
 /*
 	Start page
@@ -511,6 +519,48 @@ section.by-line div {
 }
 
 
-.hidden {
-	display:none !important;
+
+/*
+	About page
+*/
+
+.page-about header {
+	padding: 20px 30px 0;
+	height: 40px;
+	text-align: left;
+	position:relative;
+}
+
+.page-about section.content {
+	padding: 0 30px;
+	height: calc(100% - 60px);
+	min-height: 0;
+}
+
+.page-about .content div {
+	color: #fff;
+	font-size: 1.6rem;
+	height:24px;
+}
+
+.page-about #tos {
+	margin-top:30px;
+}
+
+.page-about #privacy {
+	margin-bottom:30px;
+}
+
+.page-about h1 {
+	margin-bottom:30px;
+}
+.page-about a {
+	font-size: 1rem;
+	color:#fff;
+}
+
+
+
+#template {
+	height:100%;
 }
