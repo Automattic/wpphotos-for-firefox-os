@@ -703,18 +703,22 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		var attrs = {
 			"blogkey":wp.app.currentBlog.id,
-			"post_title":title.value,
-			"post_content":content.value
+			"post_title":title.value.trim(),
+			"post_content":content.value.trim()
 		};
 
+		if (tags.value.trim().length > 0){
+			attrs["terms_names"] = {"post_tag":tags.value.trim().split(",")};
+		};
+		
 		var post = new wp.models.Post(attrs);
 		
 		// Save a local draft or sync to the server?
 		var p;
 		if(confirm(_s("prompt-publish-now"))) {
-			p = post.uploadAndSave(image_data, caption.value); // saves
+			p = post.uploadAndSave(image_data, caption.value.trim()); // saves
 		} else {
-			post.setPendingPhoto(image_data, caption.value);
+			post.setPendingPhoto(image_data, caption.value.trim());
 			p = post.save();
 		};
 		

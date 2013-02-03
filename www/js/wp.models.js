@@ -200,6 +200,7 @@ wp.models.Post = Backbone.Model.extend({
 		post_date:null,
 		post_status:"publish",
 		link:"",
+		terms_names:null,
 		post_thumbnail:null,
 		photo:null, // Saved item from wp.getMediaLibrary
 		pending_photo:null // image data awaiting upload
