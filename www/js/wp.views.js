@@ -286,6 +286,10 @@ wp.views.AboutPage = wp.views.Page.extend({
 		this.render();
 	},
 
+	events:_.extend({
+		"click button#tos": "showTos",
+		"click button#privacy": "showPrivacy"
+	}),
 	
 	render:function() {
 		
@@ -294,7 +298,15 @@ wp.views.AboutPage = wp.views.Page.extend({
 		this.$el.html( template );
 
 		return this;
-	}	
+	},
+	
+	showTos:function() {
+		window.open("http://wordpress.com/tos/", "", "resizable=yes,scrollbars=yes,status=yes");
+	},
+	
+	showPrivacy:function() {
+		window.open("http://automattic.com/privacy/", "", "resizable=yes,scrollbars=yes,status=yes");
+	}
 });
 wp.views.registerTemplate("about");
 
@@ -397,7 +409,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 					if ($el.hasClass("flip")) {
 						$el.removeClass("flip");
 						$el.addClass("loading");
-						$el.find(".scroll-refresh-label").text(_("control-loading"));
+						$el.find(".scroll-refresh-label").text(_s("control-loading"));
 						self.sync();
 					};
 				}

@@ -110,5 +110,8 @@ wp.app = {
 
 
 window.addEventListener("load", function() {
-	wp.app.init();
+	// Add a bit of a delay to avoid a race condition loading localizations
+	setTimeout(function(){
+		wp.app.init();	
+	}, 1);
 } , false);
