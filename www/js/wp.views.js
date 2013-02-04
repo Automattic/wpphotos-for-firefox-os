@@ -570,7 +570,8 @@ wp.views.PostsPage = wp.views.Page.extend({
 	events:_.extend({
 		"click button.add": "showEditor",
 		"click button.settings": "showSettings",
-		"click button.logo" : "showAbout"
+		"click button.logo" : "showAbout",
+		"click div.blog-title" : "showPicker"
 	}),
 	
 	initialize:function() {
@@ -651,6 +652,17 @@ wp.views.PostsPage = wp.views.Page.extend({
 		var collection = this.posts;
 		var content = this.el.querySelector(".content");
 		content.innerHTML = "";
+		
+		if (wp.app.blogs.length > 1) {
+			// Show the blog picker :)
+			
+			var el = document.createElement("div");
+			el.className = "blog-title";
+			el.innerHTML = wp.app.currentBlog.get("blogName");
+			
+			content.appendChild(el);
+		};
+		
 		for(var i = 0; i < collection.length; i++) {
 			var post = collection.at(i);
 			var view = new wp.views.Post({model:post});
@@ -658,6 +670,40 @@ wp.views.PostsPage = wp.views.Page.extend({
 		};
 	
 		return this;
+	},
+	
+	
+	showPicker:function(evt) {
+		if(evt) {
+			evt.stopPropagation();
+		};
+		
+		var html = "<ul>";
+		for(var i = 0; i < wp.app.blogs.length; i++) {
+			html += '<li data-idx="' + i + '">' + wp.app.blogs.at(i).get("blogName") + "</li>";
+		};
+		html += "</ul>"
+		
+		var list = document.createElement('x-select-list');
+		list.location = 'middle';
+		list.innerHTML = html;
+		
+		list.addEventListener('select', function(event) {
+		try{
+			var el = event.target;
+			var idx = parseInt(el.getAttribute("data-idx"));
+			wp.app.setCurrentBlog(wp.app.blogs.at(idx));
+			
+			localStorage.publishSetting = parseInt(opt);
+			}catch(e){console.log(e)}
+		});
+		
+		list.addEventListener('hide', function(event) {
+			list.parentNode.removeChild(list);
+		});
+		
+		document.body.appendChild(list);
+
 	},
 	
 	viewPost:function(model) {
