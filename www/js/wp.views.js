@@ -88,6 +88,15 @@ wp.views = {
 	 	};
 		
 		return p;
+	},
+	
+	normalizeUrl:function(url) { 
+		// make sure it has a protocol
+		if(!(/^https?:\/\//i).test(url)) url = 'http://' + url;
+		// add the /xmlrpc.php
+		if (!(/\/xmlrpc\.php$/i).test(url)) url = url + '/xmlrpc.php';
+		
+		return url;
 	}
 };
 
@@ -224,6 +233,10 @@ wp.views.registerTemplate("settings");
 
 
 
+/* 
+
+
+*/
 wp.views.BlogItemView = Backbone.View.extend({
 	model:null, 
 	
@@ -244,7 +257,6 @@ wp.views.BlogItemView = Backbone.View.extend({
 
 		var ul = document.createElement("ul");
 		ul.innerHTML = wp.views.templates[this.template_name].text;
-console.log(ul);
 
 		//<li><span>Blog name </span><span><button>X</button></span></li>
 		var span = ul.querySelector("span");
@@ -258,16 +270,112 @@ console.log(ul);
 	
 	edit:function(evt) {
 		evt.stopPropagation();
-		alert("edit")
+		
+		new wp.views.EditBlogModal({model:this.model});
 	},
 	
 	del:function(evt) {
 		evt.stopPropagation();
-		alert("del")
+		
+		if(confirm("Remove this blog?")){
+			// delete all the posts for this blog
+
+			// delete the blog
+			
+		};
+
 	}
 	
 });
 wp.views.registerTemplate("settings-blog-item");
+
+
+
+/* 
+
+
+*/
+wp.views.EditBlogModal = Backbone.View.extend({
+	model:null, 
+	
+	template_name:"settings-edit-modal",
+	
+	tagName:"x-modal",
+	
+	attributes:{
+		"overlay":true,
+		"esc-hide":true
+	},
+	
+	events: _.extend({
+		"click button.save":"save",
+		"click button.cancel":"hide",
+		"modalhide":"hide"
+	}),
+	
+	initialize:function(options) {
+		this.model = options.model;
+		
+		this.render();
+	},
+	
+	render:function() {
+
+		var div = document.createElement("div");
+		div.innerHTML = wp.views.templates[this.template_name].text;
+
+		div.querySelector("#username").value = this.model.get("username");
+		div.querySelector("#password").value = this.model.get("password");
+		div.querySelector("#url").innerHTML = this.model.get("url");
+		div.querySelector("#blog-name").innerHTML = this.model.get("blogName");
+
+		this.$el.html(div.innerHTML);
+
+	    document.body.appendChild(this.el);
+
+		return this;
+	},
+	
+	save:function(evt) {
+		evt.stopPropagation();
+
+		var username = this.el.querySelector("#username").value;
+		var password = this.el.querySelector("#password").value;
+
+		// Validation
+		if (!this.validateField(username) || !this.validateField(password) || !this.validateField(url)) {
+			alert(_s('prompt-fill-out-all-fields'));
+			return;
+		}
+		
+		// if all's good. 
+		url = wp.views.normalizeUrl(url);
+		
+		this.model.set({
+			"username":username,
+			"password":password
+		});
+		var self = this;
+		var p = this.model.save();
+		p.always(function(){
+			self.hide();
+		});
+	},
+	
+	hide:function(evt) {
+		evt.stopPropagation();
+		this.el.parentNode.removeChild(this.el); 
+	},
+	
+	validateField: function(field) {
+		if (field != '')
+			return true;
+		
+		return false;
+	}
+
+});
+wp.views.registerTemplate("settings-edit-modal");
 
 
 /* 
@@ -351,7 +459,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 		}
 		
 		// if all's good. 
-		url = this.normalizeUrl(url);
+		url = wp.views.normalizeUrl(url);
 		
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
 		
@@ -371,15 +479,6 @@ wp.views.LoginPage = wp.views.Page.extend({
 			return true;
 		
 		return false;
-	},
-	
-	normalizeUrl:function(url) { 
-		// make sure it has a protocol
-		if(!(/^https?:\/\//i).test(url)) url = 'http://' + url;
-		// add the /xmlrpc.php
-		if (!(/\/xmlrpc\.php$/i).test(url)) url = url + '/xmlrpc.php';
-		
-		return url;
 	},
 	
 	goBack:function() {
