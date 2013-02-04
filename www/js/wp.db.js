@@ -253,6 +253,7 @@ wp.db = {
 			};
 			
 		} catch(err) {
+			console.log(err);
 			p.discard(err);
 		};
 		
@@ -315,6 +316,62 @@ wp.db = {
 
 		return p;
 	},
+	
+	
+	/*
+		Remove all records matching the specified index
+	*/
+	removeAll:function(model, index, key) {
+		// Get all the records.
+		console.log("wp.db.removeAll: ", model, index, key);
+		var p = wp.promise();
+		
+		try {
+			var store = this.getObjectStore(model, true);		
+
+			var range = null;
+			if (key instanceof Array) {
+				if (key.length == 1) {
+					range = IDBKeyRange.only(key[0]);
+					
+				} else {
+					range = IDBKeyRange.bound(key[0], key[1]);
+				};
+				
+			} else {
+				range = IDBKeyRange.only(key);
+			};
+		
+			var index = store.index(index);
+			var req = index.openCursor(range);
+
+			// Iterate over the cursor and store each result in an array. Pass the array
+			// to the promise's resolve method. 
+			// Note: calling continue on the cursor triggers the onsuccess callback.
+			var arr = [];
+			req.onsuccess = function(event){
+				var cursor = event.target.result;
+				if(cursor) {
+					cursor.delete(); //EEK!
+					cursor.continue();
+				} else {
+					p.resolve(arr);
+				};
+			};
+			
+			req.onerror = function(event) {
+				console.log(event.target.error);
+				p.discard(event.target.error);
+			};
+			
+		} catch(err) {
+			console.log(err);
+			p.discard(err);
+		};
+		
+		return p;		
+	},
+	
 	
 	/*
 		Backbone.sync override. http://backbonejs.org/#Sync 

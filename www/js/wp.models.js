@@ -82,6 +82,28 @@ wp.models.Blog = Backbone.Model.extend({
 	isWPCom:function() {
 		var xmlrpc = this.get("xmlrpc");
 		return (xmlrpc.indexOf("wordpress.com") != -1);
+	},
+	
+	/*
+		Removes the blog and its posts from the db.
+		Calls destroy to remove the blog from its collection.
+	*/
+	remove:function() {
+		var self = this;
+		var p = wp.db.removeAll('posts', 'blogkey', this.id);
+		p.success(function() {
+			console.log("all blog's posts deleted");
+			var p1 = self.destroy();
+			p1.success(function(){
+				console.log("the blog was removed");
+			});
+			p1.fail(function(){
+				console.log("Failed to delete blog");
+			});
+		});
+		p.fail(function(){
+			console.log("failed to delete posts");
+		});
 	}
 	
 }, {});

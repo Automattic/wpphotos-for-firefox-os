@@ -6,7 +6,7 @@
 
 if(typeof(wp) == "undefined") { var wp = {} };
 
-wp.app = {
+wp.app = _.extend({
 	currentBlog:null, // model
 	posts:null,
 	blogs:null,
@@ -18,9 +18,11 @@ wp.app = {
 			location.href = location.href.substr(0,location.href.indexOf(location.hash));
 		};
 
-		this.routes = new wp.Routes();
-		Backbone.history.start();
-
+		if(!this.routes) {
+			this.routes = new wp.Routes();
+			Backbone.history.start();
+		};
+		
 		// Queue up some our async tasks and load blogs when they are done.
 		var q = wp.promiseQueue();
 		q.success(function() {
@@ -53,8 +55,12 @@ wp.app = {
 	
 	loadBlogs:function() {
 		// load blogs & current blog
-		this.blogs = new wp.models.Blogs(); // collection
-
+		if(!this.blogs) {
+			this.blogs = new wp.models.Blogs(); // collection
+			this.posts = new wp.models.Posts();
+			this.listenTo(this.blogs, "remove", this.findCurrentBlog);
+		};
+		
 		var self = this;
 		var p = this.blogs.fetch();
 		p.always(function() {
@@ -62,7 +68,6 @@ wp.app = {
 			self.blogsLoaded();
 		});
 	},
-	
 	
 	blogsLoaded:function() {
 		console.log("blogs loaded");
@@ -74,6 +79,13 @@ wp.app = {
 			return;
 		};
 
+		this.findCurrentBlog();
+
+		// Route to the blog's posts page
+		this.routes.navigate("posts", {trigger:true});
+	},
+	
+	findCurrentBlog:function() {
 		// check local storage for the key of the current blog. 	
 		var blogKey = localStorage.blogKey;
 		var blog;
@@ -86,17 +98,15 @@ wp.app = {
 		if (!blog) {
 			blog = this.blogs.at(0);
 		};
-		this.setCurrentBlog(blog);
-
-		// Route to the blog's posts page
-		this.routes.navigate("posts", {trigger:true});
 		
+		this.setCurrentBlog(blog);
 	},
 	
 	setCurrentBlog:function(blog) {
 		wp.api.setCurrentBlog(blog.attributes);
 		localStorage.blogKey = blog.id;
 		this.currentBlog = blog;
+		this.trigger("currentBlogChanged");
 	},
 	
 	isNetworkAvailable:function(){
@@ -106,7 +116,7 @@ wp.app = {
 		return false;
 	}
 
-};
+}, Backbone.Events);
 
 
 window.addEventListener("load", function() {

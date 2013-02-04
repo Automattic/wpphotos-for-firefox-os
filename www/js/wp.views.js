@@ -130,6 +130,11 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	],
 	
 	initialize:function() {
+	
+		this.listenTo(wp.app.blogs, "add", this.render);
+		this.listenTo(wp.app.blogs, "remove", this.blogRemoved);
+		this.listenTo(wp.app, "currentBlogChanged", this.render);
+		
 		this.render();
 	},
 
@@ -146,20 +151,25 @@ wp.views.SettingsPage = wp.views.Page.extend({
 		
 		var template = wp.views.templates[this.template_name].text;
 		this.$el.html( template );
-try {
-		// blogs!!!
+
 		var ul = this.el.querySelector(".bloglist ul");
 		for(var i = 0; i < wp.app.blogs.length; i++) {
 			var blog = new wp.views.BlogItemView({model:wp.app.blogs.at(i)});
 			ul.appendChild(blog.el);
 		};
-} catch(e){
-	console.log(e);
-}
+
 		var pubSetting = localStorage.publishSetting || 0;
 		this.el.querySelector("#settings-publish-settings").innerHTML = _s(this.publish_settings_options[pubSetting]);
 		
 		return this;
+	},
+	
+	blogRemoved:function() {
+		if(wp.app.blogs.length == 0) {
+			wp.app.routes.navigate("start",{trigger:true});
+		} else {
+			this.render();
+		};
 	},
 	
 	addBlog:function() {
@@ -209,11 +219,9 @@ try {
 	
 	reset:function() {
 		// Reset the app. Deletes local storage and indexeddb.
-		if(confirm("This will remove all data in the app.  Are you sure?")) {
+		if(confirm("This will remove all data in the app.  Are you *really* sure?")) {
 			delete localStorage.blogKey;
 			delete localStorage.publishSetting;
-			
-			return;
 			
 			var p = wp.db.drop();
 			p.success(function(){
@@ -278,12 +286,8 @@ wp.views.BlogItemView = Backbone.View.extend({
 		evt.stopPropagation();
 		
 		if(confirm("Remove this blog?")){
-			// delete all the posts for this blog
-
-			// delete the blog
-			
+			this.model.remove();
 		};
-
 	}
 	
 });
@@ -470,8 +474,6 @@ wp.views.LoginPage = wp.views.Page.extend({
 		p.fail(function(){
 			alert("Failed");
 		});
-		
-		
 	},
 	
 	validateField: function(field) {
@@ -490,16 +492,19 @@ wp.views.LoginPage = wp.views.Page.extend({
 
 		if (blogs.length == 0) {
 			// TODO: Nothing there.  Badness.
+			// TODO: Prompt No blogs at that URL? 
 			return;
 		};
 		
 		if (blogs.length > 1) {
 			// TODO: multiple blogs, show a picker.
+			
 			return;
 		};
 		
 		var blog = blogs.at(0);
 		var promise = blog.save();
+		wp.app.blogs.add(blog);
 		wp.app.setCurrentBlog(blog);
 
 		var p = wp.models.Posts.fetchRemotePosts();
@@ -568,32 +573,18 @@ wp.views.PostsPage = wp.views.Page.extend({
 	}),
 	
 	initialize:function() {
-
-		var self = this;
-
-		var refresh = false;
-		var blog = wp.app.currentBlog;
-		var posts;
-		if (!wp.app.posts) {
-			refresh = true;
-			posts = new wp.models.Posts();
-			wp.app.posts = posts;
-		} else {
-			posts = wp.app.posts;
-		};
+		this.posts = wp.app.posts;
 		
-		this.posts = posts;
-
-		this.listenTo(posts, "selected", this.viewPost);
-		this.listenTo(posts, "add", this.render);
-		this.listenTo(posts, "remove", this.render);
+		this.listenTo(wp.app, 'currentBlogChanged', this.refresh);
+		this.listenTo(this.posts, "selected", this.viewPost);
+		this.listenTo(this.posts, "add", this.render);
+		this.listenTo(this.posts, "remove", this.render);
 		
-		if(refresh) {
+		if(this.posts.length == 0) {
 			this.refresh();
 		} else {
 			this.render();
 		};
-
 	},
 	
 	render:function() {
@@ -654,7 +645,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 					};
 				}
 			});
-		}
+		};
 
 		var collection = this.posts;
 		var content = this.el.querySelector(".content");
