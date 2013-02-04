@@ -10,9 +10,9 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	template_name:"settings",
 	
 	publish_settings_options: [
-		"Always Ask",
-		"Publish Immediately",
-		"Publish Later"
+		"label-always-ask",
+		"label-publish-immediately",
+		"label-publish-later"
 	],
 	
 	initialize:function() {
@@ -73,7 +73,7 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	
 		var arr = this.publish_settings_options;
 		
-		var html = "<h3>" + _s("Publish Settings") + "</h3><ul>";
+		var html = "<h3>" + _s("title-publish-settings") + "</h3><ul>";
 		for(var idx in arr) {
 			html += '<li data-opt="' + idx + '">' + _s(arr[idx]) + "</li>";
 		};

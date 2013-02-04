@@ -102,20 +102,21 @@ wp.XHR.prototype.status = function() {
 wp.XHR.prototype.execute = function(headers) {
 	"use strict";
 	var self = this;	
-	var xhr = new XMLHttpRequest({mozSystem: true, mozAnon:true});
+	var xhr = new XMLHttpRequest({mozSystem: true});
 	
 	this.xhr = xhr;
 	
 	var docallbacks = function(event, arr) {
 		for (var i = 0; i < arr.length; i++) {
 			try {
+console.log("xhr docallbacks",event, arr);
 				arr[i](self.xhr, event);
 			} catch(ignore){
 				console.log(ignore);
 			};
 		};
 	};
-	
+console.log("xhr.open", this.url);
 	xhr.open(this.httpMethod, this.url, true);
 
 	if(this.headers) {

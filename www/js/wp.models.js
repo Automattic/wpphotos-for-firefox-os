@@ -139,8 +139,9 @@ wp.models.Blogs = Backbone.Collection.extend({
 		
 		rpc.fail(function(){
 			// TODO:
-			console.log("failed");
-			p.discard();
+			
+			console.log("failed", rpc.result().status);
+			p.discard(rpc.result());
 		});
 
 		return p;
