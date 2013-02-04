@@ -5,19 +5,6 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
     <title data-l10n-id="title-wordpress">WordPress</title>
-    
-	<script type="text/javascript" src="../x-tags/x-tag.js"></script>
-	<script type="text/javascript" src="../x-tags/alert-popup.js"></script>
-	<script type="text/javascript" src="../x-tags/dialog-toast.js"></script>
-	<script type="text/javascript" src="../x-tags/listview.js"></script>
-	<script type="text/javascript" src="../x-tags/select-list.js"></script>
-	<script type="text/javascript" src="../x-tags/toggle-switch.js"></script>	
-	<link rel="stylesheet" href="../x-tags/alert-popup.css">
-	<link rel="stylesheet" href="../x-tags/dialog-toast.css">
-	<link rel="stylesheet" href="../x-tags/listview.css">
-	<link rel="stylesheet" href="../x-tags/select-list.css">
-	<link rel="stylesheet" href="../x-tags/toggle-switch.css">
-
     <link rel="stylesheet" href="../css/app.css" />    
     
   </head>
@@ -31,12 +18,59 @@
 						<button class="back left"></button>
 					</header>
 					<section class="content">
-						SETTINGS!!!
+						<h1>Settings</h1>
+						<section>
+							<h2>Blogs</h2>
+							<div class="bloglist"> 
+								<ul>
+<!--
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li class="selected"><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name asdf asdfasd fasdf asdfa sdfasd fasdf asdfasdf asdfa sdfasdf asdfa sdfas dfasf asdfa sfasfa sdf </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+									<li><span>Blog name </span><span><button>X</button></span></li>
+-->
+								</ul>
+							</div>
+							<button id="settings-add" class="blue small">Add</button>
+							<button id="settings-create" class="blue small">Create</button>
+						</section>
+						
+						<section>
+						<h2>Publish Settings</h2>
+							<ul>
+								<li id="settings-publish-settings">Current Settings</li>
+							</ul>
+<!--
+							<x-select-list data-fade-duration="500" data-multi-select="true">
+								<h3>Publish Settings</h3>
+								<ul>
+									<li>Always Ask</li>
+									<li>Publish Immediately</li>
+									<li>Publish Later</li>
+								</ul>
+							</x-select-list>
+-->
+						</section>
+						
+						<section>
+							<h2>App</h2>
+							<ul>
+								<li id="settings-about">About</li>
+								<li id="settings-reset">Reset App</li>
+							</ul>
+						</section>					
 					</section>
 				</div>
 			</div>
 	  	</div>
   	</div>
-
   </body>
 </html>
