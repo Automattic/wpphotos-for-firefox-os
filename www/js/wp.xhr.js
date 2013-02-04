@@ -110,7 +110,9 @@ wp.XHR.prototype.execute = function(headers) {
 		for (var i = 0; i < arr.length; i++) {
 			try {
 				arr[i](self.xhr, event);
-			} catch(ignore){};
+			} catch(ignore){
+				console.log(ignore);
+			};
 		};
 	};
 	

@@ -48,7 +48,9 @@ wp.promise = function() {
 			if (func instanceof Function) {
 				try {
 					func(obj);
-				} catch(ignore) {};
+				} catch(ignore) {
+					console.log(ignore);
+				};
 				
 			};
 	 	};

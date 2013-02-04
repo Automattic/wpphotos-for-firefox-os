@@ -138,6 +138,7 @@ wp.db = {
 		} catch(e) {
 			console.log("wp.db: error opening the object store " + model);
 		};
+		return null;
 	},
 	
 	/*
