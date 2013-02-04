@@ -328,12 +328,12 @@ wp.views.EditBlogModal = Backbone.View.extend({
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text;
 
-		div.querySelector("#username").value = this.model.get("username");
-		div.querySelector("#password").value = this.model.get("password");
-		div.querySelector("#url").innerHTML = this.model.get("url");
-		div.querySelector("#blog-name").innerHTML = this.model.get("blogName");
-
 		this.$el.html(div.innerHTML);
+		
+		this.el.querySelector("#username").value = this.model.get("username");
+		this.el.querySelector("#password").value = this.model.get("password");
+		this.el.querySelector("#url").innerHTML = this.model.get("url");
+		this.el.querySelector("#blog-name").innerHTML = this.model.get("blogName");
 
 	    document.body.appendChild(this.el);
 
@@ -361,13 +361,14 @@ wp.views.EditBlogModal = Backbone.View.extend({
 		});
 		var self = this;
 		var p = this.model.save();
-		p.always(function(){
+		p.success(function(){
 			self.hide();
 		});
 	},
 	
 	hide:function(evt) {
-		evt.stopPropagation();
+		if(evt)
+			evt.stopPropagation();
 		this.el.parentNode.removeChild(this.el); 
 	},
 	
