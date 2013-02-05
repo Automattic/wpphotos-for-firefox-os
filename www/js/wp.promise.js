@@ -60,9 +60,9 @@ wp.promise = function() {
 		 
 		success:function(f) {
 			if (f instanceof Function) {
-				if (_status != "incomplete") {
+				if (_status == "complete") {
 					perform([f]);
-				} else {
+				} else if(_status == "incomplete") {
 					_success.push(f);
 				};
 			};
@@ -71,9 +71,9 @@ wp.promise = function() {
 		 
 		fail:function(f) {
 			 if (f instanceof Function) {
-				if (_status != "incomplete") {
+				if (_status == "failed") {
 					perform([f]);
-				} else {
+				} else if(_status == "incomplete") {
 					_fail.push(f);
 				};
 			 	
