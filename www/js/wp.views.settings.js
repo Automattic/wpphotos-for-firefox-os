@@ -250,9 +250,10 @@ wp.views.EditBlogModal = Backbone.View.extend({
 	},
 	
 	hide:function(evt) {
-		if(evt)
+		if(evt) {
 			evt.stopPropagation();
-		this.el.parentNode.removeChild(this.el); 
+		};
+		this.remove();
 	},
 	
 	validateField: function(field) {
