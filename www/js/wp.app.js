@@ -114,6 +114,21 @@ wp.app = _.extend({
 			return (window.navigator.mozConnection.bandwidth > 0);
 		} catch(ignore) {};
 		return false;
+	},
+	
+	addLoadingIndicator:function() {
+		var loadingAlert = document.createElement('x-modal');
+		loadingAlert.id = 'loading-modal';
+		loadingAlert.setAttribute('overlay', '');
+		loadingAlert.innerHTML = '<div class="modal-background"></div>';
+		loadingAlert.innerHTML += '<div class="modal-content"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
+		document.body.appendChild(loadingAlert);
+	},
+	
+	removeLoadingIndicator:function() {
+		var loadingAlert = document.getElementById('loading-modal');
+		if (loadingAlert != undefined)
+			document.body.removeChild(loadingAlert);
 	}
 
 }, Backbone.Events);

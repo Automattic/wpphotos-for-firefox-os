@@ -50,14 +50,15 @@ wp.views.LoginPage = wp.views.Page.extend({
 		
 		// if all's good. 
 		url = wp.views.normalizeUrl(url);
-		
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
-		
+		wp.app.addLoadingIndicator();
 		p.success(function() {
+			wp.app.removeLoadingIndicator();
 			self.onLoggedIn(p.result());
 		});
 		
 		p.fail(function(){
+			wp.app.removeLoadingIndicator();
 			alert("Failed");
 		});
 	},
@@ -112,12 +113,14 @@ wp.views.LoginPage = wp.views.Page.extend({
 					// Set current blog to the first one selected
 					if (firstBlog != undefined) {
 						wp.app.setCurrentBlog(firstBlog);
+						wp.app.addLoadingIndicator();
 						var p = wp.models.Posts.fetchRemotePosts();
 						// TODO: This needs some sort of wait indicator
 						p.success(function() {
 						 	wp.app.posts = p.result();
 						});
 						p.always(function() {
+							wp.app.removeLoadingIndicator();
 							wp.app.routes.navigate("posts", {trigger:true});
 						});
 						wp.app.blogs.fetch();
