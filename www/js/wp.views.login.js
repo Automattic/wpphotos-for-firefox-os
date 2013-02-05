@@ -20,8 +20,17 @@ wp.views.LoginPage = wp.views.Page.extend({
 	
 	render:function() {
 		var template = wp.views.templates[this.template_name].text;
-		// no dom manipulation needed so just render it.
+		
 		this.$el.html( template );
+		
+		// Input tags are missed by the l10n parser so do them manually.
+		var username = this.el.querySelector("#username");
+		var password = this.el.querySelector("#password");
+		var url = this.el.querySelector("#url");
+
+		username.placeholder = _s("control-username-email");
+		password.placeholder = _s("control-password");
+		url.placeholder = _s("control-blog-address");
 
 		return this;
 	},
