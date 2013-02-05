@@ -248,9 +248,14 @@ wp.views.Post = Backbone.View.extend({
 		var str = ele.textContent;
 		if(str.indexOf("[/caption]") != -1) {
 			var pos = str.indexOf("[/caption]") + 10;
-			
+
 			caption_str = str.substring(0, str.indexOf("[/caption]"));
-			caption_str = caption_str.substring(caption_str.lastIndexOf(">")).trim();
+			caption_str = caption_str.substring(caption_str.lastIndexOf("]") + 1).trim();
+			var cap_el = document.createElement("div");
+			cap_el.innerHTML = caption_str;
+			caption_str = cap_el.textContent;
+			
+//			caption_str = caption_str.substring(caption_str.lastIndexOf(">")).trim();
 			
 			str = str.substr(pos);
 		};
@@ -267,13 +272,13 @@ wp.views.Post = Backbone.View.extend({
 		var caption = div.querySelector(".caption");
 		
 		var image = this.model.image();
-		if(image) {
-			img.src = image.link;
-			
+		if(image) {			
+			img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
+
 			if (image.caption.length > 0) {
 				caption.innerHTML = image.caption;				
 			} else {
-				caption.innerHTML - caption_str;
+				caption.innerHTML = caption_str;
 			};
 
 		} else {

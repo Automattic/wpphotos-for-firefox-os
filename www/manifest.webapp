@@ -1,7 +1,6 @@
 {
   "version": "1.0",
-  "name": "WordPress Photos",
-  "type": "privileged",
+  "name": "WP Photos",
   "description": "Publish and share photos and galleries to your WordPress blog.",
   "launch_path": "/index.html",
   "icons": {
@@ -15,10 +14,7 @@
   },
   "installs_allowed_from": ["*"],
   "permissions": {
-	"systemXHR": {},
-	"network-http": {},
-	"network-tcp": {},
-	"settings":{ "access": "readonly" }
+	"systemXHR": {"description":"Accessing your blog"}
   },
   "default_locale": "en-US",
   "locales": {
