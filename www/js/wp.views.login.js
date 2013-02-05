@@ -115,7 +115,6 @@ wp.views.LoginPage = wp.views.Page.extend({
 						wp.app.setCurrentBlog(firstBlog);
 						wp.app.addLoadingIndicator();
 						var p = wp.models.Posts.fetchRemotePosts();
-						// TODO: This needs some sort of wait indicator
 						p.success(function() {
 						 	wp.app.posts = p.result();
 						});
