@@ -208,7 +208,6 @@ wp.views.EditBlogModal = Backbone.View.extend({
 	},
 	
 	render:function() {
-
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text;
 
