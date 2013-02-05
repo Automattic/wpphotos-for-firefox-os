@@ -106,8 +106,50 @@ x-select-list {
   height: 100%;
 }
 
-#background {
-/* 	background-image: url("../img/bg.jpg"); */
+#start-slideshow {
+	position:absolute;
+}
+
+@-moz-keyframes fade {
+	0% { opacity:0;-moz-transform:translate(-20px,0px) scale(1.80) rotate(0.1deg);  }
+	15% { opacity:1;-moz-transform:translate(-40px,0px) scale(1.50) rotate(0.1deg); }
+	30% { opacity:0.5;-moz-transform:translate(-60px,0px) scale(1.20) rotate(0.1deg); }
+	40% { opacity:0;-moz-transform:translate(-80px,0px) scale(1.00) rotate(0.1deg); }
+	100% { opacity:0; }
+}
+
+#start-slideshow, #start-slideshow img { 
+	position:absolute 
+}
+
+#start-slideshow {
+	z-index: -1;
+	overflow:hidden;
+	top:0px;
+	left:0px;
+	width:320px;
+	height:480px;
+}
+
+#start-slideshow img {
+	max-width: 400px;
+	height: auto; 
+	opacity:0; 
+	-moz-animation:fade 48s linear infinite; 
+}
+
+#start-slideshow .img2 { 
+	-moz-animation-delay:12s;
+}
+#start-slideshow .img3 { 
+	-moz-animation-delay:24s;
+}
+#start-slideshow .img4 { 
+	-moz-animation-delay:36s;
+}
+
+#wp-logo {
+	max-width: 100%;
 }
 
 .page {
