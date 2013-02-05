@@ -296,7 +296,8 @@ section.by-line div {
 	Posts page
 */
 .page-posts .iscroller {
-	height:100%;
+	position:absolute;
+	width: 100%;
 }
 
 .page-posts .blog-title {
@@ -323,7 +324,10 @@ section.by-line div {
 }
 
 .page-posts .scroll {
-	overflow:hidden;
+	bottom:0;
+	position: absolute;
+	top:60px;
+	width:100%;
 	height:calc(100% - 45px);
 	background-color: #000;
 }
@@ -332,8 +336,7 @@ section.by-line div {
 	position: relative;
 	z-index: 5;
 	background-color: #000;
-	height:100%;
-	overflow:scroll;
+	min-height: 0;
 }
 
 .page-posts .post {

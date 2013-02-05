@@ -5,7 +5,7 @@
 */
 
 "use strict";
-
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 wp.views.PostsPage = wp.views.Page.extend({
 	template_name:"posts",
 	
@@ -26,7 +26,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 		this.listenTo(this.posts, "selected", this.viewPost);
 		this.listenTo(this.posts, "add", this.render);
 		this.listenTo(this.posts, "remove", this.render);
-		
+				
 		if(this.posts.length == 0) {
 			this.refresh();
 		} else {
@@ -53,7 +53,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 				hScroll:false,
 				vScroll:true,
 				hScrollbar:false,
-				vScrollbar:true,
+				vScrollbar:false,
 				fixedScrollbar:true,
 				fadeScrollbar:false,
 				hideScrollbar:false,
@@ -83,6 +83,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 				},
 				onScrollEnd: function () {
 					self.dragging = false;
+console.log("dragging stopped")
 					var $el = $(el);
 					if ($el.hasClass("flip")) {
 						$el.removeClass("flip");
@@ -92,6 +93,13 @@ wp.views.PostsPage = wp.views.Page.extend({
 					};
 				}
 			});
+
+			// Need to refresh once we're added to the dom. Since we don't have a good way 
+			// to detect that, use a timeer.
+			setTimeout(function(){
+				self.iscroll.refresh();
+			}, 20);
+			
 		};
 
 		var collection = this.posts;
@@ -113,7 +121,9 @@ wp.views.PostsPage = wp.views.Page.extend({
 			var view = new wp.views.Post({model:post});
 			content.appendChild(view.el);
 		};
-	
+
+		this.iscroll.refresh();
+		
 		return this;
 	},
 	
@@ -152,10 +162,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 	},
 	
 	viewPost:function(model) {
-	
+console.log("--           view post");	
 		// if we are not pulling to refresh...
 		if(this.dragging) return;
-		
+console.log("view post");
 		window.open(model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
 		
 	},
@@ -254,8 +264,6 @@ wp.views.Post = Backbone.View.extend({
 			var cap_el = document.createElement("div");
 			cap_el.innerHTML = caption_str;
 			caption_str = cap_el.textContent;
-			
-//			caption_str = caption_str.substring(caption_str.lastIndexOf(">")).trim();
 			
 			str = str.substr(pos);
 		};

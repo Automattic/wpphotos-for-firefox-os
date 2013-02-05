@@ -9,6 +9,8 @@ if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.Routes = Backbone.Router.extend({
 
+	currentPage:null,
+	
 	stage:null,
 
 	initialize:function(options) {
@@ -67,10 +69,22 @@ console.log("wp.routes.editor");
 	
 	setView:function(view) {
 console.log("wp.routes.setView");
+		// 
+		if(this.currentPage) {
+			try {
+				// call remove on backbone views to clean up events.
+				this.currentPage.remove();
+			} catch(e){
+				console.log(e);
+			};
+		};
+
+		// Just incase...
 		while (stage.firstChild) {
 		  stage.removeChild(stage.firstChild);
 		};
 		
+		this.currentPage = view;
 		this.stage.appendChild(view.el);
 	}	
 
