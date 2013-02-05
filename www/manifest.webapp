@@ -1,6 +1,7 @@
 {
   "version": "1.0",
   "name": "WP Photos",
+  "type": "privileged",
   "description": "Publish and share photos and galleries to your WordPress blog.",
   "launch_path": "/index.html",
   "icons": {
