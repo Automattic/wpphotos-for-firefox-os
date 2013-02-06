@@ -826,7 +826,7 @@ section.by-line div {
 }
 
 .bloglist li span {
-	border-top:1px solid black;
+	border-top:1px solid #888;
     display:table-cell;
     padding: 5px;
     white-space: nowrap;
@@ -843,7 +843,6 @@ section.by-line div {
     margin-bottom:30px;
 }
 .page-settings .content section h2 {
-    border-bottom: 1px solid white;
     margin-bottom: 1px;
 }
 

@@ -133,6 +133,8 @@ wp.views.registerTemplate("settings");
 wp.views.BlogItemView = Backbone.View.extend({
 	model:null, 
 	
+	tagName:"li",
+	
 	template_name:"settings-blog-item",
 	
 	events: _.extend({
@@ -148,13 +150,13 @@ wp.views.BlogItemView = Backbone.View.extend({
 	
 	render:function() {
 
-		var ul = document.createElement("ul");
-		ul.innerHTML = wp.views.templates[this.template_name].text;
+		var div = document.createElement("div");
+		div.innerHTML = wp.views.templates[this.template_name].text;
 
-		var span = ul.querySelector("span");		
+		var span = div.querySelector("span");		
 		span.innerHTML = this.model.get("blogName");
 		
-		this.$el.html(ul.querySelector("li"));
+		this.$el.html(div.innerHTML);
 	
 		return this;
 	},
