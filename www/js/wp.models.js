@@ -494,6 +494,7 @@ wp.models.Post = Backbone.Model.extend({
 				obj[key] = hash[key];
 			};
 		};
+		obj["post_date_gmt"] = new Date(); // The blog will convert this correctly on its own.
 		delete obj["blogkey"];
 		delete obj["photo"];
 		delete obj["pending"];
