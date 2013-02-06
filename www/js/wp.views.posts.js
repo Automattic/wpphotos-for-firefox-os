@@ -259,18 +259,12 @@ wp.views.Post = Backbone.View.extend({
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text; 
 		
-		var title = div.querySelector(".post-body h3");
-		title.innerHTML = this.model.get("post_title");
-
-		var date = div.querySelector(".post-body span");
-		var postDateGmt = this.model.get("post_date_gmt");
-		date.innerHTML = this.formatGMTDate(postDateGmt);
-
+		var postTitle = this.model.get("post_title");
 		var content = div.querySelector(".post-body p");
-
+		
 		var ele = document.createElement("div");
 		ele.innerHTML = this.model.get("post_content");
-
+			
 		var caption_str = "";
 		var str = ele.textContent;
 		if(str.indexOf("[/caption]") != -1) {
@@ -290,8 +284,26 @@ wp.views.Post = Backbone.View.extend({
 			str = str.substr(0, str.lastIndexOf(" "));
 			str = str + " [...]";
 		};
+		
+		var postDateGmt = this.model.get("post_date_gmt");
+		var formattedDate = this.formatGMTDate(postDateGmt);
+		
+		if (postTitle.length == 0 && str.length == 0) {
+			var postBody = div.querySelector(".post-body");
+			postBody.style.display = "none";
+			var postDiv = div.querySelector(".post");
+			postDiv.style.marginBottom = "20px";
+			var noTitleDate = div.querySelector(".no-title-date");
+			noTitleDate.innerHTML = formattedDate;
+		} else {
+			var title = div.querySelector(".post-body h3");
+			title.innerHTML = this.model.get("post_title");
 
-		content.innerHTML = str;
+			var date = div.querySelector(".post-body span");
+			date.innerHTML = formattedDate;
+
+			content.innerHTML = str;
+		}
 
 		var img = div.querySelector(".photo img");
 		var caption = div.querySelector(".caption");
