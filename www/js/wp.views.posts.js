@@ -132,7 +132,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			evt.stopPropagation();
 		};
 		
-		var html = "<ul>";
+		var html = "<h1>" + _s("title-blogs") + "</h1><ul>";
 		for(var i = 0; i < wp.app.blogs.length; i++) {
 			html += '<li data-idx="' + i + '">' + wp.app.blogs.at(i).get("blogName") + "</li>";
 		};

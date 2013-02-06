@@ -133,10 +133,21 @@ textarea {
 }
 
 x-select-list {
-	width: 80%;
-	height:80%;
+	width: 100%;
+	height:100%;
+	padding: 0;
 	z-index: 1000;
 	font-size:1.5rem;
+	background-image: url("../img/default-background.png");
+	margin:0px;
+}
+
+x-select-list li {
+	margin: 0 20px;
+}
+
+x-select-list h1 {
+	margin:0;
 }
 
 #background, #stage {

@@ -105,7 +105,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 			var selectList = document.createElement('x-select-list');
 			selectList.setAttribute('data-fade-duration', '500');
 			selectList.setAttribute('data-multi-select', true);
-			selectList.innerHTML = '<h3>' + _s('title-select-blogs') + '</h3><ul>';
+			selectList.innerHTML = '<h1>' + _s('title-select-blogs') + '</h1><ul>';
 			for(var i = 0; i < blogs.length; i++) {
 				var blog = blogs.at(i);
 				selectList.innerHTML += '<li data-blog-id="' + blog.get('blogid') + '">' + blog.get("blogName") + '</li>';

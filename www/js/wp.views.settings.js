@@ -73,7 +73,7 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	
 		var arr = this.publish_settings_options;
 		
-		var html = "<h3>" + _s("title-publish-settings") + "</h3><ul>";
+		var html = "<h1>" + _s("title-publish-settings") + "</h1><ul>";
 		for(var idx in arr) {
 			html += '<li data-opt="' + idx + '">' + _s(arr[idx]) + "</li>";
 		};
