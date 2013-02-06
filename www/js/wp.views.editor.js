@@ -55,6 +55,10 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		// webLi0n doesn't pickup placeholders on inputs so we need to do this manually
 		this.el.querySelector("#caption").placeholder = _s("control-caption");
+		this.el.querySelector("#post-title").placeholder = _s("control-post-title");
+		this.el.querySelector("#post-content").placeholder = _s("control-tap-here");
+		this.el.querySelector("#post-tags").placeholder = _s("control-tags");
+
 
 		return this;
 	},
@@ -95,37 +99,61 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		// Save a local draft or sync to the server?
 		var p;
-		
-		var publishSetting = localStorage.publishSetting || 0;		
-		
+		var publishSetting = localStorage.publishSetting || 0;
 		switch(publishSetting) {
-			
-			case 0: //prompt
-				
-				if(confirm(_s("prompt-publish-now"))) {
-					p = post.uploadAndSave(image_data, caption.value.trim()); // saves
-				} else {
-					post.setPendingPhoto(image_data, caption.value.trim());
-					p = post.save();
-				};
-				
+			case 0:
+				p = this.promptToSave(post, image_data, caption.value.trim());
 				break;
-			case 1: // publish now
-				
-				p = post.uploadAndSave(image_data, caption.value.trim()); // saves
-									
+			case 1:
+				p = this.uploadAndSave(post, image_data, caption.value.trim());
 				break;
-			case 2: // publish later
-
-				post.setPendingPhoto(image_data, caption.value.trim());
-				p = post.save();
-
+			case 2:
+				p = this.saveLocal(post, image_data, caption.value.trim());
 				break;
 		};
+		
+		p.fail(function(){
+			var result = p.result();
+			var msg = _s("prompt-problem-publishing");
+			if (result.status == 0 && result.readyState == 0) {
+				msg = "bad url";
+			} else if(result.faultCode){
+				if (result.faultCode == 403) {
+					msg = _s("prompt-bad-username-password");
+				} else {
+					msg = result.faultString;
+				};
+			};
+			alert(_s(msg));
+		});
 		
 		wp.app.posts.add(post, {at:0});
 		wp.app.routes.navigate("posts", {trigger:true});
 		return p;
+		
+	},
+	
+	promptToSave:function(post, image_data, caption){
+		if(confirm(_s("prompt-publish-now"))) {
+			return this.uploadAndSave(post, image_data, caption);
+		} else {
+			return this.saveLocal(post, image_data, caption);
+		};
+	},
+	
+	uploadAndSave:function(post, image_data, caption) {
+	
+		if(!wp.app.isNetworkAvailable()){
+			alert(_s("prompt-network-missing-saving-locally"));
+			return this.saveLocal(post, image_data, caption);
+		};
+		
+		return post.uploadAndSave(image_data, caption); // saves
+	},
+	
+	saveLocal:function(post, image_data, caption) {
+		post.setPendingPhoto(image_data, caption);
+		return post.save();
 	},
 	
 	goBack:function() {

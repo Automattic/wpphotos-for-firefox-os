@@ -139,8 +139,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 		
 		rpc.fail(function(){
 			// TODO:
-			
-			console.log("failed", rpc.result().status);
+			console.log("failed", rpc.result());
 			p.discard(rpc.result());
 		});
 
@@ -483,6 +482,7 @@ wp.models.Post = Backbone.Model.extend({
 		this.trigger("progress", {"status":"failed"});
 		this.upload_promise.discard();
 		this.upload_promise = null;	
+		this.save(); // Save locally we don't loose the post.
 
 	},
 	

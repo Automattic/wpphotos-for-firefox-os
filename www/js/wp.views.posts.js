@@ -83,7 +83,6 @@ wp.views.PostsPage = wp.views.Page.extend({
 				},
 				onScrollEnd: function () {
 					self.dragging = false;
-console.log("dragging stopped")
 					var $el = $(el);
 					if ($el.hasClass("flip")) {
 						$el.removeClass("flip");
@@ -162,12 +161,10 @@ console.log("dragging stopped")
 	},
 	
 	viewPost:function(model) {
-console.log("--           view post");	
 		// if we are not pulling to refresh...
 		if(this.dragging) return;
-console.log("view post");
+
 		window.open(model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
-		
 	},
 	
 	refresh:function() {
@@ -187,6 +184,12 @@ console.log("view post");
 	
 	sync:function() {
 
+		if(!wp.app.isNetworkAvailable()) {
+			alert(_s('prompt-network-missing'));
+			self.iscroll.refresh();
+			return;
+		};
+		
 		var self = this;
 		var p = wp.models.Posts.fetchRemotePosts();
 		p.success(function() {
@@ -195,6 +198,20 @@ console.log("view post");
 		});
 		p.fail(function() {
 			// TODO:
+			
+			var result = p.result();
+			var msg = _s("prompt-problem-syncing");
+			if (result.status == 0 && result.readyState == 0) {
+				msg = _s("prompt-bad-url");
+			} else if(result.faultCode){
+				if (result.faultCode == 403) {
+					msg = _s("prompt-bad-username-password");
+				} else {
+					msg = result.faultString;
+				};
+			};
+			alert(_s(msg));
+			
 			self.iscroll.refresh();
 		});
 
@@ -291,7 +308,7 @@ wp.views.Post = Backbone.View.extend({
 
 		} else {
 			img.src = "";
-			caption.innerHTML = "No Photo";
+			caption.innerHTML = _s("label-no-photo");
 		};
 		
 
@@ -363,7 +380,6 @@ wp.views.Post = Backbone.View.extend({
 			return;
 		};
 		this.model.collection.trigger("selected", this.model);
-//		window.open(this.model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
 	},
 	
 	upload:function() {

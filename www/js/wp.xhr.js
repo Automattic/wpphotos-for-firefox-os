@@ -21,7 +21,7 @@ if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.XHR = function(options) {
 	var options = options || {};
-	
+
 	this.xhr 	= null;
 	this.result = null;
 	this.url 	= options["url"] || null;
@@ -109,16 +109,20 @@ wp.XHR.prototype.execute = function(headers) {
 	var docallbacks = function(event, arr) {
 		for (var i = 0; i < arr.length; i++) {
 			try {
-console.log("xhr docallbacks",event, arr);
 				arr[i](self.xhr, event);
 			} catch(ignore){
 				console.log(ignore);
 			};
 		};
 	};
-console.log("xhr.open", this.url);
-	xhr.open(this.httpMethod, this.url, true);
 
+	try {
+		xhr.open(this.httpMethod, this.url, true);
+	} catch(e) {
+		docallbacks(e, this._callbacks.fail);
+		return;
+	};
+	
 	if(this.headers) {
 		for(var key in this.headers) {
 			xhr.setRequestHeader(key, this.headers[key]);

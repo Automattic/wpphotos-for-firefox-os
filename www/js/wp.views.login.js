@@ -50,6 +50,12 @@ wp.views.LoginPage = wp.views.Page.extend({
 		
 		// if all's good. 
 		url = wp.views.normalizeUrl(url);
+		
+		if(!wp.app.isNetworkAvailable()){
+			alert(_s("prompt-network-missing"));
+			return;
+		};
+		
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
 		wp.app.addLoadingIndicator();
 		p.success(function() {
@@ -59,7 +65,19 @@ wp.views.LoginPage = wp.views.Page.extend({
 		
 		p.fail(function(){
 			wp.app.removeLoadingIndicator();
-			alert("Failed");
+			
+			var result = p.result();
+			var msg = _s("prompt-problem-logging-in");
+			if (result.status == 0 && result.readyState == 0) {
+				msg = _s("prompt-bad-url");
+			} else if(result.faultCode){
+				if (result.faultCode == 403) {
+					msg = _s("prompt-bad-username-password");
+				} else {
+					msg = result.faultString;
+				};
+			};
+			alert(_s(msg));
 		});
 	},
 	
@@ -76,9 +94,9 @@ wp.views.LoginPage = wp.views.Page.extend({
 	
 	// Result is a blogs collection
 	onLoggedIn:function(blogs) {
-		if (blogs.length == 0) {
-			// TODO: Nothing there.  Badness.
-			// TODO: Prompt No blogs at that URL? 
+	
+		if (blogs.length == 0) {			
+			alert(_s("prompt-no-blogs"));
 			return;
 		};
 		
@@ -101,29 +119,43 @@ wp.views.LoginPage = wp.views.Page.extend({
 					var selectedBlogId = selectedItems[i].getAttribute('data-blog-id');
 					var firstBlog;
 					var selectedBlogCtr = 0;
+					
 					for(var x = 0; x < blogs.length; x++) {
 						var blog = blogs.at(x);
+						
 						if (selectedBlogId == blog.get('blogid')) {
-							if (selectedBlogCtr == 0)
+						
+							if (selectedBlogCtr == 0) {
 								firstBlog = blog;
-							var promise = blog.save();
+							};
+							
+							blog.save();
 							selectedBlogCtr++;
-						}
+						};
+						
 					};
+					
 					// Set current blog to the first one selected
 					if (firstBlog != undefined) {
+						wp.app.blogs.fetch();
 						wp.app.setCurrentBlog(firstBlog);
+
+						if(!wp.app.isNetworkAvailable()) {
+							wp.app.routes.navigate("posts", {trigger:true});
+							return;
+						};
+					
 						wp.app.addLoadingIndicator();
 						var p = wp.models.Posts.fetchRemotePosts();
 						p.success(function() {
-						 	wp.app.posts = p.result();
+							wp.app.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
 						});
 						p.always(function() {
 							wp.app.removeLoadingIndicator();
 							wp.app.routes.navigate("posts", {trigger:true});
 						});
-						wp.app.blogs.fetch();
-					}
+
+					};
 				};
 			});
 			

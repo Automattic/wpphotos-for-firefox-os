@@ -105,7 +105,7 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	
 	reset:function() {
 		// Reset the app. Deletes local storage and indexeddb.
-		if(confirm("This will remove all data in the app.  Are you *really* sure?")) {
+		if(confirm("This will remove all data in the app. Are you sure?")) {
 			delete localStorage.blogKey;
 			delete localStorage.publishSetting;
 			
@@ -151,9 +151,7 @@ wp.views.BlogItemView = Backbone.View.extend({
 		var ul = document.createElement("ul");
 		ul.innerHTML = wp.views.templates[this.template_name].text;
 
-		//<li><span>Blog name </span><span><button>X</button></span></li>
-		var span = ul.querySelector("span");
-		
+		var span = ul.querySelector("span");		
 		span.innerHTML = this.model.get("blogName");
 		
 		this.$el.html(ul.querySelector("li"));
@@ -170,7 +168,7 @@ wp.views.BlogItemView = Backbone.View.extend({
 	del:function(evt) {
 		evt.stopPropagation();
 		
-		if(confirm("Remove this blog?")){
+		if(confirm(_s("prompt-remove-blog?"))){
 			this.model.remove();
 		};
 	}
