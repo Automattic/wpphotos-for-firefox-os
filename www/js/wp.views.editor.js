@@ -157,7 +157,7 @@ wp.views.EditorPage = wp.views.Page.extend({
 	},
 	
 	goBack:function() {
-		if(confirm(_s("prompt-cancel-editing?"))) {
+		if(confirm(_s("prompt-cancel-editing"))) {
 			wp.app.routes.navigate("posts", {trigger:true});
 		};
 	}
