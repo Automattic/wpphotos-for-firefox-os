@@ -59,7 +59,6 @@ wp.views.LoginPage = wp.views.Page.extend({
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
 		wp.app.addLoadingIndicator();
 		p.success(function() {
-			wp.app.removeLoadingIndicator();
 			self.onLoggedIn(p.result());
 		});
 		
@@ -171,6 +170,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 			wp.app.posts = p.result();
 		});
 		p.always(function() {
+			wp.app.removeLoadingIndicator();
 			wp.app.routes.navigate("posts", {trigger:true});
 		});
 	}
