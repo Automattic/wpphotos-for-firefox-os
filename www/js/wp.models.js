@@ -355,8 +355,8 @@ wp.models.Post = Backbone.Model.extend({
 			var html = "";
 			var img = '<a href="' + url + '"><img src="' + url + '" /></a>';
 			if (pending_photo.caption) {
-				html = '[caption id="attachment_' + result.id + '" align="alignnone"]';
-				html += '<a href="' + url + '"><img src="' + url + '" /></a>';
+				html = '[caption id="attachment_' + result.id + '" align="aligncenter" width="300"]';
+				html += '<a href="' + url + '"><img src="' + url + '" width="100%" /></a>';
 				html += pending_photo.caption;
 				html += '[/caption]\n';
 			} else {
