@@ -70,6 +70,12 @@ wp.views.EditorPage = wp.views.Page.extend({
 	
 	save:function() {
 		
+		//setTimeout(this.savePost(),100);
+		this.savePost();
+		
+	},
+	
+	savePost:function(){
 		var img = this.el.querySelector("#photo");
 		var caption = this.el.querySelector("#caption");
 		var title = this.el.querySelector("#post-title");
@@ -130,7 +136,6 @@ wp.views.EditorPage = wp.views.Page.extend({
 		wp.app.posts.add(post, {at:0});
 		wp.app.routes.navigate("posts", {trigger:true});
 		return p;
-		
 	},
 	
 	promptToSave:function(post, image_data, caption){

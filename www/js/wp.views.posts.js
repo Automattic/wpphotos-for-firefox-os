@@ -305,7 +305,7 @@ wp.views.Post = Backbone.View.extend({
 				img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
 			};
 
-			if (image.caption.length > 0) {
+			if (image.caption != undefined && image.caption.length > 0) {
 				caption.innerHTML = image.caption;				
 			} else {
 				caption.innerHTML = caption_str;
