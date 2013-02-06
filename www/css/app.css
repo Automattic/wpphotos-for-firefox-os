@@ -267,9 +267,10 @@ header button.logo {
 }
 
 header button.save {
-	width:60px;
+	width:auto;
+	padding:0 5px;
+	border-radius: 3px;
 }
-
 
 
 /*
