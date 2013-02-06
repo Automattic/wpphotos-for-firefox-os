@@ -110,7 +110,8 @@ wp.models.Blog = Backbone.Model.extend({
 
 wp.models.Blogs = Backbone.Collection.extend({
 	store:"blogs",
-	model:wp.models.Blog
+	model:wp.models.Blog,
+	comparator:"blogName"
 }, {
 	fetchRemoteBlogs:function(url, username, password) {
 		
@@ -325,7 +326,6 @@ wp.models.Post = Backbone.Model.extend({
 	},
 		
 	uploadAndSave_Upload:function() {
-
 		// Upload the image.
 		// And report progress
 		this.trigger("progress", {"status":"uploading", "percent":1});
@@ -477,7 +477,6 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	onErrorSaving:function(){
-
 		this._isSyncing = false;
 		this.trigger("progress", {"status":"failed"});
 		this.upload_promise.discard();
