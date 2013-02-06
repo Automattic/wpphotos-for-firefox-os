@@ -812,9 +812,14 @@ section.by-line div {
     border-top:0;
 }
 
+.bloglist li button:active {
+	transform: translate(0, 1px);
+}
+
 .bloglist li button {
 	color: rgb(150,0,0);
 	background-color: rgb(254,121,121);
+	background-image: url("../img/delete.png");
 	text-shadow: 0px 1px rgb(255,180,116);
 	height: 30px;
 	width: 30px;
