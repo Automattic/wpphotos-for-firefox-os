@@ -372,7 +372,7 @@ section.by-line div {
 	font-size:1.7rem;
 	line-height: 4rem;
 	height:4rem;
-	padding:5px;
+	padding:5px 5px 5px 15px;
 }
 
 .page-posts .blog-title:active {
