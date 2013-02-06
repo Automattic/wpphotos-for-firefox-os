@@ -63,7 +63,9 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	},
 	
 	createBlog:function() {
-		window.open("https://signup.wordpress.com/signup/", "", "resizable=yes,scrollbars=yes,status=yes");
+		alert(_s("prompt-create-blog"));
+		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
+		wp.app.routes.navigate("login", {trigger:true});
 	},
 	
 	publishSettings:function(evt) {

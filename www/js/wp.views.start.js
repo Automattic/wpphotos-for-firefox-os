@@ -38,7 +38,9 @@ wp.views.StartPage = wp.views.Page.extend({
 	},
 	
 	showCreate:function() {
+		alert(_s("prompt-create-blog"));
 		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
+		wp.app.routes.navigate("login", {trigger:true});
 	}
 	
 });

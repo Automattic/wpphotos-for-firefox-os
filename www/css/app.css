@@ -263,10 +263,12 @@ header button.back {
 
 header button.settings {
 	background-image: url("../img/settings.png");
+	background-repeat: no-repeat;
 }
 
 header button.add {
 	background-image: url("../img/camera.png");
+	background-repeat: no-repeat;
 }
 
 header button.logo {
