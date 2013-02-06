@@ -297,8 +297,13 @@ wp.views.Post = Backbone.View.extend({
 		var caption = div.querySelector(".caption");
 		
 		var image = this.model.image();
-		if(image) {			
-			img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
+		if(image) {
+			if(image.link.indexOf("data:image") == 0) {
+				// data url so don't use photon.
+				img.src = image.link;
+			} else {
+				img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
+			};
 
 			if (image.caption.length > 0) {
 				caption.innerHTML = image.caption;				

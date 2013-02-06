@@ -195,7 +195,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 	struct photo 	- A media item from the posts media library. Only populated if there is no post_thumbnail and the post DOES have items in its media library.
 	struct pending_photo - The photo data for a local draft of a post.
 	
-	strct photo: http://codex.wordpress.org/XML-RPC_WordPress_API/Media    
+	struct photo: http://codex.wordpress.org/XML-RPC_WordPress_API/Media    
 	    datetime date_created_gmt
 	    string parent: ID of the parent post.
 	    string link
@@ -206,7 +206,7 @@ wp.models.Blogs = Backbone.Collection.extend({
 	    string metadata
 	    string attachment_id (Added in WordPress 3.4)
 	   
-	strct pending_photo: 
+	struct pending_photo: 
 		string caption
 		string link	- This is a dataurl for the image src. Stored in the link for convenience.
 
@@ -316,7 +316,7 @@ wp.models.Post = Backbone.Model.extend({
 		this.upload_promise = wp.promise();
 		
 		if (!this.get("pending_photo")) {
-			// No photo provided, and no photo pending, so save. 
+			// No photo provided, and no photo pending.  This could be an interruppted save. 
 			this.uploadAndSave_SaveRemote();
 		} else {
 			this.uploadAndSave_Upload();		
@@ -374,6 +374,7 @@ wp.models.Post = Backbone.Model.extend({
 		p.progress(function(obj){
 			// obj will be a progress event. 
 			var percent = Math.floor((obj.loaded / obj.total) * 100);
+			console.log("Progress", percent, obj);
 			self.trigger("progress", {"status":"uploading", "percent":percent});
 //			self.upload_promise.notify({"status":"uploading", "percent":percent});
 		});
