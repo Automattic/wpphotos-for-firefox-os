@@ -373,15 +373,17 @@ wp.views.Post = Backbone.View.extend({
 				$(buttonDiv).addClass("hidden");
 				$(progressDiv).removeClass("hidden");
 				
-				if(progress) {				
-					var el = div.querySelector(".progress span");
-					
-					var progressStr = progress.status;
+				var el = div.querySelector(".progress span");
+				var progressStr = this.model.sync_status;
+				if(progress) {
+					progressStr = progress.status;
+/*
 					if(progress.percent ) {
 						progressStr += (" " + progress.percent + "%");
 					}
-					el.innerHTML = progressStr;
+*/
 				};
+				el.innerHTML = progressStr;
 				
 			} else {
 				// Else show the upload button.

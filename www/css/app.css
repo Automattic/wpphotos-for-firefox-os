@@ -647,6 +647,10 @@ section.by-line div {
 	font-size:2rem;
 }
 
+.uploader div.progress div.loading-spinner {
+	display:table;
+}
+
 
 .pull-down {
 	color: #888;
@@ -997,7 +1001,7 @@ x-modal {
 	visibility: hidden;
 }
 
-#loading-spinner {
+.loading-spinner {
 	background-color: transparent;
 	border:8px solid #fff;
 	border-top-color: transparent;

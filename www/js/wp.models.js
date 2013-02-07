@@ -218,8 +218,13 @@ wp.models.Blogs = Backbone.Collection.extend({
 */
 wp.models.Post = Backbone.Model.extend({
 	store:"posts",
+	
 	idAttribute:"link",
+	
 	_isSyncing:false,
+	
+	sync_status:null,
+	
 	defaults:{
 		blogkey:"",
 		post_id:"",
@@ -341,6 +346,7 @@ wp.models.Post = Backbone.Model.extend({
 	uploadAndSave_Upload:function() {
 		// Upload the image.
 		// And report progress
+		this.sync_status = _s("uploading");
 		this.trigger("progress", {"status":"uploading", "percent":1});
 //		this.upload_promise.notify({"status":"uploading", "percent":1});
 		
@@ -400,7 +406,8 @@ wp.models.Post = Backbone.Model.extend({
 	
 	uploadAndSave_SaveRemote:function() {
 //		this.upload_promise.notify({"status":"saving"});
-		this.trigger("progress", {"status":"saving"});
+		this.sync_status = _s("publishing");
+		this.trigger("progress", {"status":"publishing"});
 		
 		var self = this;
 		var p = wp.api.newPost(this.getUploadHash());
@@ -417,6 +424,7 @@ wp.models.Post = Backbone.Model.extend({
 	
 	uploadAndSave_SyncRemote:function(post_id) {
 //		this.upload_promise.notify({"status":"syncing"});
+		this.sync_status = _s("syncing");
 		this.trigger("progress", {"status":"syncing"});
 
 		// Since we only get the post ID back from a save make a request
@@ -473,6 +481,7 @@ wp.models.Post = Backbone.Model.extend({
 			
 			self._isSyncing = false;
 			// this.upload_promise.notify({"status":"success"});
+			self.sync_status = null;
 			self.trigger("progress", {"status":"success"});
 			self.upload_promise.resolve(self);
 			
