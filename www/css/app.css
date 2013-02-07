@@ -61,7 +61,7 @@ button.small:active,
 button.wide:active {
 	color: rgba(0,0,0,.65);
 	background-image: linear-gradient(#eee, #bbb);
-	box-shadow: inset 0 1px 5px #464646, inset 0 -1px 0 #ccc;
+	box-shadow: inset 0 1px 5px rgba(0,0,0,.65), inset 0 -1px 0 rgba(255,255,255,.65);
 }
 
 button.small {
@@ -98,7 +98,17 @@ button.blue:active {
 }
 
 .list-button {
-	/*sex*/
+	position: relative;
+}
+
+.list-button.dropdown:after {
+	content: "";
+	background: url("../img/icons/dropdown.png") no-repeat;
+	width: 18px;
+	height: 18px;
+	position: absolute;
+	right: 12px;
+	top: 12px;
 }
 
 /*
@@ -857,7 +867,6 @@ section.by-line div {
     display:block; 
     margin:0; 
     padding:0;
-    border:1px solid white;
     border-radius: 4px;
 }
 
@@ -871,54 +880,50 @@ section.by-line div {
     background-color:blue;
 }
 
-
 .bloglist {
     max-height:200px;
     display:block; 
     overflow:hidden;
     margin-bottom: 10px;
+    padding: 2px 3px 3px;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.bloglist .list-button {
+	border-radius: 0;
+	position: relative;
+}
+
+.bloglist .list-button:after {
+	right: 46px;
 }
 
 .bloglist ul {
     max-height:200px; 
     overflow-x: hidden;
     overflow-y: auto; 
-}
-
-.bloglist li {
-    display: table-row;
-}
-
-.bloglist li:first-child span {
-    border-top:0;
+    border-radius: 0;
 }
 
 .bloglist li button:active {
 	transform: translate(0, 1px);
 }
 
-.bloglist li button {
-	color: rgb(150,0,0);
-	background-color: rgb(254,121,121);
-	background-image: url("../img/delete.png");
-	text-shadow: 0px 1px rgb(255,180,116);
-	height: 30px;
-	width: 30px;
-	border: 1px;
-	font-size: 1.5rem;
-	border-radius: 3px;
-	border-bottom-color: gray;
-	border-top-color: white;
-	text-shadow: 0px 1px #ffffff;
-	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;
+.bloglist li span button {
+	background: url("../img/delete.png") no-repeat;
+	height: 18px;
+	width: 18px;
+	position: absolute;
+	right: 12px;
+	top: 12px;
+	border: none;
 }
 
 .bloglist li span {
-	border-top:1px solid #888;
-    display:table-cell;
-    padding: 5px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    display: block;
 }
 
 .bloglist li span:first-child {
@@ -932,6 +937,7 @@ section.by-line div {
 }
 .page-settings .content section h2 {
     margin-bottom: 1rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,.8);
 }
 
 .modal-background {
@@ -984,8 +990,4 @@ x-modal {
 @-moz-keyframes spin {
 	0% { -moz-transform:rotate(0deg); }
 	100% { -moz-transform:rotate(360deg); }
-}
-
-#template {
-	height:100%;
 }
