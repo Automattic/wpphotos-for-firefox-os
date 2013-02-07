@@ -5,9 +5,8 @@
   "description": "Publish and share photos and galleries to your WordPress blog.",
   "launch_path": "/index.html",
   "icons": {
-    "16": "/img/icons/wpcom-16.png",
-    "48": "/img/icons/wpcom-48.png",
-    "128": "/img/icons/wpcom-128.png"
+    "30": "/img/icons/app-icon-30.png",
+    "60": "/img/icons/app-icon-60.png"
   },
   "developer": {
     "name": "Automattic Inc.",

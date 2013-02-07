@@ -283,6 +283,14 @@ header button.back {
 	background-image: url("../img/back.png");
 }
 
+header button.settings,
+header button.add {
+	height: 44px;
+	width: 44px;
+	top: 10px;
+	margin: 0 0 0 -4px;
+}
+
 header button.settings {
 	background-image: url("../img/settings.png");
 	background-repeat: no-repeat;
@@ -291,18 +299,21 @@ header button.settings {
 header button.add {
 	background-image: url("../img/camera.png");
 	background-repeat: no-repeat;
+	margin: 0 -4px 0 0;
 }
 
 header button.logo {
 	background-image: url("../img/wplogo.png");
     background-position: left center;
     background-repeat: no-repeat;
-    padding-left: 40px;
-    font-size: 1.8rem;
+    padding-left: 46px;
+    font-size: 2.2rem;
     width: 100px;
     text-shadow: 0 1px 3px rgba(0,0,0,.8);
     height: 36px;
     margin-top: -3px;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-weight: lighter;
 }
 
 header button.save {
@@ -471,15 +482,16 @@ section.by-line div {
 	position:relative;
 }
 
+.page-editor .photo,
 .page-posts .photo {
 	position: relative;
 	z-index: 10;
 	
-	display:block;
-	min-height: 150px;
+	display: block;
+	min-height:150px;
 	
-	box-shadow: 0 1px 5px #333333;
-	background-image:url("../img/wp-placeholder.png");
+	box-shadow: 0 1px 3px rgba(0,0,0,.65);
+	background: url("../img/wp-placeholder.png");
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color: #666666;
@@ -525,10 +537,9 @@ section.by-line div {
 	top: 10px;
 	right: 10px;
 	text-align: right;
-	font-style: italic;
-	color: rgba(255,255,255,0.7);
-	text-shadow: 0 1px #333;
-	font-size: 9pt;
+	color: rgba(255,255,255,0.35);
+	text-shadow: 0 1px 3px rgba(0,0,0,.35);
+	font-size: 1.2rem;
 }
 
 .page-posts .post-body {
@@ -691,21 +702,6 @@ section.by-line div {
 .page-editor .post {
 	padding-bottom: 1px;
 	padding-top: 66px;
-}
-
-.yellow {
-	border: 10px solid yellow !important;
-	background: yellow !important;
-}
-
-.page-editor .photo {
-	position: relative;
-	z-index: 10;
-	
-	display: block;
-	min-height:150px;
-	
-	box-shadow: 0 1px 3px rgba(0,0,0,.65);
 }
 
 .page-editor .photo-table {
@@ -985,6 +981,9 @@ x-modal {
 	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
+.scroll.pulling .scroll-refresh-label:before,
+.scroll.flip .scroll-refresh-label:before,
+.scroll.loading .scroll-refresh-label:before,
 #loading-text:before {
 	content: "...";
 	visibility: hidden;
