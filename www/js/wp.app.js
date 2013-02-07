@@ -119,8 +119,13 @@ wp.app = _.extend({
 	},
 	
 	addLoadingIndicator:function() {
-		var loadingAlert = document.createElement('x-modal');
-		loadingAlert.id = 'loading-modal';
+		// There can be only one! 
+		var loadingAlert = document.getElementById('loading-modal');
+		if(loadingAlert){
+			return;
+		};
+		loadingAlert = document.createElement('x-modal'); 
+		loadingAlert.setAttribute("id", 'loading-modal');
 		loadingAlert.setAttribute('overlay', '');
 		loadingAlert.innerHTML = '<div class="modal-background"></div>';
 		loadingAlert.innerHTML += '<div class="modal-content spinner-modal"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
@@ -129,7 +134,6 @@ wp.app = _.extend({
 	
 	removeLoadingIndicator:function() {
 		var loadingAlert = document.getElementById('loading-modal');
-		console.log(loadingAlert);
 		if (loadingAlert != undefined)
 			document.body.removeChild(loadingAlert);
 	}
