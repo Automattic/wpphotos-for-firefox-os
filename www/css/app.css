@@ -30,6 +30,7 @@ h2, h3 {
 	font-weight: lighter;
 }
 
+.list-button,
 button.small,
 button.wide {
 	border: none;
@@ -48,12 +49,14 @@ button.wide {
 	box-shadow: 0 1px 0 rgba(255,255,255, 0.92) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
+.list-button:hover,
 button.small:hover,
 button.wide:hover {
 	background-image: linear-gradient(#fff, #ccc);
 	box-shadow: 0 1px 0 rgba(255,255,255, 1) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
+.list-button:active,
 button.small:active,
 button.wide:active {
 	color: rgba(0,0,0,.65);
@@ -62,14 +65,12 @@ button.wide:active {
 }
 
 button.small {
-	height: 40px;
-	font-size: 1.5rem;
-	border-radius: 3px;
-	border-bottom-color: gray;
-	border-top-color: white;
-	text-shadow: 0px 1px #ffffff;
-	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;
+	height: 36px;
+	font-size: 1.4rem;
+	margin-right: 10px;
 }
+
+
 
 button.wide {
 	height: 42px;
@@ -94,6 +95,10 @@ button.blue:active {
 	color: rgba(255,255,255,0.65);
 	background-image: linear-gradient(#1e8cbe, #0074a2);
 	box-shadow: inset 0 1px 5px #005684, inset 0 -1px 0 #1e8cbe;
+}
+
+.list-button {
+	/*sex*/
 }
 
 /*
@@ -294,29 +299,39 @@ header button.save {
 	Start page
 */
 
-.modal-content {
-    border-radius: 10px 10px 10px 10px;
-    left: 50%;
+.modal-content.blog-settings {
     padding: 20px;
     position: absolute;
     font-size: 1.5rem;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 20px;
+    right: 20px;
+    top: 100px;
+    transform: none;
+}
+
+.modal-content input[type="text"], .modal-content input[type="password"] {
+	width: 100%;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 .spinner-modal {
-    background-color: rgba(0, 0, 0, 0.5);
     color: #CCCCCC;
 }
 
 .blog-settings {
-    background-image: url("../img/default-background.png");
-    color: white;
-    overflow: hidden;
+    
 }
 
 .blog-settings #url {
-	padding-bottom: 10px;
+	margin-bottom: 2rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: rgba(255,255,255,.65);
+}
+
+.blog-settings h2 {
+	margin-bottom: 1rem;
 }
 
 
@@ -848,22 +863,8 @@ section.by-line div {
 
 .page-settings li {
 	list-style: none;
-	position: relative;
-    height:30px;
-    color:#888;
     font-size: 1.5rem;
     line-height: 30px;
-    border-top:1px solid #666;
-    padding:5px;
-}
-
-.page-settings li:first-child {
-    border-top:0;
-}
-
-.page-settings li:active {
-    background-color: rgb(177,227,242) !important;
-    color:#fff;
 }
 
 .page-settings li.selected {
@@ -930,11 +931,11 @@ section.by-line div {
     margin-bottom:30px;
 }
 .page-settings .content section h2 {
-    margin-bottom: 1px;
+    margin-bottom: 1rem;
 }
 
 .modal-background {
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.9);
     height: 100%;
     width: 100%;
 }
@@ -945,6 +946,8 @@ section.by-line div {
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8);
 }
 
 x-modal {
