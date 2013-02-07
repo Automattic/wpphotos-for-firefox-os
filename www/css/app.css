@@ -434,6 +434,7 @@ section.by-line div {
 .page-posts .iscroller {
 	position:absolute;
 	width: 100%;
+	min-height: 100%;
 }
 
 .page-posts .blog-title {
@@ -488,7 +489,7 @@ section.by-line div {
 	z-index: 10;
 	
 	display: block;
-	min-height:150px;
+	min-height:214px;/* Min height should match the requested size from the photon api */
 	
 	box-shadow: 0 1px 3px rgba(0,0,0,.65);
 	background: url("../img/wp-placeholder.png");

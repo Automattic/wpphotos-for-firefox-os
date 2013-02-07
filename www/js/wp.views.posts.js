@@ -9,7 +9,12 @@ document.addEventListener('touchmove', function (e) { e.preventDefault(); }, fal
 wp.views.PostsPage = wp.views.Page.extend({
 	template_name:"posts",
 	
+	syncedonce:false, // Have we tried to sync at least once?
+	
+	syncing:false,
+	
 	rendered:false,
+	
 	dragging:false,
 	
 	events:_.extend({
@@ -173,7 +178,25 @@ wp.views.PostsPage = wp.views.Page.extend({
 		var self = this;
 		var p = this.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
 		p.success(function() {
-			self.render();
+		
+			if(self.posts.length > 0) {
+				self.render();
+			} else if(!self.syncedonce) {
+				// If we haven't tried to sync at least once, do so now. 
+				if(self.syncing) {
+					return; 
+				};
+				
+				// Update the pull to refresh header.'
+				var $el = $(self.el.querySelector(".scroller"));
+				$el.removeClass("pulling");
+				$el.removeClass("flip");
+				$el.addClass("loading");
+				$el.find(".scroll-refresh-label").text(_s("control-loading"));
+				
+				self.sync();
+			};
+
 		});
 		p.fail(function(err) {
 			// TODO:
@@ -191,15 +214,14 @@ wp.views.PostsPage = wp.views.Page.extend({
 			return;
 		};
 		
+		this.syncing = true;
 		var self = this;
 		var p = wp.models.Posts.fetchRemotePosts();
 		p.success(function() {
-			self.iscroll.refresh();
+			self.syncedonce = true;
 			self.refresh();
 		});
-		p.fail(function() {
-			// TODO:
-			
+		p.fail(function() {			
 			var result = p.result();
 			var msg = _s("prompt-problem-syncing");
 			if (result.status == 0 && result.readyState == 0) {
@@ -212,7 +234,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 				};
 			};
 			alert(_s(msg));
-			
+
+		});
+		p.always(function(){
+			self.syncing = false;
 			self.iscroll.refresh();
 		});
 
@@ -307,7 +332,7 @@ wp.views.Post = Backbone.View.extend({
 			date.innerHTML = formattedDate;
 
 			content.innerHTML = str;
-		}
+		};
 
 		var img = div.querySelector(".photo img");
 		var caption = div.querySelector(".caption");

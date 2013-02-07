@@ -101,13 +101,27 @@ wp.app = _.extend({
 		
 		if (blog) {
 			this.setCurrentBlog(blog);
+		} else {
+			try {
+			// No blogs found. Perform a clean up.
+			wp.app.posts.update([]); // Clear the posts list.
+			delete localStorage.blogKey;
+			} catch(e){ console.log(e);};
 		};
 	},
 	
 	setCurrentBlog:function(blog) {
+		if(this.currentBlog && (this.currentBlog.id == blog.id)){
+			// same blog.  nothing to see here. move along.
+			return;
+		};
+
 		wp.api.setCurrentBlog(blog.attributes);
 		localStorage.blogKey = blog.id;
 		this.currentBlog = blog;
+		// Clear the posts list since we changed blogs. Suppress change events since we're dispatching our own. 
+		this.posts.update([], {silent:true});
+		
 		this.trigger("currentBlogChanged");
 	},
 	
