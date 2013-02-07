@@ -760,12 +760,39 @@ section.by-line div {
 }
 
 .page-about h1 {
-	margin-bottom:30px;
+	margin-bottom:24px;
 }
 
 .page-about a {
 	font-size: 1rem;
 	color:#fff;
+}
+
+.page-about ul {
+	font-size: 1.4rem;
+	color:#fff;
+	list-style: none;
+	margin: 0;
+	padding: 0 0 20px 0;
+	font-style: italic;
+}
+
+.page-about ul li {
+	opacity: 0;
+	margin: 0;
+	padding: 0 0 6px 0;
+	-moz-animation:fade-in 2s linear; 
+	-moz-animation-fill-mode:forwards;
+}
+
+@-moz-keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+
+.page-about ul #line-2 {
+	-moz-animation-delay:2s;
+}
+
+.page-about ul #line-3 {
+	-moz-animation-delay:4s;
 }
 
 
