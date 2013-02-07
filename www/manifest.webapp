@@ -2,11 +2,12 @@
   "version": "1.0",
   "name": "WP Photos",
   "type": "privileged",
-  "description": "Publish and share photos and galleries to your WordPress blog.",
+  "description": "Publish and share photos to your WordPress blog.",
   "launch_path": "/index.html",
   "icons": {
     "30": "/img/icons/app-icon-30.png",
-    "60": "/img/icons/app-icon-60.png"
+    "60": "/img/icons/app-icon-60.png",
+    "128": "/img/icons/app-icon-128.png"
   },
   "developer": {
     "name": "Automattic Inc.",
@@ -23,13 +24,13 @@
   "default_locale": "en-US",
   "locales": {
     "es": {
-      "description": "Publicar y compartir fotos y galerías para tu blog de WordPress.",
+      "description": "Publicar y compartir fotos para tu blog de WordPress.",
       "developer": {
         "url": "http://automattic.com"
       }
     },
     "pt-BR": {
-      "description": "Publicar e compartilhar fotos e galerias para seu blog WordPress",
+      "description": "Publicar e compartilhar fotos para seu blog WordPress",
       "developer": {
         "url": "http://automattic.com"
       }
