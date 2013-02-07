@@ -131,8 +131,13 @@ wp.models.Blogs = Backbone.Collection.extend({
 				var collection = new wp.models.Blogs(res);
 				for(var idx in collection.models){
 					var model = collection.models[idx];
+					
+					// encrypt password
+					var enc = CryptoJS.AES.encrypt(password, username);
+					var pass = enc.toString();
+					
 					model.set("username", username);
-					model.set("password", password);
+					model.set("password", pass);
 					// Fetching only, don't save. Let the caller decide whether to save.
 				};
 				console.log("resolving");
@@ -586,27 +591,27 @@ wp.models.Posts = Backbone.Collection.extend({
 					
 					keepers.push(m.get("link"));
 					
-					var p;
+					var p1;
 
 					// If the post has a featured image we're good. Save the post. 
 					// If no featured image, then fetch its media library.
 
 					if(m.get("post_thumbnail") != null) {
-						p = m.save();
+						p1 = m.save();
 					} else {
-						p = m.fetchRemoteMedia(); // no featured image
+						p1 = m.fetchRemoteMedia(); // no featured image
 					};
 
-					p.success(function() {
+					p1.success(function() {
 						//TODO
 					});
 
-					p.fail(function(){
+					p1.fail(function(){
 						//TODO
 					});
 
 					// Add the save promise to the promise queue.
-					q.add(p);
+					q.add(p1);
 
 				})(i);
 			};
@@ -617,8 +622,8 @@ wp.models.Posts = Backbone.Collection.extend({
 		});
 		
 		rpc.fail(function(){
-			console.log("Fetch remote posts failed.");
-			p.discard();
+			console.log("Fetch remote posts failed.", rpc.result());
+			p.discard(rpc.result());
 		});
 
 		return p;

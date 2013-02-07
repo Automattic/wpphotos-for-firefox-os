@@ -217,7 +217,6 @@ wp.views.EditBlogModal = Backbone.View.extend({
 		this.$el.html(div.innerHTML);
 		
 		this.el.querySelector("#username").value = this.model.get("username");
-		this.el.querySelector("#password").value = this.model.get("password");
 		this.el.querySelector("#url").innerHTML = this.model.get("url");
 		this.el.querySelector("#blog-name").innerHTML = this.model.get("blogName");
 
@@ -241,13 +240,21 @@ wp.views.EditBlogModal = Backbone.View.extend({
 		// if all's good. 
 		url = wp.views.normalizeUrl(url);
 		
+		// encrypt password
+		var enc = CryptoJS.AES.encrypt(password, username);
+		var pass = enc.toString();
+
 		this.model.set({
 			"username":username,
-			"password":password
+			"password":pass
 		});
 		var self = this;
 		var p = this.model.save();
 		p.success(function(){
+			if(self.model.id == wp.app.currentBlog.id){
+				wp.api.setCurrentBlog(self.model.attributes);
+			};
+		
 			self.hide();
 		});
 	},

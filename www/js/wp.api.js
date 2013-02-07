@@ -20,10 +20,15 @@ wp.api = {
 	blog:null,  // hash: {username:'', password:'', xmlrpc:'', blog_id:''}
 	getParams:function(){
 		var blog = this.blog;
+		
+		// decrypt password
+		var dec = CryptoJS.AES.decrypt(blog.password, blog.username);
+		var pass = dec.toString(CryptoJS.enc.Utf8);
+		
 		var params = [
 			blog.blog_id,
 			blog.username,
-			blog.password
+			pass
 		];
 		for (var i = 0; i < arguments.length; i++) {
 			if (arguments[i] == null)  continue;
@@ -60,7 +65,7 @@ wp.api.build = function(method, params, url) {
 			p.discard(rpc.result);
 			
 		} else {
-			p.resolve(rpc.result);		
+			p.resolve(rpc.result);	
 		};
 		
 	});

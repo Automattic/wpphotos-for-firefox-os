@@ -225,7 +225,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			self.syncedonce = true;
 			self.refresh();
 		});
-		p.fail(function() {			
+		p.fail(function() {
 			var result = p.result();
 			var msg = _s("prompt-problem-syncing");
 			if (result.status == 0 && result.readyState == 0) {
