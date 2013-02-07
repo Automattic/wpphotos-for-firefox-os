@@ -547,33 +547,36 @@ section.by-line div {
 	vertical-align:middle;	
 }
 
-
-.post button.upload {
-	height:100px;
+.post button.upload,
+.post button.discard {
 	width:200px;
-	margin-left:calc(50% - 100px);
-
-	border: 1px;
+	margin: 0 auto 1rem;
+	display: block;
 	font-size: 1.8rem;
-	border-radius: 3px;
-	border-bottom-color: gray;
-	border-top-color: white;
-	text-shadow: 0px 1px #ffffff;
-	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;
+	height:100px;
+	position: relative;
 }
 
 .post button.discard {
 	height:50px;
-	width:200px;
-	margin-left:calc(50% - 100px);
-	margin-bottom:0;
-	border: 1px;
-	font-size: 1.8rem;
-	border-radius: 3px;
-	border-bottom-color: gray;
-	border-top-color: white;
-	text-shadow: 0px 1px #ffffff;
-	box-shadow: 0px 1px #666666, 0px -1px #FFFFFF;	
+}
+
+.post button.upload:before {
+	content: "";
+	display: block;
+	margin: 0 auto;
+	float: none;
+	clear: both;
+	background-image: url("../img/icons/upload.png");
+	background-repeat: no-repeat;
+	width: 36px;
+	height: 36px;
+	position: relative;
+	top: -6px;
+}
+
+.post button.upload:active:before {
+	opacity: .65;
 }
 
 .uploader div.progress {
