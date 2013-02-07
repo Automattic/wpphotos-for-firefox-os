@@ -111,6 +111,10 @@ button.blue:active {
 	top: 12px;
 }
 
+button.wide.x-select-ok {
+	margin: 20px 0 0 20px;
+}
+
 /*
 
 button.orange {
@@ -220,7 +224,6 @@ x-select-list h1 {
 }
 
 .page {
-	position: relative;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
@@ -263,15 +266,18 @@ header button:active {
 
 header button.left {
 	position:absolute;
-	left:15px;	
+	left:14px;	
 }
 
 header button.right {
-	position:absolute;
-	right:15px;
-	text-align: right;
+	position: absolute;
+	right: 15px;
+	text-align: center;
 }
 
+header button.right.small {
+	margin-right: 4px;
+}
 
 header button.back {
 	background-image: url("../img/back.png");
@@ -301,8 +307,6 @@ header button.logo {
 
 header button.save {
 	width:auto;
-	padding:0 5px;
-	border-radius: 3px;
 }
 
 /*
@@ -436,6 +440,7 @@ section.by-line div {
 	color:black;
 }
 
+.page-editor header,
 .page-posts header {
 	background: url("../img/header.png") no-repeat 50% 0;
 	position: relative;
@@ -444,6 +449,7 @@ section.by-line div {
 	height: 66px;
 }
 
+.page-editor .scroll,
 .page-posts .scroll {
 	bottom:0;
 	position: absolute;
@@ -657,7 +663,7 @@ section.by-line div {
 
 /*
 	Editor page
-*/
+
 
 .page-editor header {
 	position:relative;
@@ -667,10 +673,11 @@ section.by-line div {
 	height: 60px;
 	background-color:black;
 }
+*/
 
 .page-editor .scroll {
 	overflow:hidden;
-	height:calc(100% - 45px);
+	height: 100%;
 }
 
 .page-editor section.content {
@@ -678,11 +685,17 @@ section.by-line div {
 	z-index: 5;
 	background-color: #000;
 	height:100%;
-	overflow:scroll;
+	overflow:auto;
 }
 
 .page-editor .post {
 	padding-bottom: 1px;
+	padding-top: 66px;
+}
+
+.yellow {
+	border: 10px solid yellow !important;
+	background: yellow !important;
 }
 
 .page-editor .photo {
@@ -692,24 +705,27 @@ section.by-line div {
 	display: block;
 	min-height:150px;
 	
-	box-shadow: 0 1px 5px #333333;
+	box-shadow: 0 1px 3px rgba(0,0,0,.65);
 }
 
 .page-editor .photo-table {
-	display:table; 
 	width:100%;
 }
 
 .page-editor .photo-cell {
-    display: table-cell;
     height: 100%;
     width: 100%;
     text-align: center;
 }
 
 .page-editor .photo img {
-	width: 100%;
-	height: 100%;
+	display: block;
+    height: auto;
+    margin: 0 auto;
+    max-height: 250px;
+    max-width: calc(100%);
+    position: relative;
+    width: auto;
 	box-shadow: 0px 1px 3px #333333 inset;
 }
 

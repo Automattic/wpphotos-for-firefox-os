@@ -53,8 +53,9 @@
 			var okSelector = '.x-select-ok';
 
 			if (this.multiSelect && xtag.query(self, okSelector).length === 0) {
-				var button = document.createElement('a');
+				var button = document.createElement('button');
 				button.className = okSelector.substring(1);
+				button.className += " blue wide";
 				button.innerHTML = this.okText;
 				button.href = '#hide';
 				self.appendChild(button);
@@ -114,7 +115,7 @@
 			},
 
 			okText: function() {
-				return this.getAttribute(okTextAttr) || 'OK';
+				return this.getAttribute(okTextAttr) || 'Add Blogs';
 			},
 
 			location: function() {
