@@ -289,16 +289,9 @@ header button.save {
 	border-radius: 3px;
 }
 
-
 /*
-
+	Start page
 */
-
-.modal-background {
-	background-color: rgba(0, 0, 0, 0.5);
-    height: 100%;
-    width: 100%;
-}
 
 .modal-content {
     border-radius: 10px 10px 10px 10px;
@@ -334,6 +327,7 @@ x-modal {
 /*
 	Start page
 */
+>>>>>>> .r91
 .page-start header {
 	text-align: left;
 }
@@ -938,19 +932,46 @@ section.by-line div {
     margin-bottom: 1px;
 }
 
+.modal-background {
+	background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+}
+
+.modal-content {
+    left: 50%;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+x-modal {
+	height: 100%;
+	width: 100%;
+}
+
 #loading-text {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: 3rem;
+	font-size: 1.8rem;
+	color: #fff;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+#loading-text:before {
+	content: "...";
+	visibility: hidden;
 }
 
 #loading-spinner {
-	background-color: rgba(0,0,0,0);
-	border:5px solid #ccc;
-	border-top:5px solid rgba(0,0,0,0);
-	border-left:5px solid rgba(0,0,0,0);
+	background-color: transparent;
+	border:8px solid #fff;
+	border-top-color: transparent;
+	border-left-color: transparent;
 	border-radius:50px;
-	width:30px;
-	height:30px;
+	width:34px;
+	height:34px;
 	margin:0 auto;
 	-moz-animation:spin 1.10s infinite linear;
 	-webkit-animation:spin 1.10s infinite linear;
