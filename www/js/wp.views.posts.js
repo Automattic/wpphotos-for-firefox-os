@@ -47,7 +47,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			var el = this.$el.find(".scroll")[0];
 
 			var self = this;
-			var refreshOffset = 50;
+			var refreshOffset = 30;
 			this.iscroll = new iScroll(el, {
 				useTransition: true,
 				hScroll:false,

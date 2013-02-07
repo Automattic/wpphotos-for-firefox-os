@@ -586,10 +586,11 @@ section.by-line div {
 .pull-down {
 	color: #888;
     font-size: 1.2rem;
-    height: 50px;
-    line-height: 50px;
+    height: 24px;
+    line-height: 24px;
     text-align: center;
-    padding-top: 58px;
+    padding-top: 56px;
+    padding-bottom: 16px;
 }
 
 .scroll-refresh-label {
