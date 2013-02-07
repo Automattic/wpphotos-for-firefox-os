@@ -23,6 +23,7 @@ h1 {
 	letter-spacing: 0.1rem;
 	line-height: 3rem;
 	text-shadow: 0 1px 3px rgba(0,0,0,.8);
+	text-align: left;
 }
 
 h2, h3 {
