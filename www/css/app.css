@@ -112,7 +112,7 @@ button.blue:active {
 }
 
 button.wide.x-select-ok {
-	margin: 20px 0 0 20px;
+	margin: 20px 0 20px 20px;
 }
 
 /*
@@ -489,13 +489,19 @@ section.by-line div {
 	z-index: 10;
 	
 	display: block;
-	min-height:214px;/* Min height should match the requested size from the photon api */
 	
 	box-shadow: 0 1px 3px rgba(0,0,0,.65);
 	background: url("../img/wp-placeholder.png");
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-color: #666666;
+}
+
+.page-editor .photo {
+	min-height: 150px; /* saftey height */
+}
+.page-posts .photo {
+	min-height: 214px;/* Min height should match the requested size from the photon api */
 }
 
 .page-posts .photo-table {
@@ -972,6 +978,7 @@ section.by-line div {
 x-modal {
 	height: 100%;
 	width: 100%;
+	z-index: 10;
 }
 
 #loading-text {

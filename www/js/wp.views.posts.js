@@ -41,6 +41,9 @@ wp.views.PostsPage = wp.views.Page.extend({
 	
 	render:function() {
 
+		// Ensure that no loading spinner is showing
+		wp.app.hideLoadingIndicator();
+		
 		if(!this.rendered) {
 			this.rendered = true;
 
@@ -281,10 +284,6 @@ wp.views.Post = Backbone.View.extend({
 	},
 	
 	render:function(progress) {
-
-		// Ensure that no loading spinner is showing
-		wp.app.removeLoadingIndicator();
-
 		var div = document.createElement("div");
 		div.innerHTML = wp.views.templates[this.template_name].text; 
 		

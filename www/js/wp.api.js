@@ -69,12 +69,13 @@ wp.api.build = function(method, params, url) {
 		p.discard({"status":xhr.status, "event":event, "readyState":xhr.readyState});
 	});
 	rpc.progress(function(xhr, event){
+console.log("API NOTIFIYING PROGRESS");
 		p.notify(event);
 	});
 	rpc.execute();
 	
 	return p;
-}
+};
 
 
 /*

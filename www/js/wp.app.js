@@ -132,21 +132,26 @@ wp.app = _.extend({
 		return false;
 	},
 	
-	addLoadingIndicator:function() {
+	showLoadingIndicator:function(msg) {
+		msg = msg || _s('control-loading');
+	
 		// There can be only one! 
 		var loadingAlert = document.getElementById('loading-modal');
 		if(loadingAlert){
+			if(msg){
+				loadingAlert.querySelector("#loading-text").innerHTML = msg;
+			}
 			return;
 		};
 		loadingAlert = document.createElement('x-modal'); 
 		loadingAlert.setAttribute("id", 'loading-modal');
 		loadingAlert.setAttribute('overlay', '');
 		loadingAlert.innerHTML = '<div class="modal-background"></div>';
-		loadingAlert.innerHTML += '<div class="modal-content spinner-modal"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
+		loadingAlert.innerHTML += '<div class="modal-content spinner-modal"><span id="loading-text">' + msg + '</span><div id="loading-spinner"></div></div>';
 		document.body.appendChild(loadingAlert);
 	},
 	
-	removeLoadingIndicator:function() {
+	hideLoadingIndicator:function() {
 		var loadingAlert = document.getElementById('loading-modal');
 		if (loadingAlert != undefined)
 			document.body.removeChild(loadingAlert);

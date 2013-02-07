@@ -135,6 +135,7 @@ wp.XHR.prototype.execute = function(headers) {
 	
 	
 	xhr.addEventListener("progress", function(event){
+console.log("XHR PROGRESS", event);
 		docallbacks(event, self._callbacks.progress);
 	}, false);
 	

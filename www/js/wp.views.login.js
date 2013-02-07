@@ -57,13 +57,13 @@ wp.views.LoginPage = wp.views.Page.extend({
 		};
 		
 		var p = wp.models.Blogs.fetchRemoteBlogs(url, username, password);
-		wp.app.addLoadingIndicator();
+		wp.app.showLoadingIndicator();
 		p.success(function() {
 			self.onLoggedIn(p.result());
 		});
 		
 		p.fail(function(){
-			wp.app.removeLoadingIndicator();
+			wp.app.hideLoadingIndicator();
 			
 			var result = p.result();
 			var msg = _s("prompt-problem-logging-in");
@@ -144,13 +144,13 @@ wp.views.LoginPage = wp.views.Page.extend({
 							return;
 						};
 					
-						wp.app.addLoadingIndicator();
+						wp.app.showLoadingIndicator();
 						var p = wp.models.Posts.fetchRemotePosts();
 						p.success(function() {
 							wp.app.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
 						});
 						p.always(function() {
-							wp.app.removeLoadingIndicator();
+							wp.app.hideLoadingIndicator();
 							wp.app.routes.navigate("posts", {trigger:true});
 						});
 
@@ -170,7 +170,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 			wp.app.posts = p.result();
 		});
 		p.always(function() {
-			wp.app.removeLoadingIndicator();
+			wp.app.hideLoadingIndicator();
 			wp.app.routes.navigate("posts", {trigger:true});
 		});
 	}
