@@ -985,14 +985,16 @@ x-modal {
 	z-index: 10;
 }
 
+.loading-text,
 #loading-text {
 	display: block;
-	margin-bottom: 3rem;
+	margin-bottom: 2rem;
 	font-size: 1.8rem;
 	color: #fff;
 	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
+.loading-text:before,
 .scroll.pulling .scroll-refresh-label:before,
 .scroll.flip .scroll-refresh-label:before,
 .scroll.loading .scroll-refresh-label:before,
