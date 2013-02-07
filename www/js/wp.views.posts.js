@@ -119,11 +119,11 @@ wp.views.PostsPage = wp.views.Page.extend({
 		if (wp.app.blogs.length > 1) {
 			// Show the blog picker :)
 			
-			var el = document.createElement("div");
-			el.className = "blog-title";
-			el.innerHTML = wp.app.currentBlog.get("blogName");
+			var pel = document.createElement("div");
+			pel.className = "blog-title";
+			pel.innerHTML = wp.app.currentBlog.get("blogName");
 			
-			content.appendChild(el);
+			content.appendChild(pel);
 		};
 		
 		for(var i = 0; i < collection.length; i++) {
