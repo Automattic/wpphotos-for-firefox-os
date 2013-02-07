@@ -110,8 +110,13 @@ wp.models.Blog = Backbone.Model.extend({
 
 wp.models.Blogs = Backbone.Collection.extend({
 	store:"blogs",
+	
 	model:wp.models.Blog,
-	comparator:"blogName"
+	
+	comparator: function(blog){
+		return blog.get("blogName").toLowerCase();
+	}
+	
 }, {
 	fetchRemoteBlogs:function(url, username, password) {
 		
