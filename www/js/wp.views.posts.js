@@ -63,14 +63,16 @@ wp.views.PostsPage = wp.views.Page.extend({
 				topOffset: refreshOffset,
 				onRefresh: function () {
 					var $el = $(el);
+					if ($el.hasClass("pulling")) $el.removeClass("pulling");
 					if ($el.hasClass("loading")){
 						$el.removeClass("loading");
-						$el.find("scroll-refresh-label").text(_s("control-pull-to-refresh"));
+						$el.find(".scroll-refresh-label").text(_s("control-pull-to-refresh"));
 					};
 				},
 				onScrollMove: function () {
 					self.dragging = true;
 					var $el = $(el);
+					$el.addClass("pulling");
 					if (this.y > 5 && !$el.hasClass("flip")){
 						$el.addClass("flip");
 						$el.find(".scroll-refresh-label").text(_s("control-release-to-refresh"));
@@ -84,6 +86,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 				onScrollEnd: function () {
 					self.dragging = false;
 					var $el = $(el);
+					$el.removeClass("pulling");
 					if ($el.hasClass("flip")) {
 						$el.removeClass("flip");
 						$el.addClass("loading");
