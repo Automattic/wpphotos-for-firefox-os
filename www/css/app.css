@@ -293,6 +293,7 @@ header button.save {
 /*
 
 */
+
 .modal-background {
 	background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
@@ -300,13 +301,30 @@ header button.save {
 }
 
 .modal-content {
-	background-color: white;
+    border-radius: 10px 10px 10px 10px;
     left: 50%;
     padding: 20px;
     position: absolute;
+    font-size: 1.5rem;
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
+.spinner-modal {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #CCCCCC;
+}
+
+.blog-settings {
+    background-image: url("../img/default-background.png");
+    color: white;
+    overflow: hidden;
+}
+
+.blog-settings #url {
+	padding-bottom: 10px;
+}
+
 
 x-modal {
 	height: 100%;

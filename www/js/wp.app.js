@@ -123,7 +123,7 @@ wp.app = _.extend({
 		loadingAlert.id = 'loading-modal';
 		loadingAlert.setAttribute('overlay', '');
 		loadingAlert.innerHTML = '<div class="modal-background"></div>';
-		loadingAlert.innerHTML += '<div class="modal-content"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
+		loadingAlert.innerHTML += '<div class="modal-content spinner-modal"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
 		document.body.appendChild(loadingAlert);
 	},
 	
