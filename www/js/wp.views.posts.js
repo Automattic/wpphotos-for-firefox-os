@@ -194,15 +194,11 @@ wp.views.PostsPage = wp.views.Page.extend({
 					return; 
 				};
 				
-				// Update the pull to refresh header.'
-				self.iscroll.minScrollY = -30;
-				var $el = $(self.el.querySelector(".scroller"));
-				$el.removeClass("pulling");
-				$el.removeClass("flip");
-				$el.addClass("loading");
-				$el.find(".scroll-refresh-label").text(_s("control-loading"));
-				
-				self.sync();
+				wp.app.showLoadingIndicator();
+				var promise = self.sync();
+				promise.always(function(){
+					wp.app.hideLoadingIndicator();
+				});
 			};
 
 		});
