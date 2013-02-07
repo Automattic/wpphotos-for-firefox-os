@@ -27,7 +27,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 	initialize:function() {
 		this.posts = wp.app.posts;
 		
-		this.listenTo(wp.app, 'currentBlogChanged', this.refresh);
+		this.listenTo(wp.app, 'currentBlogChanged', this.onBlogChanged);
 		this.listenTo(this.posts, "selected", this.viewPost);
 		this.listenTo(this.posts, "add", this.render);
 		this.listenTo(this.posts, "remove", this.render);
@@ -137,6 +137,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 		return this;
 	},
 	
+	onBlogChanged:function() {
+		this.syncedonce = false;
+		this.refresh();
+	},
 	
 	showPicker:function(evt) {
 		if(evt) {
@@ -181,16 +185,17 @@ wp.views.PostsPage = wp.views.Page.extend({
 		var self = this;
 		var p = this.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
 		p.success(function() {
-		
-			if(self.posts.length > 0) {
-				self.render();
-			} else if(!self.syncedonce) {
-				// If we haven't tried to sync at least once, do so now. 
+			
+			self.render();
+					
+			if(self.posts.length == 0 && !self.syncedonce) {
+				// If we haven't tried to sync at least once, do so. 
 				if(self.syncing) {
 					return; 
 				};
 				
 				// Update the pull to refresh header.'
+				self.iscroll.minScrollY = -30;
 				var $el = $(self.el.querySelector(".scroller"));
 				$el.removeClass("pulling");
 				$el.removeClass("flip");

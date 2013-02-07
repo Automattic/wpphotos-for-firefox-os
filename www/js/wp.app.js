@@ -103,9 +103,10 @@ wp.app = _.extend({
 			this.setCurrentBlog(blog);
 		} else {
 			try {
-			// No blogs found. Perform a clean up.
-			wp.app.posts.update([]); // Clear the posts list.
-			delete localStorage.blogKey;
+				// No blogs found. Perform a clean up.
+				wp.app.posts.update([]); // Clear the posts list.
+				localStorage.blogKey = null; // paranoia
+				delete localStorage.blogKey;
 			} catch(e){ console.log(e);};
 		};
 	},

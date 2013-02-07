@@ -114,10 +114,10 @@ wp.views.LoginPage = wp.views.Page.extend({
 
 			selectList.addEventListener('hide', function(event) {
 				var selectedItems = event.selectedItems;
+				var selectedBlogCtr = 0;
 				for(var i = 0; i < selectedItems.length; i++) {
 					var selectedBlogId = selectedItems[i].getAttribute('data-blog-id');
 					var firstBlog;
-					var selectedBlogCtr = 0;
 					
 					for(var x = 0; x < blogs.length; x++) {
 						var blog = blogs.at(x);
@@ -133,10 +133,11 @@ wp.views.LoginPage = wp.views.Page.extend({
 						};
 						
 					};
-					
+
 					// Set current blog to the first one selected
 					if (firstBlog != undefined) {
 						wp.app.blogs.fetch();
+						
 						wp.app.setCurrentBlog(firstBlog);
 
 						if(!wp.app.isNetworkAvailable()) {
