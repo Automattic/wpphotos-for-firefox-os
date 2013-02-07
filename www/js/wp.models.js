@@ -537,6 +537,8 @@ wp.models.Posts = Backbone.Collection.extend({
 		// promise's resovle method, but other closures can work with it.
 		var collection;
 		
+		var keepers = [];
+		
 		// This promise is returned to the user.
 		var p = wp.promise();		
 		
@@ -559,7 +561,9 @@ wp.models.Posts = Backbone.Collection.extend({
 				(function(j) {
 					var m = collection.at(i);
 					m.set("blogkey", blog.id);
-
+					
+					keepers.push(m.get("link"));
+					
 					var p;
 
 					// If the post has a featured image we're good. Save the post. 
@@ -585,15 +589,67 @@ wp.models.Posts = Backbone.Collection.extend({
 				})(i);
 			};
 			
+			q.add(wp.models.Posts.cleanup(keepers));
+			
+			
 		});
 		
 		rpc.fail(function(){
-			// TODO
+			console.log("Fetch remote posts failed.");
 			p.discard();
 		});
 
 		return p;
 
+	},
+	
+	cleanup:function(keepers) {
+
+		var promise = wp.promise();
+		
+		var p = wp.db.findAll("posts", "blogkey", wp.app.currentBlog.id);
+		p.success(function(){
+			
+			var posts = p.result();
+			var oldposts = [];
+			
+			for (var i = 0; i < posts.length; i++) {
+				if (posts[i].link.indexOf("http") != 0) {
+					// this is a local draft, don't delete it.
+					continue;
+				};
+							
+				// Wrapper to preserve model scope in the closure.
+				(function(j) {
+					var link = posts[j].link;
+					var found = false;
+					for (var k = 0; k < keepers.length; k++) {
+						if (link == keepers[k]){
+							found = true;
+							break;
+						};	
+					};
+					if (!found) {
+						oldposts.push(link);
+					};
+				})(i);
+			};
+			
+			// Delete the old posts.
+			if(oldposts.length > 0) {
+				wp.db.removeAll("posts", "blogkey", wp.app.currentBlog.id, oldposts, "link");
+				promise.resolve();
+			} else {
+				promise.resolve();
+			};
+		});
+		p.fail(function(){
+			console.log("Clean up after sync failed");
+			promise.discard();
+		});
+		
+		return promise;
 	}
+	
 });
 

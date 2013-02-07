@@ -321,10 +321,17 @@ wp.db = {
 	
 	/*
 		Remove all records matching the specified index
+		Params:
+			model: the name of the model / object store
+			index: the index to search
+			key: the value for the index
+			
+			scope: An array of identifiers. Matching records are from the records returned by the index. If scope is defined then comparitor must also be defined.
+			comparitor: The field on the model to compare against the values in the scope array.
 	*/
-	removeAll:function(model, index, key) {
+	removeAll:function(model, index, key, scope, comparitor) {
 		// Get all the records.
-		console.log("wp.db.removeAll: ", model, index, key);
+		console.log("wp.db.removeAll: ", model, index, key, scope);
 		var p = wp.promise();
 		
 		try {
@@ -346,14 +353,30 @@ wp.db = {
 			var index = store.index(index);
 			var req = index.openCursor(range);
 
-			// Iterate over the cursor and store each result in an array. Pass the array
-			// to the promise's resolve method. 
+			// Iterate over the cursor and remove each result. 
 			// Note: calling continue on the cursor triggers the onsuccess callback.
 			var arr = [];
 			req.onsuccess = function(event){
 				var cursor = event.target.result;
 				if(cursor) {
-					cursor.delete(); //EEK!
+					if(scope) {
+						try {
+							var remove = false;
+							for (var i = 0; i < scope.length; i++) {
+								if(scope[i] == cursor.value[comparitor]) {
+									remove = true;
+									break;
+								};
+							};
+							if(remove){
+								cursor.delete();
+							};
+						} catch(e){
+							console.log(e);
+						};
+					} else {
+						cursor.delete(); //EEK!						
+					};
 					cursor.continue();
 				} else {
 					p.resolve(arr);
@@ -372,8 +395,7 @@ wp.db = {
 		
 		return p;		
 	},
-	
-	
+		
 	/*
 		Backbone.sync override. http://backbonejs.org/#Sync 
 		Wired up in the call to open. 

@@ -95,11 +95,13 @@ wp.app = _.extend({
 		};
 		
 		// if it doesn't exist, or the blog can't be found show the first blog in the blogs list and make it current		
-		if (!blog) {
+		if (!blog && this.blogs.length > 0) {
 			blog = this.blogs.at(0);
 		};
 		
-		this.setCurrentBlog(blog);
+		if (blog) {
+			this.setCurrentBlog(blog);
+		};
 	},
 	
 	setCurrentBlog:function(blog) {

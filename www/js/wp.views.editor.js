@@ -99,7 +99,7 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		// Save a local draft or sync to the server?
 		var p;
-		var publishSetting = localStorage.publishSetting || 0;
+		var publishSetting = parseInt(localStorage.publishSetting) || 0;
 		switch(publishSetting) {
 			case 0:
 				p = this.promptToSave(post, image_data, caption.value.trim());
