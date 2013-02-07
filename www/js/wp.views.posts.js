@@ -146,12 +146,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 		list.innerHTML = html;
 		
 		list.addEventListener('select', function(event) {
-		try{
-			var el = event.target;
-			var idx = parseInt(el.getAttribute("data-idx"));
-			wp.app.setCurrentBlog(wp.app.blogs.at(idx));
-			
-			localStorage.publishSetting = parseInt(opt);
+			try{
+				var el = event.target;
+				var idx = parseInt(el.getAttribute("data-idx"));
+				wp.app.setCurrentBlog(wp.app.blogs.at(idx));
 			}catch(e){console.log(e)}
 		});
 		
