@@ -120,6 +120,7 @@ wp.app = _.extend({
 	
 	addLoadingIndicator:function() {
 		var loadingAlert = document.createElement('x-modal');
+		loadingAlert.id = 'loading-modal';
 		loadingAlert.setAttribute('overlay', '');
 		loadingAlert.innerHTML = '<div class="modal-background"></div>';
 		loadingAlert.innerHTML += '<div class="modal-content spinner-modal"><span id="loading-text">' + _s('control-loading') + '</span><div id="loading-spinner"></div></div>';
@@ -127,11 +128,10 @@ wp.app = _.extend({
 	},
 	
 	removeLoadingIndicator:function() {
-		var xModals = document.getElementsByTagName("x-modal"); 
-		for (var i = 0; i < xModals.length; i++) { 
-		    var modal = xModals[i]; 
-		    document.body.removeChild(modal);
-		}
+		var loadingAlert = document.getElementById('loading-modal');
+		console.log(loadingAlert);
+		if (loadingAlert != undefined)
+			document.body.removeChild(loadingAlert);
 	}
 
 }, Backbone.Events);
