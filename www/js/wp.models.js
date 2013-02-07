@@ -226,6 +226,7 @@ wp.models.Post = Backbone.Model.extend({
 		post_title:"",
 		post_date_gmt:null,
 		post_date:null,
+		local_date:null,
 		post_status:"publish",
 		link:"",
 		terms_names:null,
@@ -241,8 +242,10 @@ wp.models.Post = Backbone.Model.extend({
 		};
 		if(this.get("post_date") == null) {
 			obj.post_date = new Date();
-			obj.post_date_gmt = new Date(obj.post_date.valueOf() - (obj.post_date.getTimezoneOffset() * 60000));
+			obj.post_date_gmt = new Date(); //new Date(obj.post_date.valueOf() - (obj.post_date.getTimezoneOffset() * 60000));
+			obj.local_date = new Date();
 		};
+		
 		if (this.get("blogkey") == "") {
 			obj.blogkey = wp.app.currentBlog.id;
 		};
@@ -261,6 +264,11 @@ wp.models.Post = Backbone.Model.extend({
 		
 		if(attr["post_thumbnail"] instanceof Array && attr["post_thumbnail"].length == 0) {
 			attr["post_thumbnail"] = null;
+		};
+		
+		if(attr["post_date_gmt"]) {
+			var gmt = attr["post_date_gmt"];
+			attr["local_date"] = new Date(gmt.valueOf() - (gmt.getTimezoneOffset() * 60000));
 		};
 		
 		return attr;
@@ -499,7 +507,7 @@ wp.models.Post = Backbone.Model.extend({
 				obj[key] = hash[key];
 			};
 		};
-		obj["post_date_gmt"] = new Date(); // The blog will convert this correctly on its own.
+
 		delete obj["blogkey"];
 		delete obj["photo"];
 		delete obj["pending"];

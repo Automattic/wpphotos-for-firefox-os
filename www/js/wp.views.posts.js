@@ -313,9 +313,12 @@ wp.views.Post = Backbone.View.extend({
 			str = str + " [...]";
 		};
 		
+/*
 		var postDateGmt = this.model.get("post_date_gmt");
 		var formattedDate = this.formatGMTDate(postDateGmt);
-		
+*/
+		var formattedDate = this.formatGMTDate(this.model.get("local_date"));
+
 		if (postTitle.length == 0 && str.length == 0) {
 			var postBody = div.querySelector(".post-body");
 			postBody.style.display = "none";
@@ -337,7 +340,7 @@ wp.views.Post = Backbone.View.extend({
 		var caption = div.querySelector(".caption");
 		
 		var image = this.model.image();
-		if(image) {
+		if(image && image.link) {
 			if(image.link.indexOf("data:image") == 0) {
 				// data url so don't use photon.
 				img.src = image.link;
@@ -397,12 +400,15 @@ wp.views.Post = Backbone.View.extend({
 	
 	formatGMTDate:function(date) {
 		// Fix the gmt time.
+/*
 		var gmt = new Date();
 		var offset = date.getTimezoneOffset() * 60000;
 		gmt = new Date(gmt.valueOf() + offset);
 				
 		var diff = gmt - date.valueOf();
-		
+*/
+		var diff = Date.now() - date.valueOf();
+				
 		var d = "";
 		if (diff < 60000) {
 		    // seconds
