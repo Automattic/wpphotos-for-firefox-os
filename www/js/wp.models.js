@@ -347,7 +347,7 @@ wp.models.Post = Backbone.Model.extend({
 		// Upload the image.
 		// And report progress
 		this.sync_status = _s("uploading");
-		this.trigger("progress", {"status":"uploading", "percent":1});
+		this.trigger("progress", {"status":"Uploading...", "percent":1});
 //		this.upload_promise.notify({"status":"uploading", "percent":1});
 		
 		var pending_photo = this.get("pending_photo");
@@ -394,7 +394,7 @@ wp.models.Post = Backbone.Model.extend({
 			// obj will be a progress event. 
 			var percent = Math.floor((obj.loaded / obj.total) * 100);
 			console.log("Progress", percent, obj);
-			self.trigger("progress", {"status":"uploading", "percent":percent});
+			self.trigger("progress", {"status":"Uploading...", "percent":percent});
 //			self.upload_promise.notify({"status":"uploading", "percent":percent});
 		});
 		p.fail(function() {
@@ -407,7 +407,7 @@ wp.models.Post = Backbone.Model.extend({
 	uploadAndSave_SaveRemote:function() {
 //		this.upload_promise.notify({"status":"saving"});
 		this.sync_status = _s("publishing");
-		this.trigger("progress", {"status":"publishing"});
+		this.trigger("progress", {"status":"Publishing..."});
 		
 		var self = this;
 		var p = wp.api.newPost(this.getUploadHash());
@@ -425,7 +425,7 @@ wp.models.Post = Backbone.Model.extend({
 	uploadAndSave_SyncRemote:function(post_id) {
 //		this.upload_promise.notify({"status":"syncing"});
 		this.sync_status = _s("syncing");
-		this.trigger("progress", {"status":"syncing"});
+		this.trigger("progress", {"status":"Syncing..."});
 
 		// Since we only get the post ID back from a save make a request
 		// for the full post content. Its cannonical after all. 

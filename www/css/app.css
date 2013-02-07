@@ -575,7 +575,7 @@ section.by-line div {
 
 .page-posts .post-body p {
 	display: block;
-	height: 80px;
+	max-height: 80px;
 	overflow: hidden;
 	margin-bottom: 0;
 	margin-top: 10px;
