@@ -249,7 +249,39 @@ wp.views.PostsPage = wp.views.Page.extend({
 	},
 	
 	showEditor:function() {
-		wp.app.routes.navigate("editor", {trigger:true}); 
+		
+		try {
+			if(typeof(MozActivity) == "undefined") {
+				wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing
+				return;
+			};
+			
+			var self = this;
+			// Start a Moz picker activity for the user to select an image to upload
+			// either from the gallery or the camera. 
+			var activity = new MozActivity({
+				name: 'pick',
+				data: {
+					type: 'image/jpeg'
+				}
+			});
+					
+			activity.onsuccess = function() {
+				wp.app.selected_image_blob = activity.result.blob;
+				wp.app.routes.navigate("editor", {trigger:true});
+			};
+	
+			activity.onerror = function() {
+				console.log("ON ERRR");
+			};
+			
+		} catch(e) {
+			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
+			// just pass thru.
+			wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing.
+			return; 
+		};
+
 	},
 
 	showAbout:function() {

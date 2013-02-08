@@ -10,36 +10,6 @@ wp.views.EditorPage = wp.views.Page.extend({
 	
 	initialize:function() {
 		this.render();
-		
-		// This is where we need to launch the mozactivity for the picker.
-		try {
-			if(typeof(MozActivity) == "undefined") {
-				return;
-			};
-			
-			var self = this;
-			// Start a Moz picker activity for the user to select an image to upload
-			// either from the gallery or the camera. 
-			var activity = new MozActivity({
-				name: 'pick',
-				data: {
-					type: 'image/jpeg'
-				}
-			});
-					
-			activity.onsuccess = function() {
-				self.onImageSelected(activity.result.blob);
-			};
-	
-			activity.onerror = function() {
-				//TODO
-			};
-			
-		} catch(e) {
-			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
-			// just pass thru.
-			return; 
-		};
 	},
 	
 	events:_.extend({
@@ -59,13 +29,10 @@ wp.views.EditorPage = wp.views.Page.extend({
 		this.el.querySelector("#post-content").placeholder = _s("control-tap-here");
 		this.el.querySelector("#post-tags").placeholder = _s("control-tags");
 
-
-		return this;
-	},
-	
-	onImageSelected:function(blob) {
 		var img = this.el.querySelector("#photo");
-		img.src = URL.createObjectURL(blob);
+		img.src = URL.createObjectURL(wp.app.selected_image_blob); // Saved from the posts view. 
+		
+		return this;
 	},
 	
 	save:function() {
