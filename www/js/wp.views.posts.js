@@ -286,7 +286,7 @@ wp.views.Post = Backbone.View.extend({
 	
 	render:function(progress) {
 		var div = document.createElement("div");
-		div.innerHTML = wp.views.templates[this.template_name].text; 
+		div.innerHTML = wp.views.templates[this.template_name].text;
 		
 		var postTitle = this.model.get("post_title");
 		var content = div.querySelector(".post-body p");
