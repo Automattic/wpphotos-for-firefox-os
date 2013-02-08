@@ -42,7 +42,7 @@ wp.views.SettingsPage = wp.views.Page.extend({
 		for(var i = 0; i < wp.app.blogs.length; i++) {
 			var blog = new wp.views.BlogItemView({model:wp.app.blogs.at(i)});
 			ul.appendChild(blog.el);
-			blog.el.className = "list-button dropdown";
+			blog.el.className = "list-button";
 		};
 
 		var pubSetting = localStorage.publishSetting || 0;

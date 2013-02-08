@@ -479,7 +479,7 @@ section.by-line div {
 }
 
 .page-posts .post {
-	padding-bottom: 1px;
+	margin-bottom: 8px;
 	position:relative;
 }
 
@@ -545,17 +545,20 @@ section.by-line div {
 	right: 10px;
 	text-align: right;
 	color: rgba(255,255,255,0.35);
-	text-shadow: 0 1px 3px rgba(0,0,0,.35);
+	text-shadow: 0 1px 3px rgba(0,0,0,.65);
 	font-size: 1.2rem;
 }
 
 .page-posts .post-body {
-	margin: 0 5px 5px 5px;
-	padding: 10px;
+	margin: 0 5px 0;
+	padding: .8rem .8rem .4rem;
 	background-color: rgb(242,242,242);
 	overflow: hidden;
 	color: rgb(34,34,34);
-	text-transform: capitalize;
+}
+
+.page-posts .post-body.noimage {
+	margin: 0;
 }
 
 .post-body span {
@@ -567,25 +570,28 @@ section.by-line div {
 
 .post-body h3 {
 	padding: 0;
-	margin-top: 5px;
-	margin-bottom: 0;
+	margin: .6rem;
 	font-weight: lighter;
 	font-size: 1.8rem;
+	line-height: 2.4rem;
+}
+
+.yellow {
+	background: #ff0 !important;
+	border: 10px solid #ff0 !important;
 }
 
 .page-posts .post-body p {
 	display: block;
-	max-height: 80px;
+	max-height: 7.6rem;
+	line-height: 1.9rem;
 	overflow: hidden;
-	margin-bottom: 0;
-	margin-top: 10px;
+	margin: .6rem;
 
 	text-overflow: ellipsis;
-	line-height: 2rem;
 	font-weight: lighter;
 	font-size: 1.3rem;
-	color: #000;
-	opacity: 0.75;	
+	color: #464646;
 }
 
 .post .upload-mask {
@@ -756,7 +762,6 @@ section.by-line div {
 	background-color: rgb(242,242,242);
 	overflow: hidden;
 	color: rgb(34,34,34);
-	text-transform: capitalize;
 }
 
 .page-editor .post-body textarea  {
@@ -916,6 +921,16 @@ section.by-line div {
 .bloglist .list-button {
 	border-radius: 0;
 	position: relative;
+}
+
+.bloglist li.list-button:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+}
+
+.bloglist li.list-button:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
 }
 
 .bloglist .list-button:after {

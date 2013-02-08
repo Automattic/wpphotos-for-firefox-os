@@ -314,6 +314,11 @@ wp.views.Post = Backbone.View.extend({
 			str = str + " [...]";
 		};
 		
+		// Hide content (paragraph) if there is none
+		if (str.length == 0) {
+			content.className = "hidden";
+		}
+		
 /*
 		var postDateGmt = this.model.get("post_date_gmt");
 		var formattedDate = this.formatGMTDate(postDateGmt);
@@ -322,14 +327,19 @@ wp.views.Post = Backbone.View.extend({
 
 		if (postTitle.length == 0 && str.length == 0) {
 			var postBody = div.querySelector(".post-body");
-			postBody.style.display = "none";
-			var postDiv = div.querySelector(".post");
-			postDiv.style.marginBottom = "20px";
+			postBody.className += " hidden";
 			var noTitleDate = div.querySelector(".no-title-date");
 			noTitleDate.innerHTML = formattedDate;
-		} else {
+		}
+		
+		else {
 			var title = div.querySelector(".post-body h3");
 			title.innerHTML = this.model.get("post_title");
+			
+			// Hide Title if there is none
+			if (postTitle.length == 0) {
+				title.className += " hidden";
+			}
 
 			var date = div.querySelector(".post-body span");
 			date.innerHTML = formattedDate;
@@ -357,7 +367,14 @@ wp.views.Post = Backbone.View.extend({
 
 		} else {
 			img.src = "";
-			caption.innerHTML = _s("label-no-photo");
+			// Hide image and caption if there is no image
+			var photo = div.querySelector(".photo");
+			photo.className += " hidden";
+			caption.className += " hidden";
+			
+			// Enable no-image styling for posts
+			var postBody = div.querySelector(".post-body");
+			postBody.className += " noimage";
 		};
 		
 
