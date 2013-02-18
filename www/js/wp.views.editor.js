@@ -30,8 +30,17 @@ wp.views.EditorPage = wp.views.Page.extend({
 		this.el.querySelector("#post-tags").placeholder = _s("control-tags");
 
 		var img = this.el.querySelector("#photo");
-		img.src = URL.createObjectURL(wp.app.selected_image_blob); // Saved from the posts view. 
-		
+		try {
+			if(typeof(MozActivity) == "undefined") {
+				img.src = "img/start/1.jpg"; // For browser testing prime with a local image.
+			} else {
+				img.src = URL.createObjectURL(wp.app.selected_image_blob); // Saved from the posts view.
+				wp.app.selected_image_blob = null; // discard.
+			};
+		} catch(e) {
+			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox.
+			img.src = "img/start/1.jpg"; // For browser testing prime with a local image.			
+		};
 		return this;
 	},
 	

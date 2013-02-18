@@ -46,7 +46,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 		if (!this.validateField(username) || !this.validateField(password) || !this.validateField(url)) {
 			alert(_s('prompt-fill-out-all-fields'));
 			return;
-		}
+		};
 		
 		// if all's good. 
 		url = wp.views.normalizeUrl(url);

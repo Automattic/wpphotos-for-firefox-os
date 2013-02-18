@@ -146,6 +146,7 @@ wp.XHR.prototype.execute = function(headers) {
 	};
 	
 	xhr.onloadstart = function(event) {
+		console.log("xhr.onloadStart")
 		// TODO: ?
 	};
 	
@@ -165,11 +166,11 @@ wp.XHR.prototype.execute = function(headers) {
 	};
 	
 	xhr.ontimeout = function(event) {
-		// TODO: Support?
+		docallbacks(event, self._callbacks.fail);
 	};
 	
 	xhr.onreadystatechange = function(event) {
-		// TODO: Support?		
+		console.log("xhr.readyState", xhr.readyState);
 	};
 	
 	// Don't send empty strings.

@@ -79,7 +79,9 @@ wp.XMLRPC.prototype.progress = function(f) {
 
 // Execute the request.
 wp.XMLRPC.prototype.execute = function() {
-	this.xhr.data = this.formatRequestBody();
+	var req_body = this.formatRequestBody();
+	console.log("XMLRPC.execute: Request body length", req_body.length);
+	this.xhr.data = req_body;
 	this.xhr.httpMethod = "POST";
 	this.xhr.execute();
 };

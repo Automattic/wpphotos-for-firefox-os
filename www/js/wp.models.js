@@ -55,11 +55,13 @@ wp.models.Blog = Backbone.Model.extend({
 	},
 	
 	fetchRemoteOptions:function() {
+		console.log("fetching remote options");
 		var self = this;
 		
 		// Limit ooptions returned to just the ones we're interested in:
 		var ops = [
 			"blogname",
+			"software_version",
 			"gmt_offset",
 			"thumbnail_size_w",
 			"thumbnail_size_h",
@@ -71,11 +73,12 @@ wp.models.Blog = Backbone.Model.extend({
 
 		var p = wp.api.getOptions(ops);
 		p.success(function() {
+			console.log("options success", p.result());
 			self.set("options", p.result());
 			self.save();
 		});
 		p.fail(function(){
-			// TODO
+			console.log("options failed", p.result());
 		});
 	},
 	
@@ -320,6 +323,7 @@ wp.models.Post = Backbone.Model.extend({
 	},
 
 	setPendingPhoto:function(image_data, caption) {
+		console.log("post.setPendingPhoto");
 		caption = caption || null;
 		var obj = {
 			link:image_data,
@@ -329,6 +333,7 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	uploadAndSave:function(image_data, caption) {
+		console.log("post.uploadAndSave");
 		// Save the image data and caption to be uploaded.
 		if(image_data) {
 			this.setPendingPhoto(image_data, caption);
@@ -339,7 +344,7 @@ wp.models.Post = Backbone.Model.extend({
 		this.upload_promise = wp.promise();
 		
 		if (!this.get("pending_photo")) {
-			// No photo provided, and no photo pending.  This could be an interruppted save. 
+			// No photo provided, and no photo pending.  This could be an interrupted save. 
 			this.uploadAndSave_SaveRemote();
 		} else {
 			this.uploadAndSave_Upload();		
@@ -349,6 +354,7 @@ wp.models.Post = Backbone.Model.extend({
 	},
 		
 	uploadAndSave_Upload:function() {
+		console.log("post.uploadAndSave_Upload");
 		// Upload the image.
 		// And report progress
 		this.sync_status = _s("uploading");
@@ -370,7 +376,9 @@ wp.models.Post = Backbone.Model.extend({
 
 		var self = this;
 		var p = wp.api.uploadFile(data);
+		console.log("post.uploadAndSave_Upload: uploadFile called");
 		p.success(function() {
+			console.log("post.uploadAndSave_Upload: Success");
 			// Update content here while we have it just in case there is 
 			// an error saving to the db in the next step. 
 			var result = p.result();
@@ -400,7 +408,6 @@ wp.models.Post = Backbone.Model.extend({
 			var percent = Math.floor((obj.loaded / obj.total) * 100);
 			console.log("Progress", percent, obj);
 			self.trigger("progress", {"status":"Uploading...", "percent":percent});
-//			self.upload_promise.notify({"status":"uploading", "percent":percent});
 		});
 		p.fail(function() {
 			console.log("Upload Failed");
@@ -410,13 +417,15 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	uploadAndSave_SaveRemote:function() {
-//		this.upload_promise.notify({"status":"saving"});
+		console.log("post.uploadAndSave_SaveRemote");
+		
 		this.sync_status = _s("publishing");
 		this.trigger("progress", {"status":"Publishing..."});
 		
 		var self = this;
 		var p = wp.api.newPost(this.getUploadHash());
 		p.success(function() {
+			console.log("post.uploadAndSave_SaveRemote:  Success");
 			var post_id = p.result();
 			self.uploadAndSave_SyncRemote(post_id);
 		});
@@ -428,7 +437,8 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	uploadAndSave_SyncRemote:function(post_id) {
-//		this.upload_promise.notify({"status":"syncing"});
+		console.log("post.uploadAndSave_SyncRemote");
+		
 		this.sync_status = _s("syncing");
 		this.trigger("progress", {"status":"Syncing..."});
 
@@ -442,6 +452,8 @@ wp.models.Post = Backbone.Model.extend({
 		// Fetch the cannonical post.
 		var p = wp.api.getPost(post_id);
 		p.success(function() {
+			console.log("post.uploadAndSave_SyncRemote: Synced cannonical post");
+			
 			// Save the guid used as a temporary link. We'll want to delete this record after we save.
 			self.temp_link = self.get("link");
 
@@ -462,6 +474,8 @@ wp.models.Post = Backbone.Model.extend({
 		};
 		var p1 = wp.api.getMediaLibrary(filter);
 		p1.success(function(){
+			console.log("post.uploadAndSave_SyncRemote: retrieved media item", p1.result());
+			
 			var res = p1.result();
 			if ((res instanceof Array) && (res.length > 0)){
 				self.set({photo:res[0], pending_photo:null});
@@ -479,11 +493,13 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	uploadAndSave_SaveFinal:function() {
+		console.log("post.uploadAndSave_SaveFinal");
+		
 		var self = this;
 		var p = this.save();
 		p.success(function() {
 			// Yay! Finally all done!
-			
+			console.log("post.uploadAndSave_SaveFinal: Success");
 			self._isSyncing = false;
 			// this.upload_promise.notify({"status":"success"});
 			self.sync_status = null;
@@ -505,6 +521,8 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	onErrorSaving:function(){
+		console.log("post.onErrorSaving");
+		
 		this._isSyncing = false;
 		this.trigger("progress", {"status":"failed"});
 		this.upload_promise.discard();
@@ -524,7 +542,7 @@ wp.models.Post = Backbone.Model.extend({
 
 		delete obj["blogkey"];
 		delete obj["photo"];
-		delete obj["pending"];
+		delete obj["pending_photo"];
 		delete obj["link"];
 		
 		return obj;
