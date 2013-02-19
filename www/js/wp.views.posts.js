@@ -138,6 +138,8 @@ wp.views.PostsPage = wp.views.Page.extend({
 	},
 	
 	onBlogChanged:function() {
+		this.render();
+		
 		this.syncedonce = false;
 		this.refresh();
 	},
@@ -162,7 +164,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 				var el = event.target;
 				var idx = parseInt(el.getAttribute("data-idx"));
 				wp.app.setCurrentBlog(wp.app.blogs.at(idx));
-			}catch(e){console.log(e)}
+			} catch(e){console.log(e);};
 		});
 		
 		list.addEventListener('hide', function(event) {
@@ -202,11 +204,10 @@ wp.views.PostsPage = wp.views.Page.extend({
 			};
 
 		});
-		p.fail(function(err) {
-			// TODO:
-			alert(err);
+		p.fail(function() {
+			alert(p.result());
 		});
-		
+
 		return p;
 	},
 	

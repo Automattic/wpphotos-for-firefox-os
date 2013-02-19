@@ -279,9 +279,11 @@ wp.models.Post = Backbone.Model.extend({
 			attr["post_thumbnail"] = null;
 		};
 		
-		if(attr["post_date_gmt"]) {
-			var gmt = attr["post_date_gmt"];
-			attr["local_date"] = new Date(gmt.valueOf() - (gmt.getTimezoneOffset() * 60000));
+		if(attr["link"] && attr["link"].indexOf("http") != -1) {
+			if(attr["post_date_gmt"]) {
+				var gmt = attr["post_date_gmt"];
+				attr["local_date"] = new Date(gmt.valueOf() - (gmt.getTimezoneOffset() * 60000));
+			};
 		};
 		
 		return attr;
@@ -544,6 +546,7 @@ wp.models.Post = Backbone.Model.extend({
 		delete obj["photo"];
 		delete obj["pending_photo"];
 		delete obj["link"];
+		delete obj["local_date"];
 		
 		return obj;
 	}
@@ -566,10 +569,7 @@ wp.models.Posts = Backbone.Collection.extend({
 		// Sorts the list from newest to oldest.
 		// Local drafts should always be first so we return the negative of the current date.
 		try{
-			if(post.isLocalDraft()){
-				return -Date.now();
-			};
-			return -post.get("post_date_gmt").valueOf();
+			return -post.get("local_date").valueOf();
 		} catch(e) {
 			return 0;
 		};

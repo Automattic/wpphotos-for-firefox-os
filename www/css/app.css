@@ -422,7 +422,6 @@ section.by-line div {
 }
 
 .page-login .scroll {
-	overflow-y:scroll;
 	height:100%;
 
 }
@@ -1052,4 +1051,8 @@ x-modal {
 	color: #fff;
 	text-shadow: 0 0 5px #fff;
 	clear: both;
+}
+
+#template {
+	height:100%;
 }

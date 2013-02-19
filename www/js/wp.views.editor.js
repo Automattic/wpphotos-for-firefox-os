@@ -52,12 +52,30 @@ wp.views.EditorPage = wp.views.Page.extend({
 		var content = this.el.querySelector("#post-content");
 		var tags = this.el.querySelector("#post-tags");
 		
+		// Unagi device camera takes photos at 1200 x 1600.
+		// Images size > 2mb so downsize for faster uploads and better performance.
+		// TODO: Add a setting to let the user decide on image size.
+		var maxWidth = (img.naturalWidth < img.naturalHeight) ? 600 : 800;
+		var width = img.naturalWidth;
+		var height = img.naturalHeight;
+		
+		if (img.naturalWidth > maxWidth) {
+			var r = maxWidth / img.naturalWidth;
+			width = maxWidth;
+			height = height * r;
+		};
+		
+		
 		var canvas = this.el.querySelector("#photo-canvas");
-		canvas.width = img.naturalWidth;
-		canvas.height = img.naturalHeight;
+		// canvas.width = img.naturalWidth;
+		// canvas.height = img.naturalHeight;
+		canvas.width = width;
+		canvas.height = height;
+		
 		
 		var ctx = canvas.getContext('2d');
-		ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+		// ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+		ctx.drawImage(img, 0, 0, width, height);
 	
 		var image_data = canvas.toDataURL("image/png", 0.80);
 		
@@ -133,7 +151,7 @@ wp.views.EditorPage = wp.views.Page.extend({
 	},
 	
 	goBack:function() {
-		if(confirm(_s("prompt-cancel-editing"))) {
+		if(confirm(_s("prompt-discard-post?"))) {
 			wp.app.routes.navigate("posts", {trigger:true});
 		};
 	}
