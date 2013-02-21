@@ -32,11 +32,12 @@
 			singleTouch = false;
 		}
 	});
-
+	
 	window.addEventListener('touchend', function(event) {
 		// only hide when a single touch occurs
 		if (singleTouch) {
-			hideVisibleSelectLists();
+			// On touch screens, this prevents scrolling or correctly selecting an LI. - EJ
+			// hideVisibleSelectLists();
 		}
 	});
 
@@ -89,6 +90,7 @@
 					selectList.hide(this);
 				}
 			}
+			
 		},
 
 		setters: {
