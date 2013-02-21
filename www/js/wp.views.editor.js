@@ -44,7 +44,59 @@ wp.views.EditorPage = wp.views.Page.extend({
 		return this;
 	},
 	
+	goBack:function() {
+		if(confirm(_s("prompt-discard-post?"))) {
+			wp.app.routes.navigate("posts", {trigger:true});
+		};
+	},
+	
 	save:function() {
+		// Save a local draft or sync to the server?
+		var publishSetting = parseInt(localStorage.publishSetting) || 0;
+		switch(publishSetting) {
+			case 0:
+				this.prompt();
+				break;
+			case 1:
+				this.upload();
+				break;
+			case 2:
+				this.prepareToSave(false); // Save local
+				break;
+		};
+	},
+	
+	prompt:function(){
+		if(confirm(_s("prompt-publish-now"))) {
+			this.upload();
+		} else {
+			this.prepareToSave(false); // Save local
+		};
+	},
+	
+	upload:function() {
+		if(!wp.app.isNetworkAvailable()){
+			alert(_s("prompt-network-missing-saving-locally"));
+			this.prepareToSave(false); // Save local
+		};
+		
+		this.prepareToSave(true); // Upload and save
+	},
+	
+	prepareToSave:function(upload_now){
+		// There can be an apparent lag on some devices when getting the image data from a canvas.
+		// We don't want the app to look unresponsive so show the loading indicator, 
+		// give the DOM a chance to refresh, then get the image data.
+		wp.app.showLoadingIndicator(_s("Formatting..."));
+		
+		var self = this;
+		setTimeout(function(){
+			self.performSave(upload_now);
+			wp.app.hideLoadingIndicator();
+		}, 100);
+	},
+
+	performSave:function(upload_now) {
 		
 		var img = this.el.querySelector("#photo");
 		var caption = this.el.querySelector("#caption");
@@ -65,16 +117,11 @@ wp.views.EditorPage = wp.views.Page.extend({
 			height = height * r;
 		};
 		
-		
 		var canvas = this.el.querySelector("#photo-canvas");
-		// canvas.width = img.naturalWidth;
-		// canvas.height = img.naturalHeight;
 		canvas.width = width;
 		canvas.height = height;
 		
-		
 		var ctx = canvas.getContext('2d');
-		// ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
 		ctx.drawImage(img, 0, 0, width, height);
 	
 		var image_data = canvas.toDataURL("image/png", 0.80);
@@ -91,19 +138,12 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		var post = new wp.models.Post(attrs);
 		
-		// Save a local draft or sync to the server?
 		var p;
-		var publishSetting = parseInt(localStorage.publishSetting) || 0;
-		switch(publishSetting) {
-			case 0:
-				p = this.promptToSave(post, image_data, caption.value.trim());
-				break;
-			case 1:
-				p = this.uploadAndSave(post, image_data, caption.value.trim());
-				break;
-			case 2:
-				p = this.saveLocal(post, image_data, caption.value.trim());
-				break;
+		if(upload_now){
+			p = post.uploadAndSave(image_data, caption.value.trim()); // saves
+		} else {
+			post.setPendingPhoto(image_data, caption.value.trim());
+			p = post.save();
 		};
 		
 		p.fail(function(){
@@ -123,37 +163,6 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		wp.app.posts.add(post, {at:0});
 		wp.app.routes.navigate("posts", {trigger:true});
-		return p;
-		
-	},
-	
-	promptToSave:function(post, image_data, caption){
-		if(confirm(_s("prompt-publish-now"))) {
-			return this.uploadAndSave(post, image_data, caption);
-		} else {
-			return this.saveLocal(post, image_data, caption);
-		};
-	},
-	
-	uploadAndSave:function(post, image_data, caption) {
-	
-		if(!wp.app.isNetworkAvailable()){
-			alert(_s("prompt-network-missing-saving-locally"));
-			return this.saveLocal(post, image_data, caption);
-		};
-		
-		return post.uploadAndSave(image_data, caption); // saves
-	},
-	
-	saveLocal:function(post, image_data, caption) {
-		post.setPendingPhoto(image_data, caption);
-		return post.save();
-	},
-	
-	goBack:function() {
-		if(confirm(_s("prompt-discard-post?"))) {
-			wp.app.routes.navigate("posts", {trigger:true});
-		};
 	}
 	
 });

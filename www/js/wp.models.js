@@ -274,11 +274,12 @@ wp.models.Post = Backbone.Model.extend({
 	},
 	
 	parse:function(attr) {
+		if(typeof(attr) == "string") return attr;
 		
 		if(attr["post_thumbnail"] instanceof Array && attr["post_thumbnail"].length == 0) {
 			attr["post_thumbnail"] = null;
 		};
-		
+
 		if(attr["link"] && attr["link"].indexOf("http") != -1) {
 			if(attr["post_date_gmt"]) {
 				var gmt = attr["post_date_gmt"];
@@ -359,9 +360,8 @@ wp.models.Post = Backbone.Model.extend({
 		console.log("post.uploadAndSave_Upload");
 		// Upload the image.
 		// And report progress
-		this.sync_status = _s("uploading");
+		this.sync_status = _s("Uploading...");
 		this.trigger("progress", {"status":"Uploading...", "percent":1});
-//		this.upload_promise.notify({"status":"uploading", "percent":1});
 		
 		var pending_photo = this.get("pending_photo");
 		if(!pending_photo) return;

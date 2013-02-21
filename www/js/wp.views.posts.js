@@ -273,7 +273,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			};
 	
 			activity.onerror = function() {
-				console.log("ON ERRR");
+				console.log("There was an error picking an image with the picker.");
 			};
 			
 		} catch(e) {
