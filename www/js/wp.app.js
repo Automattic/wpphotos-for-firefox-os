@@ -104,7 +104,7 @@ wp.app = _.extend({
 		} else {
 			try {
 				// No blogs found. Perform a clean up.
-				wp.app.posts.update([]); // Clear the posts list.
+				wp.app.posts.set([]); // Clear the posts list.
 				localStorage.blogKey = null; // paranoia
 				delete localStorage.blogKey;
 			} catch(e){ console.log(e);};
@@ -121,7 +121,7 @@ wp.app = _.extend({
 		localStorage.blogKey = blog.id;
 		this.currentBlog = blog;
 		// Clear the posts list since we changed blogs. Suppress change events since we're dispatching our own. 
-		this.posts.update([], {silent:true});
+		this.posts.set([], {silent:true});
 		
 		this.trigger("currentBlogChanged");
 	},
