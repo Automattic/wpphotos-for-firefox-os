@@ -458,14 +458,14 @@ wp.db = {
 		p.success(function(){
 			if (success) {
 				// Backbone callback.
-				success(model, p.result(), options);
+				success(p.result());
 			};
 			model.trigger('sync', model, p.result(), options);
 		});
 		
 		p.fail(function() {
 			if(error) {
-				error(model, p.result(), options);
+				error(p.result());
 			};
 			model.trigger('error', model, p.result(), options);
 		});
