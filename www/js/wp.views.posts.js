@@ -5,7 +5,7 @@
 */
 
 "use strict";
-document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
 wp.views.PostsPage = wp.views.Page.extend({
 	template_name:"posts",
 	
@@ -53,6 +53,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			this.$el.html( template );
 						
 			var el = this.$el.find(".scroll")[0];
+			el.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 
 			var self = this;
 			var refreshOffset = 30;
@@ -105,7 +106,7 @@ wp.views.PostsPage = wp.views.Page.extend({
 			});
 
 			// Need to refresh once we're added to the dom. Since we don't have a good way 
-			// to detect that, use a timeer.
+			// to detect that, use a timer.
 			setTimeout(function(){
 				self.iscroll.refresh();
 			}, 20);
