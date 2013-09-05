@@ -1,5 +1,6 @@
-(function(window, document, undefined) {
-	var multiSelectAttr = 'data-multi-select';
+(function(window, document) {
+  
+  var multiSelectAttr = 'data-multi-select';
 	var okTextAttr = 'data-ok-text';
 	var locationAttr = 'data-location';
 
@@ -32,13 +33,13 @@
 			singleTouch = false;
 		}
 	});
-	
+
 	window.addEventListener('touchend', function(event) {
 		// only hide when a single touch occurs
 		if (singleTouch) {
-			// On touch screens, this prevents scrolling or correctly selecting an LI. - EJ
-			// hideVisibleSelectLists();
+			hideVisibleSelectLists();
 		}
+		singleTouch = false;
 	});
 
 	window.addEventListener('keyup', function(event) {
@@ -47,93 +48,34 @@
 			hideVisibleSelectLists();
 		}
 	});
-
-	xtag.register('x-select-list', {
-		onInsert: function() {
-			var self = this;
-			var okSelector = '.x-select-ok';
-
-			if (this.multiSelect && xtag.query(self, okSelector).length === 0) {
-				var button = document.createElement('button');
-				button.className = okSelector.substring(1);
-				button.className += " blue wide";
-				button.innerHTML = this.okText;
-				button.href = '#hide';
-				self.appendChild(button);
-
-				button.addEventListener('click', function(event) {
-					event.preventDefault();
-					self.hide();
-				});
-			}
-
-			self.show();
-		},
-
-		events: {
-			'click:touch': function(event) {
-				event.stopPropagation();
-			},
-
-			'click:delegate(li)': function(event, selectList) {
-				if (selectList.multiSelect) {
-					// toggle selection
-					if (this.getAttribute(styleSelectedAttr)) {
-						xtag.fireEvent(this, 'deselect');
-						this.removeAttribute(styleSelectedAttr);
-					} else {
-						xtag.fireEvent(this, 'select');
-						this.setAttribute(styleSelectedAttr, 'true');
-					}
-				} else {
-					xtag.fireEvent(this, 'select');
-					selectList.hide(this);
-				}
-			}
-			
-		},
-
-		setters: {
-			multiSelect: function(multiSelect) {
-				if (this.multiSelect) {
-					this.setAttribute(multiSelectAttr, multiSelect);
-				} else {
-					this.removeAttribute(multiSelectAttr);
-				}
-			},
-
-			okText: function(okText) {
-				this.setAttribute(okTextAttr, okText);
-			},
-
-			location: function(location) {
-				this.setAttribute(locationAttr, location);
-			}
-		},
-
-		getters: {
-			multiSelect: function() {
-				return !!this.getAttribute(multiSelectAttr);
-			},
-
-			okText: function() {
-				return this.getAttribute(okTextAttr) || 'Add Blogs';
-			},
-
-			location: function() {
-				var location = this.getAttribute(locationAttr);
-
-				// default location is center
-				if (location !== 'top' && location !== 'bottom') {
-					location = 'center';
-				}
-
-				return location;
-			}
-		},
-
-		methods: {
-			/**
+  
+  
+  xtag.register('x-select-list', {
+    
+    lifecycle: {
+      inserted:function() {
+        var self = this;
+  			var okSelector = '.x-select-ok';
+  
+  			if (this.multiSelect && xtag.query(self, okSelector).length === 0) {
+  				var button = document.createElement('a');
+  				button.className = okSelector.substring(1);
+  				button.innerHTML = this.okText;
+  				button.href = '#hide';
+  				self.appendChild(button);
+  
+  				button.addEventListener('click', function(event) {
+  					event.preventDefault();
+  					self.hide();
+  				});
+  			}
+  
+  			self.show();
+      }
+    },
+    
+    methods: {
+      /**
 			 * Shows this select list, triggering a show event.
 			 */
 			show: function() {
@@ -169,6 +111,75 @@
 			getSelected: function() {
 				return xtag.query(this, 'li[' + styleSelectedAttr + ']');
 			}
-		}
-	});
+    },
+    
+    events: {
+      'tap': function(event) {
+				event.stopPropagation();
+			},
+
+			'click:delegate(li)': function(event) {
+			  var selectList = event.currentTarget;
+				if (selectList.multiSelect) {
+					// toggle selection
+					if (this.getAttribute(styleSelectedAttr)) {
+						xtag.fireEvent(this, 'deselect');
+						this.removeAttribute(styleSelectedAttr);
+					} else {
+						xtag.fireEvent(this, 'select');
+						this.setAttribute(styleSelectedAttr, 'true');
+					}
+				} else {
+					xtag.fireEvent(this, 'select');
+					selectList.hide(this);
+				}
+			}
+    },
+    
+    accessors: {
+      
+      multiSelect: {
+        attribute: {
+          boolean: true,
+          name:'multiSelect'
+        },
+  			set: function(multiSelect) {
+  				if (this.multiSelect) {
+  					this.setAttribute(multiSelectAttr, multiSelect);
+  				} else {
+  					this.removeAttribute(multiSelectAttr);
+  				}
+  			},
+  			get: function() {
+  				return !!this.getAttribute(multiSelectAttr);
+  			}
+      },
+      
+      okText: {
+        set: function(okText) {
+  				this.setAttribute(okTextAttr, okText);
+  			},
+				get: function() {
+  				return this.getAttribute(okTextAttr) || 'OK';
+  			}
+      },
+      
+      location: {
+        set: function(location) {
+  				this.setAttribute(locationAttr, location);
+  			},
+  			get: function() {
+  				var location = this.getAttribute(locationAttr);
+  
+  				// default location is center
+  				if (location !== 'top' && location !== 'bottom') {
+  					location = 'center';
+  				}
+  
+  				return location;
+  			}
+      }
+    }
+  });
+  
 })(this, this.document);
