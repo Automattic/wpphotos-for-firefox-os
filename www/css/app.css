@@ -404,6 +404,44 @@ x-shiftbox > section {
 }
 
 
+.page-posts .post-body {
+	margin: 0;
+	padding: .8rem .8rem .4rem;
+	background-color: rgb(242,242,242);
+	overflow: hidden;
+	color: rgb(34,34,34);
+}
+
+.page-posts .post-body .post-title {
+	padding: 0;
+	margin: 0;
+	font-weight: lighter;
+	font-size: 1.8rem;
+	line-height: 2.4rem;
+}
+
+.page-posts .post-body .post-content {
+	display: block;
+	max-height: 7.6rem;
+	line-height: 1.9rem;
+	overflow: hidden;
+	margin: 0;
+
+	text-overflow: ellipsis;
+	font-weight: lighter;
+	font-size: 1.3rem;
+	color: #464646;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -812,13 +850,7 @@ x-modal {
 	font-size: 1.2rem;
 }
 
-.page-posts .post-body {
-	margin: 0 5px 0;
-	padding: .8rem .8rem .4rem;
-	background-color: rgb(242,242,242);
-	overflow: hidden;
-	color: rgb(34,34,34);
-}
+
 
 .page-posts .post-body.noimage {
 	margin: 0;
@@ -831,30 +863,11 @@ x-modal {
 	font-weight: lighter;
 }
 
-.post-body h3 {
-	padding: 0;
-	margin: .6rem;
-	font-weight: lighter;
-	font-size: 1.8rem;
-	line-height: 2.4rem;
-}
+
 
 .yellow {
 	background: #ff0 !important;
 	border: 10px solid #ff0 !important;
-}
-
-.page-posts .post-body p {
-	display: block;
-	max-height: 7.6rem;
-	line-height: 1.9rem;
-	overflow: hidden;
-	margin: .6rem;
-
-	text-overflow: ellipsis;
-	font-weight: lighter;
-	font-size: 1.3rem;
-	color: #464646;
 }
 
 .post .upload-mask {

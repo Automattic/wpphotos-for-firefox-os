@@ -291,7 +291,6 @@ wp.views.Post = Backbone.View.extend({
 			postContent = postContent + "...";
 		};
 		
-		
 		// Caption
 		var captionEl = div.querySelector(".caption");
 		if (captionStr) {
@@ -305,6 +304,8 @@ wp.views.Post = Backbone.View.extend({
 		var titleEl = div.querySelector(".post-title");
 		if (postTitle) {
 		  titleEl.innerHTML = postTitle;
+		} else {
+		  titleEl.className += " hidden";
 		};
 		
 		// Summary
