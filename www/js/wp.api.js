@@ -57,8 +57,8 @@ wp.api = {
 wp.api.build = function(method, params, url) {
 	
 	var p = wp.promise();
-	
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":method, "params":params, "url":url});
+	var headers = {"X-User-Agent" : "wpphotos/" + wp.app.version};
+	var rpc = new wp.XMLRPC({"xmlrpcMethod":method, "params":params, "url":url, "headers":headers});
 	rpc.success(function(xhr, event){
 		
 		if(rpc.fault) {
