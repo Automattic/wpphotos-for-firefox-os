@@ -53,20 +53,23 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	
 	blogRemoved:function() {
 		if(wp.app.blogs.length == 0) {
-			wp.app.routes.navigate("start",{trigger:true});
+//			wp.app.routes.navigate("start", {trigger:true});
+			wp.nav.push("start");
 		} else {
 			this.render();
 		};
 	},
 	
 	addBlog:function() {
-		wp.app.routes.navigate("login", {trigger:true});
+//		wp.app.routes.navigate("login", {trigger:true});
+		wp.nav.push("login");
 	},
 	
 	createBlog:function() {
 		alert(_s("prompt-create-blog"));
 		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
-		wp.app.routes.navigate("login", {trigger:true});
+//		wp.app.routes.navigate("login", {trigger:true});
+		wp.nav.push("login");
 	},
 	
 	publishSettings:function(evt) {
@@ -103,7 +106,8 @@ wp.views.SettingsPage = wp.views.Page.extend({
 	},
 	
 	about:function() {
-		wp.app.routes.navigate("about", {trigger:true});
+//		wp.app.routes.navigate("about", {trigger:true});
+		wp.nav.push("about");
 	},
 	
 	reset:function() {

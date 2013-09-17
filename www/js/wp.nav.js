@@ -22,48 +22,123 @@
 
 if(typeof(wp) == "undefined") { var wp = {} };
 
-wp.Nav = function(node){
-	this._container = node;
-	this._transitioning = false;
-	
-	this.views = [];
-	this.popped = [];
-	this.pushed = [];
-	
-	this.pending_transitions = 0;
+wp.nav = {
+
+  stage:null,
+  
+  transitions: ["scrollLeft", "coverUp", "none"],
+
+  init: function() {
+    this.stage = document.getElementById('stage');
+    var self = this;
+    this.stage.addEventListener('shuffleend', function(e){
+      self._trimDeck();
+    });
+  },
+  
+  push: function(page, transition) {
+    var card = this._fetchCard(page, transition);
+    this.stage.appendChild(card);
+    
+    var allCards = this.stage.getAllCards();
+    this.stage.shuffleTo(allCards.indexOf(card));
+  },
+  
+  pop: function() {
+    var currIndex = this.stage.selectedIndex;
+    if (currIndex > 0) {
+      var card = this.stage.cards[currIndex-1];
+      if (card.transitionOverride == "none") {
+        card.transitionOverride = "scrollLeft";
+      }
+    }
+    this.stage.historyBack();
+  },
+  
+  setPage: function(page, transition) {
+    var card = this._fetchCard(page, transition);
+    
+    this.stage.insertBefore(card, this.stage.firstChild);
+    
+    var allCards = this.stage.getAllCards();
+    this.stage.shuffleTo(allCards.indexOf(card));
+  },
+  
+  _trimDeck: function() {
+    var allCards = this.stage.getAllCards();
+    var currentCard = this.stage.getSelectedCard();
+    for (var i = allCards.length; i > 0; i--) {
+      var card = this.stage.getCardAt(i-1);
+      if (card != currentCard) {
+        this.stage.removeChild(card);
+      } else {
+        return;
+      };
+    };
+  },
+  
+  _fetchCard: function(page, transition) {
+    var allCards = this.stage.getAllCards();
+    for(var card in allCards) {
+      if (card.cardName == page) {
+        return card;
+      };
+    };
+  
+    var view = this._fetchPage(page);
+    if (!page) {
+      alert("Page does not exist.");
+      return;
+    };
+    
+    var card = document.createElement("x-card");
+    card.cardName = page;
+    if (this._isValidTransition(transition)) {
+      card.transitionOverride = transition;
+    };
+    card.appendChild(view.el);
+    return card;
+  },
+  
+  _isValidTransition: function(transition) {
+    if(!transition){
+      return false;
+    };
+    
+    for(var t in this.transitions) {
+      if (this.transitions[t] == transition) {
+        return true;
+      };
+    };
+    
+    return false;
+  },
+  
+  _fetchPage: function(page) {
+    var view;
+    
+    switch(page) {
+      case 'start':
+        view = new wp.views.StartPage();
+        break;
+      case 'login':
+        view = new wp.views.LoginPage();
+        break;
+      case 'posts':
+        view = new wp.views.PostsPage();
+        break;
+      case 'editor':
+        view = new wp.views.EditorPage();
+        break;
+      case 'settings':
+        view = new wp.views.SettingsPage();
+        break;
+      case 'about':
+        view = new wp.views.AboutPage();
+        break;
+    };
+    
+    return view;
+  }
+  
 };
-
-
-wp.Nav.prototype.handleTransitionEnd = function() {
-	
-};
-
-
-wp.Nav.prototype.pushView = function(view) {
-	
-};
-
-
-wp.Nav.prototype.popView = function() {
-	
-};
-
-
-wp.Nav.prototype.popToView = function(view) {
-	
-};
-
-
-wp.Nav.prototype.setViews = function(views) {
-	// Set the view stack.
-	// Make the last one visible. 
-	// Do not use transitions. 
-};
-
-
-wp.Nav.prototype.getCurrentView = function() {
-	if (this._views.length == 0) return null;
-	
-	return this._views[this._views.length - 1];
-};
-

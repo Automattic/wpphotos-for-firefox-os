@@ -7,21 +7,14 @@
 if(typeof(wp) == "undefined") { var wp = {} };
 
 wp.app = _.extend({
+  version:"1.1",
 	currentBlog:null, // model
 	posts:null,
 	blogs:null,
-	routes:null,
 	
 	init:function() {
-		// Clear any location hash so the router doesn't pick it up by mistake. 
-		if(location.hash.length > 0) {
-			location.href = location.href.substr(0,location.href.indexOf(location.hash));
-		};
 
-		if(!this.routes) {
-			this.routes = new wp.Routes();
-			Backbone.history.start();
-		};
+    wp.nav.init();
 		
 		// Queue up some our async tasks and load blogs when they are done.
 		var q = wp.promiseQueue();
@@ -29,14 +22,14 @@ wp.app = _.extend({
 			wp.app.loadBlogs();	
 		});
 
-		var p;		
 		// Load Templates
-		p = wp.views.loadTemplates();
+		var p = wp.views.loadTemplates();
 		p.success(function(){
-
+      // noop
 		});
 		p.fail(function() {
 			// couldn't load templates
+			alert("Failed to load view templates.");
 		});
 		q.add(p);
 		
@@ -44,10 +37,10 @@ wp.app = _.extend({
 		// Open database 
 		p = wp.db.open();
 		p.success(function() {
-			
+			// noop
 		});
 		p.fail(function() {
-			// couldn't load db
+			alert("Failed to open database.");
 		});
 		q.add(p);
 	},
@@ -74,15 +67,13 @@ wp.app = _.extend({
 
 		if (this.blogs.length == 0) {
 			// no blogs, show start/signup
-			// wp.routes....
-			this.routes.navigate("start", {trigger:true});
+			wp.nav.setPage("start", "none");
 			return;
 		};
 
 		this.findCurrentBlog();
 
-		// Route to the blog's posts page
-		this.routes.navigate("posts", {trigger:true});
+    wp.nav.setPage("posts", "none");
 	},
 	
 	findCurrentBlog:function() {

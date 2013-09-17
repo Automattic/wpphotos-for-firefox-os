@@ -11,7 +11,10 @@ wp.views.LoginPage = wp.views.Page.extend({
 	
 	events: _.extend({
 		"click button.login": "performLogin",
-		"click button.back": "goBack"
+		"click button.back": "goBack",
+		"click button.create-account": "showCreate",
+		"change input" : "checkForm",
+		"keyup input" : "checkForm"
 	}),
 	
 	initialize:function() {
@@ -33,6 +36,18 @@ wp.views.LoginPage = wp.views.Page.extend({
 		url.placeholder = _s("control-blog-address");
 
 		return this;
+	},
+	
+	checkForm:function() {
+		var username = $("#username").val();
+		var password = $("#password").val();
+		var url = $("#url").val();
+		
+		if (this.validateField(username) && this.validateField(password) && this.validateField(url)) {
+			$("#login-btn")[0].removeAttribute("disabled");
+		} else {
+  		$("#login-btn")[0].setAttribute("disabled",true);
+		};
 	},
 	
 	performLogin:function() {
@@ -88,7 +103,13 @@ wp.views.LoginPage = wp.views.Page.extend({
 	},
 	
 	goBack:function() {
-		wp.app.routes.navigate("goBack", {trigger:true});
+//		wp.app.routes.navigate("goBack", {trigger:true});
+    wp.nav.pop();
+	},
+	
+	showCreate:function() {
+		alert(_s("prompt-create-blog"));
+		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
 	},
 	
 	// Result is a blogs collection
@@ -141,7 +162,8 @@ wp.views.LoginPage = wp.views.Page.extend({
 						wp.app.setCurrentBlog(firstBlog);
 
 						if(!wp.app.isNetworkAvailable()) {
-							wp.app.routes.navigate("posts", {trigger:true});
+//							wp.app.routes.navigate("posts", {trigger:true});
+							wp.nav.push("posts");
 							return;
 						};
 					
@@ -152,7 +174,8 @@ wp.views.LoginPage = wp.views.Page.extend({
 						});
 						p.always(function() {
 							wp.app.hideLoadingIndicator();
-							wp.app.routes.navigate("posts", {trigger:true});
+//							wp.app.routes.navigate("posts", {trigger:true});
+							wp.nav.push("posts");
 						});
 
 					};
@@ -172,7 +195,8 @@ wp.views.LoginPage = wp.views.Page.extend({
 		});
 		p.always(function() {
 			wp.app.hideLoadingIndicator();
-			wp.app.routes.navigate("posts", {trigger:true});
+//			wp.app.routes.navigate("posts", {trigger:true});
+			wp.nav.push("posts");
 		});
 	}
 });

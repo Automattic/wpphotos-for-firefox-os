@@ -11,22 +11,27 @@
 	<div id="background"></div>
   	<div id="stage">
 		<div id="template">
-			<div class="page page-posts">
-				<header>
-					<button class="settings left"></button>
-					<button class="logo" data-l10n-id="title-photos">pHotos</button>
-					<button class="add right"></button>
-				</header>
-				<div class="scroll">
-					<div class="iscroller">
-						<div class="pull-down">
-							<span class="scroll-refresh-label">Pull down to refresh...</span>
-						</div>
+		
+  		<x-shiftbox class="page page-posts">
+        <section>
+  			  <x-appbar>
+  			    <button class="menu"></button>
+  					<header><button class="logo" data-l10n-id="title-photos">pHotos</button></header>
+  					<button class="refresh "></button>
+  					<button class="add"></button>
+  			  </x-appbar>
+  				<div class="scroll">
 						<section class="content">
 						</section>
-					</div>
-				</div>
-			</div>
+						<section class="load-more">lOad more?</section>
+  				</div>
+  			</section>
+        <aside>
+          <ul class="blog-list">
+          </ul>
+          <button class="settings menu-item" data-l10n-id="control-settings">sEttings</button>
+        </aside>
+      </x-shiftbox>
 		</div>
   	</div>
   </body>

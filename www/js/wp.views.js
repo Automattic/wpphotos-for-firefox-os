@@ -109,7 +109,8 @@ wp.views.Page = Backbone.View.extend({
 	},
 	
 	goBack:function() {
-		wp.app.routes.navigate("goBack", {trigger:true});
+//		wp.app.routes.navigate("goBack", {trigger:true});
+    wp.nav.pop();
 	}
 
 });

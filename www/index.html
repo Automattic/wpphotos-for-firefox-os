@@ -12,21 +12,32 @@
     <script type="text/javascript" src="js/lib/l10n.js"></script>
     
     <!-- x-tags.  See http://x-tags.org/ -->
+    <link rel="stylesheet" href="x-tags/appbar.css" />
+    <link rel="stylesheet" href="x-tags/deck.css" />
     <link rel="stylesheet" href="x-tags/modal.css" />
     <link rel="stylesheet" href="x-tags/select-list.css" />
+    <link rel="stylesheet" href="x-tags/shiftbox.css" />
     <link rel="stylesheet" href="x-tags/switch.css" />
     
+    <link rel="stylesheet" href="css/noticons.css">
     <link rel="stylesheet" href="css/app.css" />
 
   </head>
   <body>
-    <div id="stage"></div>
+    <x-deck id="stage"><x-card></x-card></x-deck>
 	 
     <!-- x-tags.  See http://x-tags.org/ -->
+<!--
 	  <script src="x-tags/x-tag-components.js"></script>
 	  <script src="x-tags/core.js"></script>
+-->
+    <script src="x-tags/x-tag-core.js"></script>
+    <script src="x-tags/request.js"></script>
+	  <script src="x-tags/appbar.js"></script>
+	  <script src="x-tags/deck.js"></script>
     <script src="x-tags/modal.js"></script>
     <script src="x-tags/select-list.js"></script>
+    <script src="x-tags/shiftbox.js"></script>
     <script src="x-tags/switch.js"></script>
     
     <!-- third party -->
@@ -51,6 +62,7 @@
     <script src="js/wp.views.posts.js"></script>
     <script src="js/wp.views.editor.js"></script>
     <script src="js/wp.routes.js"></script>
+    <script src="js/wp.nav.js"></script>
     <script src="js/wp.app.js"></script>
 
   </body>

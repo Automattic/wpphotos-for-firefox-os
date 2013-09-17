@@ -46,7 +46,8 @@ wp.views.EditorPage = wp.views.Page.extend({
 	
 	goBack:function() {
 		if(confirm(_s("prompt-discard-post?"))) {
-			wp.app.routes.navigate("posts", {trigger:true});
+//			wp.app.routes.navigate("posts", {trigger:true});
+      wp.nav.pop();
 		};
 	},
 	
@@ -162,7 +163,8 @@ wp.views.EditorPage = wp.views.Page.extend({
 		});
 		
 		wp.app.posts.add(post, {at:0});
-		wp.app.routes.navigate("posts", {trigger:true});
+//		wp.app.routes.navigate("posts", {trigger:true});
+    wp.nav.pop();
 	}
 	
 });

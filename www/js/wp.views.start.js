@@ -15,7 +15,7 @@ wp.views.StartPage = wp.views.Page.extend({
 
 	events: _.extend({
 		"click button.login": "showLogin",
-		"click button.createblog": "showCreate"
+		"click button.create-account": "showCreate"
 	}),
 	
 	render:function() {
@@ -34,13 +34,15 @@ wp.views.StartPage = wp.views.Page.extend({
 	},
 	
 	showLogin:function() {
-		wp.app.routes.navigate("login", {trigger:true}); 
+//		wp.app.routes.navigate("login", {trigger:true});
+		wp.nav.push("login");
 	},
 	
 	showCreate:function() {
 		alert(_s("prompt-create-blog"));
 		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
-		wp.app.routes.navigate("login", {trigger:true});
+//		wp.app.routes.navigate("login", {trigger:true});
+		wp.nav.push("login");
 	}
 	
 });
