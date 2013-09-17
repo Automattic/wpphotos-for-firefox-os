@@ -194,7 +194,6 @@ wp.views.PostsPage = wp.views.Page.extend({
 		
 		try {
 			if(typeof(MozActivity) == "undefined") {
-//				wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing
 				wp.nav.push("editor");
 				return;
 			};
@@ -211,7 +210,6 @@ wp.views.PostsPage = wp.views.Page.extend({
 					
 			activity.onsuccess = function() {
 				wp.app.selected_image_blob = activity.result.blob;
-//				wp.app.routes.navigate("editor", {trigger:true});
 				wp.nav.push("editor");
 			};
 	
@@ -222,7 +220,6 @@ wp.views.PostsPage = wp.views.Page.extend({
 		} catch(e) {
 			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
 			// just pass thru.
-//			wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing.
 			wp.nav.push("editor");
 			return; 
 		};
@@ -230,13 +227,12 @@ wp.views.PostsPage = wp.views.Page.extend({
 	},
 
 	showAbout:function() {
-//		wp.app.routes.navigate("about", {trigger:true});
-		wp.nav.push("about");
+		wp.nav.push("about", "coverUp");
 	},
 	
 	showSettings:function() {
-//		wp.app.routes.navigate("settings", {trigger:true}); 
-		wp.nav.push("settings");
+		this.toggleMenu();
+		wp.nav.push("settings", "coverUp");
 	}
 	
 });
@@ -287,7 +283,7 @@ wp.views.Post = Backbone.View.extend({
 		
 		if (postContent.length > 160) {
 			postContent = postContent.substr(0, 160);
-			postContent = postContent.substr(0, str.lastIndexOf(" "));
+			postContent = postContent.substr(0, postContent.lastIndexOf(" "));
 			postContent = postContent + "...";
 		};
 		

@@ -45,12 +45,14 @@ wp.nav = {
   },
   
   pop: function() {
+    // We want to play the last card animation in reverse,
+    // to ensure this, get the transitionOverride from the current card 
+    // and apply it to the previous card.
     var currIndex = this.stage.selectedIndex;
     if (currIndex > 0) {
+      var override = this.stage.selectedCard.transitionOverride || "scrollLeft";
       var card = this.stage.cards[currIndex-1];
-      if (card.transitionOverride == "none") {
-        card.transitionOverride = "scrollLeft";
-      }
+      card.transitionOverride = override;
     }
     this.stage.historyBack();
   },
