@@ -22,7 +22,9 @@
 
 "use strict";
                      
-if(typeof(wp) == "undefined") { var wp = {} };
+if(typeof wp === "undefined") {
+	var wp = {};
+}
 
 wp.db = {
 	name:"com.wordpress.photos",
@@ -46,7 +48,7 @@ wp.db = {
 			if (wp.db.idb) {
 				wp.db.idb.close();
 				wp.db.idb = null;
-			};
+			}
 			
 			var request = window.indexedDB.deleteDatabase(this.name);
 			request.onsuccess = function(event) {
@@ -62,7 +64,7 @@ wp.db = {
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 		
 		return p;
 	},
@@ -77,7 +79,7 @@ wp.db = {
 		if (this.idb) {
 			p.resolve(this.idb);
 			return p;
-		};
+		}
 
 		try {
 			var request = window.indexedDB.open(this.name, this.getVersion());
@@ -88,12 +90,12 @@ wp.db = {
 				var db = event.currentTarget.result;
 				wp.db.idb = db;				
 				
-				if(typeof(Backbone) != "undefined") {
-					Backbone.ajaxSync = Backbone.sync
+				if(typeof Backbone !== "undefined") {
+					Backbone.ajaxSync = Backbone.sync;
 					Backbone.sync = function(method, model, options) {
 						return wp.db.sync(method, model, options);
 					};
-				};
+				}
 
 				p.resolve(event.target.result);
 			};
@@ -105,18 +107,18 @@ wp.db = {
 				for (var i = event.oldVersion; i < wp.db.migrations.length;  i++) {
 					console.log("onupgradeneeded: Migrating to version " + (i +1));
 					wp.db.migrations[i].up(db);
-				};
+				}
 			};
 
 			request.onerror = function(event) {
 				console.log("wp.db: error opening database. " + event.target.errorCode);
 				p.discard(event.target.error);
-			};			
+			};
 
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 		
 		return p;
 	},
@@ -128,7 +130,7 @@ wp.db = {
 	*/
 	getObjectStore:function(model, write) {
 		try {		
-			var mode = (true == write) ? 'readwrite' : 'readonly';
+			var mode = (true === write) ? 'readwrite' : 'readonly';
 			var tx = this.idb.transaction(model.toLowerCase(), mode);
 			if(mode){
 				console.log(mode);
@@ -137,7 +139,7 @@ wp.db = {
 			
 		} catch(e) {
 			console.log("wp.db: error opening the object store " + model);
-		};
+		}
 		return null;
 	},
 	
@@ -187,11 +189,11 @@ wp.db = {
 			req.onerror = function(event) {
 				console.log("wp.db.find: " + event.target.error);
 				p.discard(event.target.error);
-			};			
+			};		
 
 		} catch (err) {
 			p.discard(err);
-		};
+		}
 		
 		return p;
 	},
@@ -207,26 +209,26 @@ wp.db = {
 			var store = this.getObjectStore(model);		
 			var req = null;
 	
-			if(typeof(index) != 'undefined' && typeof(key) != 'undefined') {
+			if(typeof index !== 'undefined' && typeof key !== 'undefined') {
 				var range = null;
 				if (key instanceof Array) {
-					if (key.length == 1) {
+					if (key.length === 1) {
 						range = IDBKeyRange.only(key[0]);
 						
 					} else {
 						range = IDBKeyRange.bound(key[0], key[1]);
-					};
+					}
 					
 				} else {
 					range = IDBKeyRange.only(key);
-				};
+				}
 			
-				var index = store.index(index);
+				index = store.index(index);
 				req = index.openCursor(range);
 				
 			} else {
 				req = store.openCursor();
-			};
+			}
 			
 			// Iterate over the cursor and store each result in an array. Pass the array
 			// to the promise's resolve method. 
@@ -240,12 +242,12 @@ wp.db = {
 					var obj = {};
 					for(var key in cursor.value){
 						obj[key] = cursor.value[key];
-					};
+					}
 					arr.push(obj);
 					cursor.continue();
 				} else {
 					p.resolve(arr);
-				};
+				}
 			};
 			
 			req.onerror = function(event) {
@@ -256,7 +258,7 @@ wp.db = {
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 		
 		return p;
 	},
@@ -269,7 +271,7 @@ wp.db = {
 		var p = wp.promise();
 		
 		try {
-			var store = this.getObjectStore(model, true)
+			var store = this.getObjectStore(model, true);
 			var req = store.put(object);
 	
 			req.onsuccess = function(event) {
@@ -284,7 +286,7 @@ wp.db = {
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 		
 		return p;
 	},
@@ -313,7 +315,7 @@ wp.db = {
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 
 		return p;
 	},
@@ -339,18 +341,18 @@ wp.db = {
 
 			var range = null;
 			if (key instanceof Array) {
-				if (key.length == 1) {
+				if (key.length === 1) {
 					range = IDBKeyRange.only(key[0]);
 					
 				} else {
 					range = IDBKeyRange.bound(key[0], key[1]);
-				};
+				}
 				
 			} else {
 				range = IDBKeyRange.only(key);
-			};
+			}
 		
-			var index = store.index(index);
+			index = store.index(index);
 			var req = index.openCursor(range);
 
 			// Iterate over the cursor and remove each result. 
@@ -363,24 +365,24 @@ wp.db = {
 						try {
 							var remove = false;
 							for (var i = 0; i < scope.length; i++) {
-								if(scope[i] == cursor.value[comparitor]) {
+								if(scope[i] === cursor.value[comparitor]) {
 									remove = true;
 									break;
-								};
-							};
+								}
+							}
 							if(remove){
 								cursor.delete();
-							};
+							}
 						} catch(e){
 							console.log(e);
-						};
+						}
 					} else {
 						cursor.delete(); //EEK!						
-					};
+					}
 					cursor.continue();
 				} else {
 					p.resolve(arr);
-				};
+				}
 			};
 			
 			req.onerror = function(event) {
@@ -391,7 +393,7 @@ wp.db = {
 		} catch(err) {
 			console.log(err);
 			p.discard(err);
-		};
+		}
 		
 		return p;		
 	},
@@ -427,8 +429,8 @@ wp.db = {
 					} else {
 						// Get all records for the model.
 						p = wp.db.findAll(model.store);
-					};
-				};
+					}
+				}
 			
 				break;
 				
@@ -448,9 +450,11 @@ wp.db = {
 			default :
 				// Not supported.
 				break;
-		};
+		}
 	
-		if (!p) return;
+		if (!p) {
+			return;
+		}
 		
 		var success = options.success;
 		var error = options.error;
@@ -459,14 +463,14 @@ wp.db = {
 			if (success) {
 				// Backbone callback.
 				success(p.result());
-			};
+			}
 			model.trigger('sync', model, p.result(), options);
 		});
 		
 		p.fail(function() {
 			if(error) {
 				error(p.result());
-			};
+			}
 			model.trigger('error', model, p.result(), options);
 		});
 		

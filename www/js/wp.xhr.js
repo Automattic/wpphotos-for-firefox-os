@@ -17,18 +17,20 @@
 */
 "use strict";
 
-if(typeof(wp) == "undefined") { var wp = {} };
+if(typeof wp === "undefined") { 
+	var wp = {};
+}
 
 wp.XHR = function(options) {
-	var options = options || {};
+	options = options || {};
 
-	this.xhr 	= null;
+	this.xhr	= null;
 	this.result = null;
-	this.url 	= options["url"] || null;
-	this.data 	= options["data"] || null;
-	this.format = options["format"] || null;
-	this.httpMethod = options["httpMethod"] || "GET";
-	this.headers = options["headers"] || false;
+	this.url	= options.url || null;
+	this.data	= options.data || null;
+	this.format = options.format || null;
+	this.httpMethod = options.httpMethod || "GET";
+	this.headers = options.headers || false;
 
 	this._callbacks = {
 		success:[],
@@ -92,7 +94,7 @@ wp.XHR.prototype.clean = function() {
 wp.XHR.prototype.abort = function() {
 	if (this.xhr.status > 0 && this.xhr.status < 4) {
 		this.xhr.abort();
-	};
+	}
 };
 
 wp.XHR.prototype.status = function() {
@@ -100,8 +102,7 @@ wp.XHR.prototype.status = function() {
 };
 
 wp.XHR.prototype.execute = function(headers) {
-	"use strict";
-	var self = this;	
+	var self = this;
 	var xhr = new XMLHttpRequest({mozSystem: true});
 	
 	this.xhr = xhr;
@@ -112,8 +113,8 @@ wp.XHR.prototype.execute = function(headers) {
 				arr[i](self.xhr, event);
 			} catch(ignore){
 				console.log(ignore);
-			};
-		};
+			}
+		}
 	};
 
 	try {
@@ -121,17 +122,17 @@ wp.XHR.prototype.execute = function(headers) {
 	} catch(e) {
 		docallbacks(e, this._callbacks.fail);
 		return;
-	};
+	}
 	
 	if(this.headers) {
 		for(var key in this.headers) {
 			xhr.setRequestHeader(key, this.headers[key]);
-		};
-	};
+		}
+	}
 	
 	if(this.format) {
 		xhr.responseType = this.format;
-	};
+	}
 	
 	
 	xhr.addEventListener("progress", function(event){
@@ -146,7 +147,7 @@ wp.XHR.prototype.execute = function(headers) {
 	};
 	
 	xhr.onloadstart = function(event) {
-		console.log("xhr.onloadStart")
+		console.log("xhr.onloadStart");
 		// TODO: ?
 	};
 	

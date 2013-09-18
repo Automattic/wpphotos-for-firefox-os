@@ -14,7 +14,9 @@
 
 "use strict";
 
-if(typeof(wp) == "undefined") { var wp = {} };
+if(typeof wp === "undefined") { 
+	var wp = {};
+}
 
 wp.api = {
 	blog:null,  // hash: {username:'', password:'', xmlrpc:'', blog_id:''}
@@ -31,10 +33,12 @@ wp.api = {
 			pass
 		];
 		for (var i = 0; i < arguments.length; i++) {
-			if (arguments[i] == null)  continue;
-			
+			if (arguments[i] === null) {
+				continue;
+			}
+
 			params.push(arguments[i]);
-		};
+		}
 		return params;
 	},
 	
@@ -47,9 +51,9 @@ wp.api = {
 		this.blog = blog.attributes || blog;
 		
 		// if the object passed specified a url instead of an xmlrpc property, reassign
-		if (!this.blog.xmlrpc && this.blog.url)
+		if (!this.blog.xmlrpc && this.blog.url) {
 			this.blog.xmlrpc = this.blog.url;
-		
+		}
 	}
 };
 
@@ -66,7 +70,7 @@ wp.api.build = function(method, params, url) {
 			
 		} else {
 			p.resolve(rpc.result);	
-		};
+		}
 		
 	});
 	rpc.fail(function(xhr, event){
@@ -86,7 +90,7 @@ wp.api.build = function(method, params, url) {
 	user: http://codex.wordpress.org/XML-RPC_WordPress_API/Users
 	wp.getUsersBlogs
 		string username
-	    string password 
+		string password 
 */
 wp.api.getUsersBlogs = function(url, username, password) {
 	var params = [
@@ -124,7 +128,7 @@ wp.api.getOptions = function(options) {
 			int offset
 			string orderby
 			string order 
-	    
+
 	wp.newPost
 		int blog_id
 		string username
@@ -147,15 +151,15 @@ wp.api.getOptions = function(options) {
 		int post_thumbnail
 		int post_parent
 		array custom_fields
-		    struct
-		        string key
-		        string value 
+			struct
+				string key
+				string value 
 		struct terms: Taxonomy names as keys, array of term IDs as values.
 		struct terms_names: Taxonomy names as keys, array of term names as values.
 		struct enclosure
-		    string url
-		    int length
-		    string type 
+			string url
+			int length
+			string type 
 
 
 	wp.getPostFormats
@@ -211,25 +215,25 @@ wp.api.getPostStatusList = function() {
 	media: http://codex.wordpress.org/XML-RPC_WordPress_API/Media
 	wp.getMediaLibrary
 		int blog_id
-	    string username
-	    string password
-	    struct filter
-	    	int number
-	    	int offset
-	    	parent_id
-	    	mime_type
-	    
+		string username
+		string password
+		struct filter
+			int number
+			int offset
+			parent_id
+			mime_type
+
 	wp.uploadFile
 		int blogid
-	    string username
-	    string password
-	    struct data
-	        string name: Filename.
-	        string type: File MIME type.
-	        string bits: base64-encoded binary data.
-	        bool overwrite: Optional. Overwrite an existing attachment of the same name. (Added in WordPress 2.2) 
+		string username
+		string password
+		struct data
+			string name: Filename.
+			string type: File MIME type.
+			string bits: base64-encoded binary data.
+			bool overwrite: Optional. Overwrite an existing attachment of the same name. (Added in WordPress 2.2) 
 
-		return:	        
+		return:
 			string id (Added in WordPress 3.4)
 			string file: Filename.
 			string url
@@ -239,7 +243,7 @@ wp.api.getPostStatusList = function() {
 wp.api.getMediaLibrary = function(filter) {
 	var params = wp.api.getParams(filter);
 	return wp.api.build("wp.getMediaLibrary", params, this.getUrl());
-}
+};
 	
 wp.api.uploadFile = function(data) {
 	var params = wp.api.getParams(data);
