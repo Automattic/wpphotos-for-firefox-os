@@ -5,26 +5,24 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
     <title data-l10n-id="title-wordpress">WordPress</title>
-    <link rel="stylesheet" href="../css/app.css" />
+    <link rel="stylesheet" href="../css/app.css" />       
   </head>
   <body>
+	<div id="background"></div>
   	<div id="stage">
-		<div>
-			<div class="page page-settings">
+		<div id="template">
+			<div class="page page-settings page-publish-settings">
+			  <x-appbar>
+			    <button class="back"></button>
+			    <header data-l10n-id="title-publish-settings">pUblish Settings</header>
+			  </x-appbar>
 				<div class="scroll">
 					<section class="content">
-						<section>
-							<div class="bloglist"> 
-								<ul>
-									<li id="template"><div class="list-button"><span></span></div><button></button></li>
-								</ul>
-							</div>
-						</section>
+						<ul></ul>
 					</section>
 				</div>
 			</div>
 	  	</div>
   	</div>
-
   </body>
 </html>

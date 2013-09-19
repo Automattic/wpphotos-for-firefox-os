@@ -80,24 +80,30 @@ wp.nav = {
   },
   
   _fetchCard: function(page, transition) {
-    var allCards = this.stage.getAllCards();
-    for(var card in allCards) {
-      if (card.cardName == page) {
-        return card;
-      };
-    };
-  
-    var view = this._fetchPage(page);
-    if (!page) {
-      alert("Page does not exist.");
-      return;
-    };
-    
+  	var view;
+  	if (typeof page === 'string') {
+	    var allCards = this.stage.getAllCards();
+	    for(var card in allCards) {
+	      if (card.cardName == page) {
+	        return card;
+	      }
+	    }
+	  
+	    view = this._fetchPage(page);
+	    if (!page) {
+	      alert("Page does not exist.");
+	      return;
+	    }
+    } else {
+	    view = page;
+	    page = view.template_name;
+    }
+
     var card = document.createElement("x-card");
     card.cardName = page;
     if (this._isValidTransition(transition)) {
       card.transitionOverride = transition;
-    };
+    }
     card.appendChild(view.el);
     return card;
   },
@@ -105,13 +111,13 @@ wp.nav = {
   _isValidTransition: function(transition) {
     if(!transition){
       return false;
-    };
+    }
     
     for(var t in this.transitions) {
       if (this.transitions[t] == transition) {
         return true;
-      };
-    };
+      }
+    }
     
     return false;
   },
@@ -138,6 +144,12 @@ wp.nav = {
       case 'about':
         view = new wp.views.AboutPage();
         break;
+      case 'settings-site' :
+      	view = new wp.views.SettingsSitePage();
+      	break;
+      case 'settings-publish-settings' :
+      	view = new wp.views.SettingsPublishPage();
+      	break;
     };
     
     return view;

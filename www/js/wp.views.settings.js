@@ -20,7 +20,7 @@ wp.views.SettingsPage = wp.views.Page.extend({
 		this.listenTo(wp.app.blogs, "add", this.render);
 		this.listenTo(wp.app.blogs, "remove", this.blogRemoved);
 		this.listenTo(wp.app, "currentBlogChanged", this.render);
-		
+		this.listenTo(wp.app, "publishSettingsChanged", this.render);
 		this.render();
 	},
 
@@ -48,65 +48,35 @@ wp.views.SettingsPage = wp.views.Page.extend({
 		var pubSetting = localStorage.publishSetting || 0;
 		this.el.querySelector("#settings-publish-settings").innerHTML = _s(this.publish_settings_options[pubSetting]);
 		
+		this.el.querySelector("#settings-version").innerHTML = wp.app.version;
+		
 		return this;
 	},
 	
 	blogRemoved:function() {
 		if(wp.app.blogs.length == 0) {
-//			wp.app.routes.navigate("start", {trigger:true});
-			wp.nav.push("start");
+			wp.nav.setPage("start");
 		} else {
 			this.render();
 		};
 	},
 	
 	addBlog:function() {
-//		wp.app.routes.navigate("login", {trigger:true});
 		wp.nav.push("login");
 	},
 	
 	createBlog:function() {
 		alert(_s("prompt-create-blog"));
 		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
-//		wp.app.routes.navigate("login", {trigger:true});
 		wp.nav.push("login");
 	},
 	
 	publishSettings:function(evt) {
 		evt.stopPropagation();
-		
-		var self = this;
-	
-		var arr = this.publish_settings_options;
-		
-		var html = "<h1>" + _s("title-publish-settings") + "</h1><ul>";
-		for(var idx in arr) {
-			html += '<li data-opt="' + idx + '">' + _s(arr[idx]) + "</li>";
-		};
-		html += "</ul>"
-		
-		var list = document.createElement('x-select-list');
-		list.location = 'middle';
-		list.innerHTML = html;
-			
-		list.addEventListener('select', function(event) {
-		try{
-			var el = event.target;
-			var opt = el.getAttribute("data-opt");
-			localStorage.publishSetting = parseInt(opt);
-			}catch(e){console.log(e)}
-		});
-		
-		list.addEventListener('hide', function(event) {
-			list.parentNode.removeChild(list);
-			self.render();
-		});
-		
-		document.body.appendChild(list);
+		wp.nav.push("settings-publish-settings");
 	},
 	
 	about:function() {
-//		wp.app.routes.navigate("about", {trigger:true});
 		wp.nav.push("about");
 	},
 	
@@ -170,8 +140,9 @@ wp.views.BlogItemView = Backbone.View.extend({
 	
 	edit:function(evt) {
 		evt.stopPropagation();
-		
-		new wp.views.EditBlogModal({model:this.model});
+//		new wp.views.EditBlogModal({model:this.model});		
+		var page = new wp.views.SettingsSitePage({model:this.model});
+		wp.nav.push(page);
 	},
 	
 	del:function(evt) {

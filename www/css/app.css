@@ -147,6 +147,12 @@ x-appbar > *:before {
 	background-color: rgb(30, 140, 190);
 }
 
+.page .scroll {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
 .content button:active {
   transform: translateY(1px);
 }
@@ -160,14 +166,10 @@ x-appbar > *:before {
 
 .page-start section.content,
 .page-login section.content,
-.page-about section.content {
+.page-about section.content,
+.page-settings section.content {
 	padding: 44px 20px 0 20px;
 	min-height: 0;
-}
-
-.page-start .scroll,
-.page-login .scroll {
-	height:100%;
 }
 
 .page-start footer,
@@ -192,7 +194,7 @@ x-appbar > *:before {
 }
 
 
-/*  start */
+/*  start page */
 
 .page-start h1 {
   text-align: center;
@@ -264,8 +266,7 @@ x-appbar > *:before {
 }
 
 
-
-/*  login  */
+/*  login page  */
 
 .page-login button.login {
   height:44px;
@@ -304,7 +305,7 @@ x-appbar > *:before {
 }
 
 
-/*  posts */
+/*  posts page */
 
 x-shiftbox > section {
   box-shadow: -1px 0px 20px rgba(0,0,0,0.5);
@@ -323,9 +324,7 @@ x-shiftbox > section {
 	position: absolute;
 	top:0;
 	width:100%;
-	height:100%;
 	background-color: rgb(16,16,16);
-	overflow: auto;
 }
 
 .page-posts section.content {
@@ -442,9 +441,10 @@ x-shiftbox > section {
 }
 
 
-/* About */
+/* about page */
 
-.page-about {
+.page-about,
+.page-settings {
   background-color:#333;
 }
 
@@ -454,10 +454,166 @@ x-shiftbox > section {
 
 .page-about .content section {
   text-align: center;
+  padding-bottom: 10px;
 }
 
 
+/* settings page */
 
+.page-settings x-appbar header {
+  line-height: 44px;
+  font-family: OpenSansLight,"Helvetica Neue",Helvetica,sans-serif;
+  font-size: 2.2rem;
+  height: 42px;
+  line-height: 40px;
+  text-align: left;
+  vertical-align: middle;
+  color:#fff;
+}
+
+.page-settings section.content {
+	color:white;
+}
+
+.page-settings #settings-version {
+	position: absolute;
+	right: 10px;
+}
+
+.page-settings ul {
+	background-color: #eee;
+    display:block; 
+    margin:0; 
+    padding:0;
+    border-radius: 4px;
+}
+
+.page-settings li,
+.page-settings .bloglist li div {
+	position: relative;
+	list-style: none;
+	border: none;
+	color: #464646;
+	font-family: OpenSans, Helvetica, sans-serif;
+	font-size: 1.5rem;
+	line-height: 42px;
+	font-weight: normal;
+	height: 42px;
+	padding: 0 10px;
+	text-shadow: 0 1px 0 rgba(255,255,255,1);
+	border-radius: 3px;
+	background-color: #eee;
+	box-shadow: 0 1px 0 rgba(255,255,255, 0.92) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.page-settings .list-button:active {
+	color: #eee;
+	background-color: rgb(46, 162, 204);
+	box-shadow: 0 1px 0 rgba(46, 162, 204, 0.92) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+}
+
+.page-settings .disclosure:after {
+	content: '\f431';
+	background: none;
+	display: inline-block;
+	font: 30px/30px 'Noticons';
+	transform: rotate(-90deg);
+	transform-origin: 15px 15px 0;
+	vertical-align: top;
+    position: absolute;
+    right: 0px;
+    top: 6px;
+    width:30px;
+}
+
+
+.page-settings .bloglist {
+    max-height:200px;
+    display:block; 
+    overflow:hidden;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.bloglist ul {
+    max-height:200px; 
+    overflow-x: hidden;
+    overflow-y: auto; 
+    border-radius: 0;
+}
+
+.bloglist li {
+	padding: 0;
+}
+
+.bloglist li div {
+	padding: 0 10px;
+}
+
+.bloglist li:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+}
+
+.bloglist li:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+}
+
+.bloglist li span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    margin-right:40px;
+}
+
+.page-settings .bloglist li button {
+	background-color: transparent;
+	background-position: center center;
+	border: medium none;
+	height: 42px;
+	width: 36px;
+	position: absolute;
+	top:0;
+	right:0;
+	padding: 0;
+}
+
+.page-settings .bloglist li button:before {
+	color: rgb(215, 77, 17);
+	content: '\f407';
+	border: none;
+	background: none;
+	display: inline-block;
+	font: 30px/30px 'Noticons';
+}
+
+.page-settings .bloglist li button:active:before {
+ 	color: #fff;
+}
+
+.page-settings .bloglist li button:active {
+	background-color: rgb(241, 131, 30);
+	transform: translateY(0);
+}
+
+
+.page-publish-settings ul {
+	margin-top:10px;
+}
+
+.page-publish-settings ul li.selected:after {
+	content: '\f418';
+	border: none;
+	background: none;
+	display: inline-block;
+	position:absolute;
+	right: 10px;
+	font: 30px/42px 'Noticons';
+}
 
 
 
@@ -576,7 +732,6 @@ h2, h3 {
 	font-weight: lighter;
 }
 
-.list-button,
 button.small,
 button.wide {
 	border: none;
@@ -595,14 +750,12 @@ button.wide {
 	box-shadow: 0 1px 0 rgba(255,255,255, 0.92) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-.list-button:hover,
 button.small:hover,
 button.wide:hover {
 	background-image: linear-gradient(#fff, #ccc);
 	box-shadow: 0 1px 0 rgba(255,255,255, 1) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
-.list-button:active,
 button.small:active,
 button.wide:active {
 	color: rgba(0,0,0,.65);
@@ -643,19 +796,6 @@ button.blue:active {
 	box-shadow: inset 0 1px 5px #005684, inset 0 -1px 0 #1e8cbe;
 }
 
-.list-button {
-	position: relative;
-}
-
-.list-button.dropdown:after {
-	content: "";
-	background: url("../img/icons/dropdown.png") no-repeat;
-	width: 18px;
-	height: 18px;
-	position: absolute;
-	right: 12px;
-	top: 12px;
-}
 
 button.wide.x-select-ok {
 	margin: 20px 0 20px 20px;
@@ -1118,107 +1258,6 @@ x-modal {
 /*
 	Settings page
 */
-
-.page-settings header {
-	padding: 20px 30px 0;
-	height: 40px;
-	text-align: left;
-	position:relative;
-}
-
-.page-settings section.content {
-	padding: 0 30px;
-	height: calc(100% - 60px);
-	min-height: 0;
-	color:white;
-	overflow: visible;
-}
-
-.page-settings .scroll {
-	overflow-y:scroll;
-	height:100%;
-
-}
-
-.page-settings ul {
-	background-color: #eee;
-    display:block; 
-    margin:0; 
-    padding:0;
-    border-radius: 4px;
-}
-
-.page-settings li {
-	list-style: none;
-    font-size: 1.5rem;
-    line-height: 30px;
-}
-
-.page-settings li.selected {
-    background-color:blue;
-}
-
-.bloglist {
-    max-height:200px;
-    display:block; 
-    overflow:hidden;
-    margin-bottom: 10px;
-    padding: 2px 3px 3px;
-    border-radius: 3px;
-    background: #fff;
-}
-
-.bloglist .list-button {
-	border-radius: 0;
-	position: relative;
-}
-
-.bloglist li.list-button:first-child {
-	border-top-left-radius: 2px;
-	border-top-right-radius: 2px;
-}
-
-.bloglist li.list-button:last-child {
-	border-bottom-left-radius: 2px;
-	border-bottom-right-radius: 2px;
-}
-
-.bloglist .list-button:after {
-	right: 46px;
-}
-
-.bloglist ul {
-    max-height:200px; 
-    overflow-x: hidden;
-    overflow-y: auto; 
-    border-radius: 0;
-}
-
-.bloglist li button:active {
-	transform: translate(0, 1px);
-}
-
-.bloglist li span button {
-	background: url("../img/delete.png") no-repeat;
-	height: 18px;
-	width: 18px;
-	position: absolute;
-	right: 12px;
-	top: 12px;
-	border: none;
-}
-
-.bloglist li span {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block;
-}
-
-.bloglist li span:first-child {
-    width: 100%;
-    max-width: 180px;
-    overflow: hidden;
-}
 
 .page-settings .content section {
     margin-bottom:30px;

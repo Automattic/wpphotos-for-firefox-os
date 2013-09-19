@@ -17,7 +17,6 @@
   "permissions": {
 	"systemXHR": {"description":"Required for remote syncing via XMLRPC."},
     "device-storage:pictures":{ "access": "readonly", "description":"Required for choosing photos to post to a blog." },
-
     "storage":{"description":"Required for storing synced data and images for offline use."}
   },
   "orientation": "portrait-primary",
