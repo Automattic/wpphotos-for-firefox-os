@@ -45,12 +45,13 @@ wp.nav = {
   },
   
   pop: function() {
-    // We want to play the last card animation in reverse,
-    // to ensure this, get the transitionOverride from the current card 
-    // and apply it to the previous card.
+  	// When popping we want to play current/top card's animation in reverse.
+  	// The deck is going to play the previous cards animation in reverse. (doH!)
+  	// We can work around this behavior by assigning the current card's desiredTransition
+  	// to the previos card's transitionOverride property.
     var currIndex = this.stage.selectedIndex;
     if (currIndex > 0) {
-      var override = this.stage.selectedCard.transitionOverride || "scrollLeft";
+      var override = this.stage.selectedCard.desiredTransition || "scrollLeft";
       var card = this.stage.cards[currIndex-1];
       card.transitionOverride = override;
     }
@@ -85,6 +86,10 @@ wp.nav = {
 	    var allCards = this.stage.getAllCards();
 	    for(var card in allCards) {
 	      if (card.cardName == page) {
+      	    if (this._isValidTransition(transition)) {
+      	      card.desiredTransition = transition;
+		      card.transitionOverride = transition;
+		    }
 	        return card;
 	      }
 	    }
@@ -102,6 +107,7 @@ wp.nav = {
     var card = document.createElement("x-card");
     card.cardName = page;
     if (this._isValidTransition(transition)) {
+	  card.desiredTransition = transition;
       card.transitionOverride = transition;
     }
     card.appendChild(view.el);
