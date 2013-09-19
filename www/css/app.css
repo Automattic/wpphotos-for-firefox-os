@@ -116,7 +116,8 @@ x-appbar button.menu:before {
 }
 
 x-appbar button.add:after {
-  content: '\f215';
+/*   content: '\f215'; */
+  content: '\f102';
   background: none;
   display: inline-block;
   font: 22px/40px 'Noticons';
