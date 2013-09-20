@@ -140,7 +140,6 @@ wp.views.BlogItemView = Backbone.View.extend({
 	
 	edit:function(evt) {
 		evt.stopPropagation();
-//		new wp.views.EditBlogModal({model:this.model});		
 		var page = new wp.views.SettingsSitePage({model:this.model});
 		wp.nav.push(page);
 	},
