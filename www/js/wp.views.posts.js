@@ -333,7 +333,7 @@ wp.views.Post = Backbone.View.extend({
 			photo.className += " hidden";
 
 			// Enable no-image styling for posts
-			var postBody = div.querySelector(".post-body");
+			var postBody = div.querySelector(".post-content");
 			postBody.className += " noimage";
 		};
 		

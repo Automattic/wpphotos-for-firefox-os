@@ -401,6 +401,7 @@ x-shiftbox > section {
 	z-index: 10;
 	background-color: #fff;
 	padding:10px;
+	margin-bottom:10px;
 	box-shadow: 0 0 1px inset;
 }
 
@@ -431,7 +432,7 @@ x-shiftbox > section {
 }
 
 .page-posts .post .post-title {
-	padding: 10px 0 5px 0;
+	padding: 0 0 5px;
 	margin: 0;
 	font-size: 16pt;
 	color: #999;
