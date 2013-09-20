@@ -397,7 +397,6 @@ x-shiftbox > section {
 
 .page-posts .photo {
 	position: relative;
-	min-height: 214px;/* Min height should match the requested size from the photon api */
 	z-index: 10;
 	background-color: #fff;
 	margin-bottom:10px;
@@ -411,6 +410,7 @@ x-shiftbox > section {
 
 .page-posts .photo-box {
 	position:relative;
+	min-height: 175px;
 }
 
 .page-posts .photo-shadow {

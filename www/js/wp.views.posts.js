@@ -263,8 +263,8 @@ wp.views.Post = Backbone.View.extend({
 		div.innerHTML = wp.views.templates[this.template_name].text;
 
 		var html = "";
-    var postContent;
-    var captionStr; 
+		var postContent;
+		var captionStr;
     
     // Strip the HTML from the post content
 		var ele = document.createElement("div");
@@ -290,30 +290,30 @@ wp.views.Post = Backbone.View.extend({
 		// Caption
 		var captionEl = div.querySelector(".caption");
 		if (captionStr) {
-  		captionEl.innerHTML = captionStr;
+			captionEl.innerHTML = captionStr;
 		} else {
-  		captionEl.className += " hidden";
+			captionEl.className += " hidden";
 		};
 		
 		// Title 
 		var postTitle = this.model.get("post_title");
 		var titleEl = div.querySelector(".post-title");
 		if (postTitle) {
-		  titleEl.innerHTML = postTitle;
+			titleEl.innerHTML = postTitle;
 		} else {
-		  titleEl.className += " hidden";
+			titleEl.className += " hidden";
 		};
 		
 		// Summary
 		var contentEl = div.querySelector(".post-content");
 		if (postContent) {
-  		contentEl.innerHTML = postContent;
+			contentEl.innerHTML = postContent;
 		};
 		
 		// Date
-    var formattedDate = this.formatGMTDate(this.model.get("local_date"));
-    var dateEl = div.querySelector(".post-date");
-    dateEl.innerHTML = formattedDate;
+		var formattedDate = this.formatGMTDate(this.model.get("local_date"));
+		var dateEl = div.querySelector(".post-date");
+		dateEl.innerHTML = formattedDate;
 		
 		// Photo
 		var img = div.querySelector(".photo img");
@@ -323,7 +323,8 @@ wp.views.Post = Backbone.View.extend({
 				// data url so don't use photon.
 				img.src = image.link;
 			} else {
-				img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
+				// TODO: If private blog then do not use photon.
+				img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?w=' + $('.photo').width();
 			};
 
 		} else {
