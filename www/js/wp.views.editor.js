@@ -8,46 +8,107 @@
 wp.views.EditorPage = wp.views.Page.extend({
 	template_name:"editor",
 	
+	active_text_id:null,
+	
 	initialize:function() {
 		this.render();
 	},
 	
 	events:_.extend({
 		"click button.save": "save",
-		"click button.back": "goBack"
+		"click button.back": "goBack",
+		"click label" : "showEditor",
+		"click span" : "showEditor",
+		"click button.cancel": "hideEditor",
+		"click button.done" : "updateText"
 	}),
 	
 	render:function() {
 		var template = wp.views.templates[this.template_name].text;
-		// update the dom
-
 		this.$el.html( template );
-		
-		// webLi0n doesn't pickup placeholders on inputs so we need to do this manually
-		this.el.querySelector("#caption").placeholder = _s("control-caption");
-		this.el.querySelector("#post-title").placeholder = _s("control-post-title");
-		this.el.querySelector("#post-content").placeholder = _s("control-tap-here");
-		this.el.querySelector("#post-tags").placeholder = _s("control-tags");
 
 		var img = this.el.querySelector("#photo");
 		try {
 			if(typeof(MozActivity) == "undefined") {
-				img.src = "img/start/1.jpg"; // For browser testing prime with a local image.
+				// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox.
+				// To handle everything in one place throw an error evenfor the versions that do not throw an exception.
+				throw "ignore";
 			} else {
 				img.src = URL.createObjectURL(wp.app.selected_image_blob); // Saved from the posts view.
 				wp.app.selected_image_blob = null; // discard.
 			};
 		} catch(e) {
-			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox.
-			img.src = "img/start/1.jpg"; // For browser testing prime with a local image.			
+			// For browser testing prime with a local image.
+			img.src = "img/start/1.jpg";
 		};
 		return this;
 	},
 	
+	updateText: function() {
+		this.hideEditor();
+		
+		var textarea = this.el.querySelector("#editor");
+		var div = this.el.querySelector("#"+this.active_text_id);
+		div.innerHTML = textarea.value;
+		textarea.value = "";
+	},
+	
+	showEditor: function(evt) {
+		var btn;
+		var target = (evt.target.nodeName == 'label') ? evt.target : evt.target.parentNode;
+		var header = this.el.querySelector("header");
+		header.innerHTML = target.querySelector("span").textContent;
+		
+		var div = target.querySelector("div");
+		this.active_text_id = div.id;
+		
+		var textarea = this.el.querySelector("#editor");
+		textarea.value = div.innerHTML;
+		
+		$(textarea).removeClass("hidden");
+		textarea.focus();
+		
+		btn = this.el.querySelector(".back");
+		$(btn).addClass("hidden");
+		
+		btn = this.el.querySelector(".save");
+		$(btn).addClass("hidden");
+		
+		btn = this.el.querySelector(".done");
+		$(btn).removeClass("hidden");
+
+		btn = this.el.querySelector(".cancel");
+		$(btn).removeClass("hidden");		
+		
+	},
+	
+	hideEditor: function() {
+		var btn;
+		
+		var header = this.el.querySelector("header");
+		var attr = header.getAttribute("data-l10n-id");
+		header.innerHTML = _s(attr);
+		
+		var textarea = this.el.querySelector("#editor");
+		$(textarea).addClass("hidden");
+		
+		btn = this.el.querySelector(".back");
+		$(btn).removeClass("hidden");
+		
+		btn = this.el.querySelector(".save");
+		$(btn).removeClass("hidden");
+		
+		btn = this.el.querySelector(".done");
+		$(btn).addClass("hidden");
+
+		btn = this.el.querySelector(".cancel");
+		$(btn).addClass("hidden");
+		
+	},
+	
 	goBack:function() {
 		if(confirm(_s("prompt-discard-post?"))) {
-//			wp.app.routes.navigate("posts", {trigger:true});
-      wp.nav.pop();
+			wp.nav.pop();
 		};
 	},
 	
@@ -129,21 +190,21 @@ wp.views.EditorPage = wp.views.Page.extend({
 		
 		var attrs = {
 			"blogkey":wp.app.currentBlog.id,
-			"post_title":title.value.trim(),
-			"post_content":content.value.trim()
+			"post_title":title.innerHTML.trim(),
+			"post_content":content.innerHTML.trim()
 		};
 
-		if (tags.value.trim().length > 0){
-			attrs["terms_names"] = {"post_tag":tags.value.trim().split(",")};
+		if (tags.innerHTML.trim().length > 0){
+			attrs["terms_names"] = {"post_tag":tags.innerHTML.trim().split(",")};
 		};
 		
 		var post = new wp.models.Post(attrs);
 		
 		var p;
 		if(upload_now){
-			p = post.uploadAndSave(image_data, caption.value.trim()); // saves
+			p = post.uploadAndSave(image_data, caption.innerHTML.trim()); // saves
 		} else {
-			post.setPendingPhoto(image_data, caption.value.trim());
+			post.setPendingPhoto(image_data, caption.innerHTML.trim());
 			p = post.save();
 		};
 		
@@ -163,8 +224,8 @@ wp.views.EditorPage = wp.views.Page.extend({
 		});
 		
 		wp.app.posts.add(post, {at:0});
-//		wp.app.routes.navigate("posts", {trigger:true});
-    wp.nav.pop();
+
+		wp.nav.pop();
 	}
 	
 });

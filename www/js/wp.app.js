@@ -25,7 +25,7 @@ wp.app = _.extend({
 		// Load Templates
 		var p = wp.views.loadTemplates();
 		p.success(function(){
-      // noop
+			// noop
 		});
 		p.fail(function() {
 			// couldn't load templates

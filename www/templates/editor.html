@@ -15,25 +15,32 @@
   	<div id="stage">
 		<div id="template"> 		
 			<div class="page page-editor">
-				<header>
-					<button class="back left"></button>
-					<button class="save blue right small" data-l10n-id="control-save">sAve</button>
-				</header>
+				  <x-appbar>
+	    			  <button class="back"></button>
+	    			  <button class="cancel hidden"></button>
+	    			  <header data-l10n-id="title-new-photo">nEw Photo</header>
+	    			  <button class="save"></button>
+	    			  <button class="done hidden"></button>
+	  			  </x-appbar>
 				<div class="scroll">				
 					<section class="content">
 						<div class="post">
 							<div class="photo">
-								<div class="photo-table">
-									<div class="photo-cell">
-										<img id="photo" src="" />
-									</div>
-								</div>
-								<div class="caption-frame"><input id="caption" type="text" placeholder="tAp to caption" /></div>
+								<img id="photo" src="" />
+								<label class="textlabel"><span data-l10n-id="control-caption">cAption</span>
+									<div class="textfield" id="caption"></div>
+								</label>
 							</div>
 							<div class="post-body">
-								<textarea id="post-title" class="post-title" type="text" placeholder="pOst title (optional)" ></textarea>
-								<textarea id="post-content" class="post-content" type="text" placeholder="tAp here to type post (optional)" rows="3" ></textarea>
-								<textarea id="post-tags" type="text" placeholder="tAgs (comma separated, optional)" ></textarea>
+								<label class="textlabel"><span data-l10n-id="control-post-title">tItle</span>
+									<div class="textfield" id="post-title"></div>
+								</label>
+								<label class="textlabel"><span data-l10n-id="control-post-body">cOntent</span>
+									<div class="textfield" id="post-content"></div>
+								</label>
+								<label class="textlabel"><span data-l10n-id="control-post-tags">tAgs</span>
+									<div class="textfield" id="post-tags"></div>
+								</label>
 							</div>
 							<div class="canvas-wrapper">
 								<canvas id="photo-canvas"></canvas>
@@ -41,6 +48,7 @@
 						</div>
 					</section>
 				</div>
+				<textarea id="editor" class="hidden"></textarea>
 			</div>
 		</div>
   	</div>

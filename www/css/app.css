@@ -105,7 +105,7 @@ x-appbar button.back:before {
 }
 
 x-appbar button.menu {
-    width:30px;
+	width:30px;
 }
 
 x-appbar button.menu:before {
@@ -116,7 +116,7 @@ x-appbar button.menu:before {
 }
 
 x-appbar button.add:after {
-/*   content: '\f215'; */
+/*	 content: '\f215'; */
   content: '\f102';
   background: none;
   display: inline-block;
@@ -195,7 +195,7 @@ x-appbar > *:before {
 }
 
 
-/*  start page */
+/*	start page */
 
 .page-start h1 {
   text-align: center;
@@ -267,7 +267,7 @@ x-appbar > *:before {
 }
 
 
-/*  login page  */
+/*	login page	*/
 
 .page-login button.login {
   height:44px;
@@ -306,7 +306,7 @@ x-appbar > *:before {
 }
 
 
-/*  posts page */
+/*	posts page */
 
 x-shiftbox > section {
   box-shadow: -1px 0px 20px rgba(0,0,0,0.5);
@@ -461,7 +461,8 @@ x-shiftbox > section {
 
 /* settings page */
 
-.page-settings x-appbar header {
+.page-settings x-appbar header,
+.page-editor x-appbar header {
   line-height: 44px;
   font-family: OpenSansLight,"Helvetica Neue",Helvetica,sans-serif;
   font-size: 2.2rem;
@@ -483,10 +484,10 @@ x-shiftbox > section {
 
 .page-settings ul {
 	background-color: #eee;
-    display:block; 
-    margin:0; 
-    padding:0;
-    border-radius: 4px;
+	display:block; 
+	margin:0; 
+	padding:0;
+	border-radius: 4px;
 }
 
 .page-settings li,
@@ -522,27 +523,27 @@ x-shiftbox > section {
 	transform: rotate(-90deg);
 	transform-origin: 15px 15px 0;
 	vertical-align: top;
-    position: absolute;
-    right: 0px;
-    top: 6px;
-    width:30px;
+	position: absolute;
+	right: 0px;
+	top: 6px;
+	width:30px;
 }
 
 
 .page-settings .bloglist {
-    max-height:200px;
-    display:block; 
-    overflow:hidden;
-    margin-bottom: 10px;
-    border-radius: 3px;
-    background: #fff;
+	max-height:200px;
+	display:block; 
+	overflow:hidden;
+	margin-bottom: 10px;
+	border-radius: 3px;
+	background: #fff;
 }
 
 .bloglist ul {
-    max-height:200px; 
-    overflow-x: hidden;
-    overflow-y: auto; 
-    border-radius: 0;
+	max-height:200px; 
+	overflow-x: hidden;
+	overflow-y: auto; 
+	border-radius: 0;
 }
 
 .bloglist li {
@@ -564,11 +565,11 @@ x-shiftbox > section {
 }
 
 .bloglist li span {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block;
-    overflow: hidden;
-    margin-right:40px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+	overflow: hidden;
+	margin-right:40px;
 }
 
 .page-settings .bloglist li button {
@@ -618,27 +619,133 @@ x-shiftbox > section {
 
 
 
+/* Editor */
 
+x-appbar button.cancel:before {
+	content: '\f405';
+	background: none;
+	display: inline-block;
+	font: 30px/40px 'Noticons';
+}
 
+x-appbar button.done:after {
+	content: '\f418';
+	background: none;
+	display: inline-block;
+	font: 30px/40px 'Noticons';
+}
 
-.page-editor .photo {
-	min-height: 150px; /* saftey height */
+x-appbar button.save:after {
+	content: '\f411';
+	background: none;
+	display: inline-block;
+	font: 30px/40px 'Noticons';
+}
+
+.page-editor .post {
+	padding-top: 44px;
+}
+
+.page-editor section.content {
+	position:relative;
+	z-index: 5;
+	background-color: #eee;
+	height:100%;
+	overflow:auto;
 }
 
 .page-editor .photo {
 	position: relative;
-	z-index: 10;
-	
 	display: block;
-	
-	box-shadow: 0 1px 3px rgba(0,0,0,.65);
-	background: url("../img/wp-placeholder.png");
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color: #666666;
+	background-color: #fff;
+	margin:10px;
+}
+
+.page-editor .photo img {
+	display: block;
+	margin: 0 auto;
+	box-shadow: 0px 1px 3px #333333 inset;
+	border:10px solid #fff;
+	max-width: 100%;
+	max-height: 180px;
+}
+
+.page-editor .post-body {
+	color: rgb(34,34,34);
+	margin: 0 10px 10px;
+}
+
+.page-editor .textlabel:before {
+	content: '\f411';
+	background: none;
+	display: inline-block;
+	font: 24px/30px 'Noticons';
+	color: #999;
+	width: 24px;
+	vertical-align: top;
+}
+
+.page-editor .textlabel,
+.page-editor .textfield {
+	background-color: #fff;
+	font-family: OpenSans,Helvetica,arial,sans-serif;
+    font-size: 1.4rem;
+    line-height: 2.5rem;
+}
+
+.page-editor .textlabel {
+	display: block;
+	padding: 10px;
+	color: #999;
+    margin-bottom:1px;
+}
+
+.page-editor .textfield {
+    color:#666;
+	font-weight: 100;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 80px;
+    min-height: 0;
+}
+
+.page-editor .photo input[type="text"] {
+	box-shadow: none;
 }
 
 
+.page-editor .post-body textarea  {
+	border:none;
+	width: calc(100% - 20px);
+	box-shadow: none;
+	height: 40px;
+	margin: 0;
+	margin-bottom: 1px;
+	font-weight: lighter;
+}
+
+.page-editor .post-body textarea.post-content {
+	height: 72px;
+}
+
+.page-editor .canvas-wrapper {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+}
+
+#editor {
+	display: block;
+	position: absolute;
+	top: 44px;
+	left: 0;
+	width: calc(100% - 20px);
+	height: calc(100% - 64px);
+	z-index: 10;
+}
 
 
 
@@ -866,13 +973,13 @@ section.content {
 */
 
 .modal-content.blog-settings {
-    padding: 20px;
-    position: absolute;
-    font-size: 1.5rem;
-    left: 20px;
-    right: 20px;
-    top: 100px;
-    transform: none;
+	padding: 20px;
+	position: absolute;
+	font-size: 1.5rem;
+	left: 20px;
+	right: 20px;
+	top: 100px;
+	transform: none;
 }
 
 .modal-content input[type="text"], .modal-content input[type="password"] {
@@ -882,7 +989,7 @@ section.content {
 }
 
 .spinner-modal {
-    color: #CCCCCC;
+	color: #CCCCCC;
 }
 
 .blog-settings #url {
@@ -948,9 +1055,7 @@ x-modal {
 }
 */
 
-.page-editor .photo {
-	min-height: 150px; /* saftey height */
-}
+
 .page-posts .photo {
 	min-height: 214px;/* Min height should match the requested size from the photon api */
 }
@@ -961,10 +1066,10 @@ x-modal {
 }
 
 .page-posts .photo-cell {
-    display: table-cell;
-    height: 100%;
-    width: 100%;
-    text-align: center;
+	display: table-cell;
+	height: 100%;
+	width: 100%;
+	text-align: center;
 }
 
 /*
@@ -1007,14 +1112,6 @@ x-modal {
 .page-posts .post-body.noimage {
 	margin: 0;
 }
-
-.post-body span {
-	float: right;
-	color: #ccc;
-	font-size: 1.3rem;
-	font-weight: lighter;
-}
-
 
 
 .yellow {
@@ -1088,111 +1185,7 @@ x-modal {
 
 
 
-/*
-	Editor page
 
-
-.page-editor header {
-	position:relative;
-	z-index: 10;
-	box-shadow: 0px 1px 5px #333333;
-	padding: 0 20px;
-	height: 60px;
-	background-color:black;
-}
-*/
-
-.page-editor .scroll {
-	overflow:hidden;
-	height: 100%;
-}
-
-.page-editor section.content {
-	position:relative;
-	z-index: 5;
-	background-color: #000;
-	height:100%;
-	overflow:auto;
-}
-
-.page-editor .post {
-	padding-bottom: 1px;
-	padding-top: 66px;
-}
-
-.page-editor .photo-table {
-	width:100%;
-}
-
-.page-editor .photo-cell {
-    height: 100%;
-    width: 100%;
-    text-align: center;
-}
-
-.page-editor .photo img {
-	display: block;
-    height: auto;
-    margin: 0 auto;
-    max-height: 250px;
-    max-width: calc(100%);
-    position: relative;
-    width: auto;
-	box-shadow: 0px 1px 3px #333333 inset;
-}
-
-.page-editor .photo .caption-frame {
-	position: absolute;
-	bottom: 10px;
-	text-align: center;
-	width: 100%;
-}
-.page-editor .photo input[type="text"] {
-	margin: 0;
-	font-size: 1.4rem;
-	font-weight: lighter;
-	color: #666666;
-	display: inline;
-	opacity: .7;
-}
-
-.page-editor .post-body {
-	margin: 0 5px 5px 5px;
-	background-color: rgb(242,242,242);
-	overflow: hidden;
-	color: rgb(34,34,34);
-}
-
-.page-editor .post-body textarea  {
-	border-left: 0px solid black;
-	border-right: 0px solid black;
-	border-top: 0px solid black;
-	border-bottom: 1px solid #eee;
-	width: calc(100% - 20px);
-	box-shadow: none;
-	height: 20px;
-	margin: 0;
-	font-weight: lighter;
-	color: #888;
-}
-
-.page-editor .post-body textarea.post-title {
-	font-size: 1.8rem;
-	height:22px;
-}
-
-.page-editor .post-body textarea.post-content {
-	height: 72px;
-}
-
-.page-editor .canvas-wrapper {
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-}
 
 
 
@@ -1261,27 +1254,27 @@ x-modal {
 */
 
 .page-settings .content section {
-    margin-bottom:30px;
+	margin-bottom:30px;
 }
 .page-settings .content section h2 {
-    margin-bottom: 1rem;
-    text-shadow: 0 1px 2px rgba(0,0,0,.8);
+	margin-bottom: 1rem;
+	text-shadow: 0 1px 2px rgba(0,0,0,.8);
 }
 
 .modal-background {
 	background-color: rgba(0, 0, 0, 0.9);
-    height: 100%;
-    width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 .modal-content {
-    left: 50%;
-    padding: 20px;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,.8);
+	left: 50%;
+	padding: 20px;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	color: #fff;
+	text-shadow: 0 1px 3px rgba(0,0,0,.8);
 }
 
 x-modal {
