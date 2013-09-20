@@ -379,6 +379,9 @@ wp.views.Post = Backbone.View.extend({
 	},
 	
 	formatGMTDate:function(date) {
+		
+		return date.toLocaleDateString();
+	
 		// Fix the gmt time.
 /*
 		var gmt = new Date();

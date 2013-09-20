@@ -331,7 +331,7 @@ x-shiftbox > section {
 .page-posts section.content {
 	position: relative;
 	z-index: 5;
-  background-color: rgb(16,16,16);
+	background-color: #eee;
 	min-height: 0;
 	margin-top: 44px;
 }
@@ -380,9 +380,8 @@ x-shiftbox > section {
   display:block;
   border:none;
   background:none;
-  width:100%;
-  padding:0px;
-  margin:0px;
+  padding:0 5px;
+  margin:0;
 }
 
 .page-posts .post .photo-btn:active {
@@ -390,57 +389,70 @@ x-shiftbox > section {
 }
 
 .page-posts .post {
-	margin-bottom: 8px;
+	margin-bottom: 5px;
+	padding-bottom: 10px;
 	position:relative;
-}
-
-.page-posts .photo {
-	min-height: 214px;/* Min height should match the requested size from the photon api */
+	background-color:#fff;
 }
 
 .page-posts .photo {
 	position: relative;
+	min-height: 214px;/* Min height should match the requested size from the photon api */
 	z-index: 10;
-	
-	display: block;
-	
-	box-shadow: 0 1px 3px rgba(0,0,0,.65);
-	background: url("../img/wp-placeholder.png");
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-color: #666666;
+	background-color: #fff;
+	padding:10px;
+	box-shadow: 0 0 1px inset;
 }
 
+.page-posts .photo img {
+	max-height: 100%;
+	max-width: 100%;
+}
 
-.page-posts .post-body {
+.page-posts .photo-box {
+	position:relative;
+}
+
+.page-posts .photo-shadow {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 2px;
+	box-shadow: 0px 0px 1px black inset;
+	z-index: 10px;
+}
+
+.page-posts .photo .caption {
+	font-size: 10pt;
+	color: #999;
+	margin-top: 10px;
+	font-family: OpenSansLight;
+}
+
+.page-posts .post .post-title {
+	padding: 10px 0 5px 0;
 	margin: 0;
-	padding: .8rem .8rem .4rem;
-	background-color: rgb(242,242,242);
-	overflow: hidden;
-	color: rgb(34,34,34);
+	font-size: 16pt;
+	color: #999;
+	font-family: OpenSansLight;
 }
 
-.page-posts .post-body .post-title {
+.page-posts .post .post-content {
+	display: block;
+	margin: 0;
 	padding: 0;
-	margin: 0;
-	font-weight: lighter;
-	font-size: 1.8rem;
-	line-height: 2.4rem;
-}
-
-.page-posts .post-body .post-content {
-	display: block;
-	max-height: 7.6rem;
-	line-height: 1.9rem;
 	overflow: hidden;
-	margin: 0;
-
 	text-overflow: ellipsis;
-	font-weight: lighter;
-	font-size: 1.3rem;
-	color: #464646;
+	font-size: 12pt;
+	color: #999;
 }
 
+.page-posts .post .post-date {
+	font-size:10pt;
+	color: #ddd;
+	padding: 5px 0;
+}
 
 /* about page */
 
@@ -1056,46 +1068,6 @@ x-modal {
 */
 
 
-.page-posts .photo {
-	min-height: 214px;/* Min height should match the requested size from the photon api */
-}
-
-.page-posts .photo-table {
-	display:table; 
-	width:100%;
-}
-
-.page-posts .photo-cell {
-	display: table-cell;
-	height: 100%;
-	width: 100%;
-	text-align: center;
-}
-
-/*
-.page-posts .photo img {
-	display:block;
-	width: 100%;
-	box-shadow: 0px 1px 3px #333333 inset;
-}
-*/
-
-.page-posts .photo .caption {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	width: 66%;
-	max-height: 50%;
-	
-	text-align: right;
-	text-overflow: ellipsis;
-	font-style: italic;
-	color: #fff;
-	text-shadow: 0 1px #333;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	font-size: 11pt;
-}
 
 .page-posts .photo .no-title-date {
 	position: absolute;
