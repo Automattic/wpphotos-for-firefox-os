@@ -31,6 +31,9 @@ body {
   background-color: rgb(30, 140, 190);
 }
 
+button {
+	background-image:none; /* Removes the background gradient image Firefox OS tries to apply by default. */
+}
 
 /* App bar */
 
@@ -65,6 +68,9 @@ x-appbar header {
 	text-align: left;
 	position:relative;
 	padding:0 5px;
+    min-width:175px; /* FFOS simulator does not support box-flex proprety ?!?. Fake it for now but a better fix is needed.*/
+    -moz-box-flex: 1 !important;
+    box-flex: 1 !important;
 }
 
 x-appbar header button.logo {
@@ -77,6 +83,7 @@ x-appbar header button.logo {
   text-align: left;
   vertical-align: middle;
   line-height: 36px;
+  background: none;
 }
 
 x-appbar header button.logo:active {
@@ -300,7 +307,7 @@ x-appbar > *:before {
   font-family: OpenSans;
   font-size: 1.5rem;
   color:#eee;
-  background-color: transparent;  
+  background:none;
   width: 100%;
   padding: 0;
 }
@@ -405,7 +412,7 @@ x-shiftbox > section {
 
 .page-posts .photo img {
 	max-height: 100%;
-	max-width: 100%;
+	width: 100%;
 }
 
 .page-posts .photo-box {
@@ -585,8 +592,7 @@ x-shiftbox > section {
 }
 
 .page-settings .bloglist li button {
-	background-color: transparent;
-	background-position: center center;
+	background:none;
 	border: medium none;
 	height: 42px;
 	width: 36px;
@@ -678,7 +684,7 @@ x-appbar button.save:after {
 	margin: 0 auto;
 	box-shadow: 0px 1px 3px #333333 inset;
 	border:10px solid #fff;
-	max-width: 100%;
+	max-width: calc(100% - 20px);
 	max-height: 180px;
 }
 
