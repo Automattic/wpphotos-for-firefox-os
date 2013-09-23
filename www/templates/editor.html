@@ -1,57 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width" />
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width" />
 
-    <title data-l10n-id="title-wordpress">WordPress</title>
+		<title data-l10n-id="title-wordpress">WordPress</title>
 
-    <link rel="stylesheet" href="../css/app.css" />
+		<link rel="stylesheet" href="../css/app.css" />
 
-  </head>
-  <body>
-	<div id="background"></div>
-  	<div id="stage">
-		<div id="template"> 		
-			<div class="page page-editor">
-				  <x-appbar>
-	    			  <button class="back"></button>
-	    			  <button class="cancel hidden"></button>
-	    			  <header data-l10n-id="title-new-photo">nEw Photo</header>
-	    			  <button class="save"></button>
-	    			  <button class="done hidden"></button>
-	  			  </x-appbar>
-				<div class="scroll">				
-					<section class="content">
-						<div class="post">
-							<div class="photo">
-								<img id="photo" src="" />
-								<label class="textlabel"><span data-l10n-id="control-caption">cAption</span>
-									<div class="textfield" id="caption"></div>
-								</label>
-							</div>
-							<div class="post-body">
-								<label class="textlabel"><span data-l10n-id="control-post-title">tItle</span>
-									<div class="textfield" id="post-title"></div>
-								</label>
-								<label class="textlabel"><span data-l10n-id="control-post-body">cOntent</span>
-									<div class="textfield" id="post-content"></div>
-								</label>
-								<label class="textlabel"><span data-l10n-id="control-post-tags">tAgs</span>
-									<div class="textfield" id="post-tags"></div>
-								</label>
-							</div>
-							<div class="canvas-wrapper">
-								<canvas id="photo-canvas"></canvas>
-							</div>
+	</head>
+	<body>
+		<div id="stage">
+			<div id="template"> 		
+				<div class="page page-editor">
+					<x-appbar>
+						<button class="back"></button>
+						<button class="cancel hidden"></button>
+						<header data-l10n-id="title-new-photo">nEw Photo</header>
+						<div class="force-right">
+							<button class="save"></button>
+							<button class="done hidden"></button>
 						</div>
-					</section>
+					</x-appbar>
+					<div class="scroll">				
+						<section class="content">
+							<div class="post">
+								<div class="photo">
+									<img id="photo" src="" />
+									<label class="textlabel"><span data-l10n-id="control-caption">cAption</span>
+										<div class="textfield" id="caption"></div>
+									</label>
+								</div>
+								<div class="post-body">
+									<label class="textlabel"><span data-l10n-id="control-post-title">tItle</span>
+										<div class="textfield" id="post-title"></div>
+									</label>
+									<label class="textlabel"><span data-l10n-id="control-post-body">cOntent</span>
+										<div class="textfield" id="post-content"></div>
+									</label>
+									<label class="textlabel"><span data-l10n-id="control-post-tags">tAgs</span>
+										<div class="textfield" id="post-tags"></div>
+									</label>
+								</div>
+								<div class="canvas-wrapper">
+									<canvas id="photo-canvas"></canvas>
+								</div>
+							</div>
+						</section>
+					</div>
+					<textarea id="editor" class="hidden"></textarea>
 				</div>
-				<textarea id="editor" class="hidden"></textarea>
 			</div>
 		</div>
-  	</div>
 
-  </body>
+	</body>
 </html>

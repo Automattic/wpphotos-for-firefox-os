@@ -114,7 +114,6 @@ button.wide:active {
 }
 
 button.small {
-	height: 36px;
 	margin-right: 10px;
 	font-size: 1.4rem;
 }
@@ -184,7 +183,6 @@ x-appbar button {
 	padding: 0;
 	border: none;
 	background-color: transparent;
-	background-position: center center;
 	color: #fff;
 	font-size: 1.6rem;
 	text-align: center;
@@ -205,11 +203,6 @@ x-appbar header {
 	text-align: left;
 	vertical-align: middle;
 }
-
-.page-settings x-appbar header,
-.page-editor x-appbar header {
-}
-
 
 x-appbar header button.logo {
 	min-width: 125px;
@@ -295,12 +288,36 @@ x-appbar button.save:after {
 	font: 30px/40px 'Noticons';
 }
 
+x-appbar .force-right {
+	position:absolute;
+	right: 0;
+	top: 0;
+	margin: 0;
+	padding: 0;
+	background-color: none;
+}
+
+x-appbar .force-right:before {
+	background-color: transparent;
+}
+
+x-appbar .force-right > *:before {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	width: 1px;
+	background-color: rgba(255, 255, 255, 0.25);
+	content: " ";
+}
+
+/* stage */
+
 #background, #stage {
 	position: absolute;
 	width: 100%;
 	height: 100%;
 }
-
 
 /* pages */
 
@@ -428,6 +445,7 @@ x-appbar button.save:after {
 	display: block;
 	height: 44px;
 	min-width: 100px;
+	margin: 0 auto;
 	padding: 5px 10px;
 	border-radius: 3px;
 	border: none;
@@ -690,6 +708,7 @@ x-shiftbox > section {
 
 .page-about header {
 	margin-top: 10px;
+	text-align: center;
 }
 
 .page-about .content section {
