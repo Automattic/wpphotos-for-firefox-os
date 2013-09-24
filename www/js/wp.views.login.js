@@ -103,8 +103,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 	},
 	
 	goBack:function() {
-//		wp.app.routes.navigate("goBack", {trigger:true});
-    wp.nav.pop();
+	    wp.nav.pop();
 	},
 	
 	showCreate:function() {
@@ -162,8 +161,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 						wp.app.setCurrentBlog(firstBlog);
 
 						if(!wp.app.isNetworkAvailable()) {
-//							wp.app.routes.navigate("posts", {trigger:true});
-							wp.nav.push("posts");
+							wp.nav.setPage("posts", null, true);
 							return;
 						};
 					
@@ -174,8 +172,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 						});
 						p.always(function() {
 							wp.app.hideLoadingIndicator();
-//							wp.app.routes.navigate("posts", {trigger:true});
-							wp.nav.push("posts");
+							wp.nav.setPage("posts", null, true);
 						});
 
 					};
@@ -195,8 +192,7 @@ wp.views.LoginPage = wp.views.Page.extend({
 		});
 		p.always(function() {
 			wp.app.hideLoadingIndicator();
-//			wp.app.routes.navigate("posts", {trigger:true});
-			wp.nav.push("posts");
+			wp.nav.setPage("posts", null, true);
 		});
 	}
 });

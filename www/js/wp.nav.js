@@ -58,13 +58,14 @@ wp.nav = {
     this.stage.historyBack();
   },
   
-  setPage: function(page, transition) {
+  setPage: function(page, transition, forceForward) {
     var card = this._fetchCard(page, transition);
+    var progress = forceForward ? "forward" : null;
     
     this.stage.insertBefore(card, this.stage.firstChild);
     
     var allCards = this.stage.getAllCards();
-    this.stage.shuffleTo(allCards.indexOf(card));
+    this.stage.shuffleTo(allCards.indexOf(card), progress);
   },
   
   _trimDeck: function() {
