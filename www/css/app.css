@@ -77,64 +77,28 @@ input[type="password"] {
 textarea {
 	padding: 10px;
 	overflow: hidden;
+	border: none;
 	font-family: OpenSans, Helvetica, arial, sans-serif;
 	font-size: 1.4rem;
 	line-height: 2.5rem;
 	resize: none;
 }
 
-button.small,
-button.wide {
-	height: auto;
+button.push {
+	min-width: 100px;
+	margin: 15px auto 5px;
 	padding: 5px 10px;
 	border: none;
 	border-radius: 3px;
-	background-color: #eee;
-	background-image: linear-gradient(#eee, #bbb);
-	box-shadow: 0 1px 0 rgba(255,255,255, 0.92) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
-	color: #464646;
-	font-family: OpenSans, Helvetica, sans-serif;
-	font-size: 1.5rem;
-	font-weight: normal;
-	line-height: 32px;
-	text-shadow: 0 1px 0 #fff;
-}
-
-button.small:hover,
-button.wide:hover {
-	background-image: linear-gradient(#fff, #ccc);
-	box-shadow: 0 1px 0 #fff inset, 0 1px 3px rgba(0, 0, 0, 0.35);
-}
-
-button.small:active,
-button.wide:active {
-	color: rgba(0, 0, 0, .65);
-	background-image: linear-gradient(#eee, #bbb);
-	box-shadow: 0 1px 5px rgba(0,0,0,.65) inset, 0 -1px 0 rgba(255,255,255,.65) inset;
-}
-
-button.small {
-	margin-right: 10px;
 	font-size: 1.4rem;
-}
-
-button.wide {
-	width: 200px;
-	height: 42px;
-	margin-bottom: 20px;
+	line-height: 2.4rem;
 }
 
 button.blue {
-	color: #fff;
-	background-color: #2ea2cc;
-	background-image: linear-gradient(#1e8cbe, #0074a2);
-	box-shadow: 0 1px 0 rgba(120, 200, 230, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+	color: #eee;
+	background-color: rgb(46, 162, 204);
 	text-shadow: 0 -1px 0 rgba(0, 116, 162, 0.8);
-}
-
-button.blue:hover {
-	background-image: linear-gradient(#2ea2cc, #0074a2);
-	box-shadow: 0 1px 0 rgba(120, 200, 230, 0.7) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+	box-shadow: 0 1px 0 rgba(120, 200, 230, 0.5);
 }
 
 button.blue:active {
@@ -143,8 +107,23 @@ button.blue:active {
 	box-shadow: inset 0 1px 5px #005684, inset 0 -1px 0 #1e8cbe;
 }
 
-button.wide.x-select-ok {
-	margin: 20px 0 20px 20px;
+button.blue[disabled] {
+	background-color: rgb(37,151,196);
+	background-image: none;
+	color: rgb(125,193,221);
+}
+
+button.black {
+	color:rgb(148,148,148);
+	background-color: rgb(58,58,58);
+	text-shadow: 0 -1px 0 rgba(28,28,28,0.8);
+	box-shadow: 0 1px 0 rgba(73, 73, 73, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+button.black:active {
+	color: rgba(255, 255, 255, 0.45);
+	background-image: linear-gradient(#333, #363636);
+	box-shadow: inset 0 1px 5px #202020;
 }
 
 section.content {
@@ -160,6 +139,22 @@ x-modal {
 	height: 100%;
 	width: 100%;
 	z-index: 120;
+}
+
+x-modal .modal-background {
+    height: 100%;
+    width: 100%;
+	background-color: rgba(0, 0, 0, 0.9);
+}
+
+x-modal .modal-content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 20px;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8);
+    transform: translate(-50%, -50%);
 }
 
 x-appbar {
@@ -178,14 +173,20 @@ x-appbar > *:before {
 
 x-appbar button {
 	position:relative;
-	height: 44px;
 	width: 44px;
+	height: 44px;
+	margin: 0;
 	padding: 0;
 	border: none;
 	background-color: transparent;
 	color: #fff;
-	font-size: 1.6rem;
+	font: 24px/42px 'Noticons';
 	text-align: center;
+}
+
+x-appbar button:after {
+	display: inline-block;
+	width: 40px;
 }
 
 x-appbar button:active {
@@ -194,73 +195,55 @@ x-appbar button:active {
 
 x-appbar header {
 	position: relative;
-	height: 42px;
 	padding:0 5px;
 	color: #fff;
-	font-size: 2.2rem;
-	font-family: OpenSansLight, "Helvetica Neue", Helvetica, sans-serif;
-	line-height: 40px;
+	font-size: 22px;
+	font-weight: lighter;
+	line-height: 42px;
 	text-align: left;
 	vertical-align: middle;
 }
 
-x-appbar header button.logo {
-	min-width: 125px;
-	height: 42px;
-	background: none;
-	text-shadow: 1px 0px 1px rgba(0,0,0,.8);
-	font-size: 2.2rem;
+x-appbar header .logo {
+	margin: 0;
+	text-shadow: 1px 0px 1px rgba(0, 0, 0, .8);
 	font-family: "Helvetica Neue", Helvetica, sans-serif;
 	font-weight: lighter;
-	text-align: left;
-	line-height: 36px;
+}
+
+x-appbar header .logo:before {
+	content: '\f205'; /* WordPress logo */
+	margin-right: 5px;
+	font: 32px/42px 'Noticons';
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
 	vertical-align: middle;
 }
 
-x-appbar header button.logo:before {
-	content: '\f205'; /* WordPress logo */
-	display: inline-block;
-	margin-right: 5px;
-	background: none;
-	font: 32px/36px 'Noticons';
-	text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
-	vertical-align: top;
-}
-
-x-appbar button.back:before {
+x-appbar button.back:after {
 	content: '\f431'; /* chevron */
-	display: inline-block;
-	margin-top: 3px;
-	background: none;
-	font: 40px/40px 'Noticons';
-	vertical-align: top;
+	width:auto;
+	margin-top: 5px;
+	font: 34px/34px 'Noticons';
 	transform: rotate(90deg);
-	transform-origin: 20px 20px 0;
+	transform-origin: 17px 17px 0;
 }
 
 x-appbar button.menu {
 	width:30px;
 }
 
-x-appbar button.menu:before {
+x-appbar button.menu:after {
 	content: '\f419'; /* menu */
-	display: inline-block;
-	background: none;
+	width: auto;
 	font: 20px/42px 'Noticons';
 }
 
 x-appbar button.add:after {
 	content: '\f102'; /* camera */
-	display: inline-block;
-	background: none;
-	font: 22px/40px 'Noticons';
 }
 
 x-appbar button.refresh:after {
 	content: '\f420'; /* refresh */
-	display: inline-block;
-	background: none;
-	font: 22px/40px 'Noticons';
 }
 
 x-appbar button.refreshing:after {
@@ -268,26 +251,29 @@ x-appbar button.refreshing:after {
 }
 
 x-appbar button.cancel:before {
+	width: 0;
+	background-color: transparent;
+}
+
+x-appbar button.cancel:after {
 	content: '\f405'; /* x */
-	background: none;
-	display: inline-block;
-	font: 30px/40px 'Noticons';
+	font-size: 30px;
 }
 
 x-appbar button.done:after {
 	content: '\f418'; /* check mark */
-	background: none;
-	display: inline-block;
-	font: 30px/40px 'Noticons';
+	font-size: 30px;
 }
 
 x-appbar button.save:after {
 	content: '\f411'; /* pencil */
-	background: none;
-	display: inline-block;
-	font: 30px/40px 'Noticons';
+	font-size: 30px;
 }
 
+/*
+	.force-right class is a work around for broken flex box support on Firefox OS.
+	Remove this and update the templates once flex box works properly.
+*/
 x-appbar .force-right {
 	position:absolute;
 	right: 0;
@@ -295,6 +281,7 @@ x-appbar .force-right {
 	margin: 0;
 	padding: 0;
 	background-color: none;
+	font-size: 0;
 }
 
 x-appbar .force-right:before {
@@ -329,27 +316,20 @@ x-appbar .force-right > *:before {
 }
 
 .page .scroll {
+	position: relative;
 	display: block;
 	height: 100%;
 	overflow-y: auto;
 }
 
-.content button:active {
-	transform: translateY(1px);
-}
-
-.content button[disabled]:active {
-	transform: none;
-}
-
 
 /* start & login pages */
 
-.page-start section.content,
-.page-login section.content,
-.page-about section.content,
-.page-settings section.content {
-	padding: 44px 20px 0 20px;
+.page-start .content,
+.page-login .content,
+.page-about .content,
+.page-settings .content {
+	padding: 44px 20px 5px;
 	min-height: 0;
 }
 
@@ -405,62 +385,26 @@ x-appbar .force-right > *:before {
 .page-start button.login {
 	position: absolute;
 	right: 10px;
-	height: 34px;
-	margin: 15px, auto, 5px;
-	padding: 5px 10px;	 
-	min-width: 100px;
-	border: none;
-	border-radius: 3px;
-	color: #eee;
-	background-color: rgb(46, 162, 204);
-	font-family: OpenSans;
-	font-size: 1.4rem;
-	font-weight: normal;	
-	text-shadow: 0 -1px 0 rgba(0, 116, 162, 0.8);
-	box-shadow: 0 1px 0 rgba(120, 200, 230, 0.5);
 }
 
 .page-start button.create-account {
 	position: absolute;
 	left: 10px;
-	height:34px;
-	min-width: 100px;
-	margin: 15px auto 5px;
-	padding: 5px 10px;
-	border-radius: 3px;
-	border: none;
-	color:rgb(148,148,148);
-	background-color: rgb(58,58,58);
-	font-family: OpenSans;
-	font-size: 1.4rem;
-	font-weight: normal;
-	text-shadow: 0 -1px 0 rgba(28,28,28,0.8);
-	box-shadow: 0 1px 0 rgba(73, 73, 73, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 
 /*	login page	*/
 
-.page-login button.login {
-	display: block;
-	height: 44px;
-	min-width: 100px;
-	margin: 0 auto;
-	padding: 5px 10px;
-	border-radius: 3px;
-	border: none;
-	color: #eee;
-	background-color: #2ea2cc;
-	font-family: OpenSans;
-	font-size: 1.7rem;
-	font-weight: normal;
-	text-shadow: 0 -1px 0 rgba(0, 116, 162, 0.8);
-	box-shadow: 0 1px 0 rgba(120, 200, 230, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.35);
+.page-login .content img {
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
-.page-login button.login[disabled] {
-	background-color: rgb(37,151,196);
-	color: rgb(125,193,221);
+.page-login button.login {
+	display:block;
+	margin: 0 auto;
+	font-size: 1.7rem;
+	line-height: 3rem;
 }
 
 .page-login footer button {
@@ -470,10 +414,14 @@ x-appbar .force-right > *:before {
 	border: none;
 	background: none;
 	color: #eee;
-	font-family: OpenSans;
 	font-size: 1.5rem;
 }
 
+@media (max-height: 400px) {
+	.page-login footer {
+		display: none;
+	}
+}
 
 /*	posts page */
 
@@ -706,7 +654,7 @@ x-shiftbox > section {
 	background-color: #333;
 }
 
-.page-about header {
+.page-about .content header {
 	margin-top: 10px;
 	text-align: center;
 }
@@ -767,8 +715,12 @@ x-shiftbox > section {
 
 /* settings page */
 
-.page-settings section.content {
+.page-settings .content {
 	color: #fff;
+}
+
+.page-settings button.push {
+	margin: 0;
 }
 
 .page-settings #settings-version {
