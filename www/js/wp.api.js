@@ -14,72 +14,77 @@
 
 "use strict";
 
-if(typeof wp === "undefined") { 
+if( typeof wp === 'undefined' ) { 
 	var wp = {};
 }
 
 wp.api = {
-	blog:null,  // hash: {username:'', password:'', xmlrpc:'', blog_id:''}
-	getParams:function(){
+	blog: null,  // hash: { username:'', password:'', xmlrpc:'', blog_id:'' }
+	getParams: function() {
 		var blog = this.blog;
 		
 		// decrypt password
-		var dec = CryptoJS.AES.decrypt(blog.password, blog.username);
-		var pass = dec.toString(CryptoJS.enc.Utf8);
+		var dec = CryptoJS.AES.decrypt( blog.password, blog.username );
+		var pass = dec.toString( CryptoJS.enc.Utf8 );
 		
 		var params = [
 			blog.blog_id,
 			blog.username,
 			pass
 		];
-		for (var i = 0; i < arguments.length; i++) {
-			if (arguments[i] === null) {
+		
+		for ( var i = 0; i < arguments.length; i++ ) {
+			if ( arguments[i] === null ) {
 				continue;
 			}
 
-			params.push(arguments[i]);
+			params.push( arguments[i] );
 		}
+		
 		return params;
 	},
 	
-	getUrl:function() {
+	getUrl: function() {
 		return this.blog.xmlrpc;
 	},
 	
-	setCurrentBlog:function(blog) {
+	setCurrentBlog: function( blog ) {
 		// blog.attributes handles backbone objects vs a hash
 		this.blog = blog.attributes || blog;
 		
 		// if the object passed specified a url instead of an xmlrpc property, reassign
-		if (!this.blog.xmlrpc && this.blog.url) {
+		if ( ! this.blog.xmlrpc && this.blog.url ) {
 			this.blog.xmlrpc = this.blog.url;
 		}
 	}
 };
 
 
-wp.api.build = function(method, params, url) {
+wp.api.build = function( method, params, url) {
 	
 	var p = wp.promise();
-	var headers = {"X-User-Agent" : "wpphotos/" + wp.app.version};
-	var rpc = new wp.XMLRPC({"xmlrpcMethod":method, "params":params, "url":url, "headers":headers});
-	rpc.success(function(xhr, event){
+	var headers = { 'X-User-Agent' : 'wpphotos/' + wp.app.version };
+	var rpc = new wp.XMLRPC( { 'xmlrpcMethod': method, 'params': params, 'url': url, 'headers': headers } );
+	rpc.success( function() {
 		
-		if(rpc.fault) {
-			p.discard(rpc.result);
+		if( rpc.fault ) {
+			p.discard( rpc.result );
 			
 		} else {
-			p.resolve(rpc.result);	
+			p.resolve( rpc.result );	
 		}
 		
+	} );
+	
+	rpc.fail( function( xhr, event ) {
+		wp.log( 'xhr failed', xhr.status, event, xhr.readyState );
+		p.discard( { 'status': xhr.status, 'event': event, 'readyState': xhr.readyState } );
 	});
-	rpc.fail(function(xhr, event){
-		console.log("xhr failed", xhr.status, event, xhr.readyState);
-		p.discard({"status":xhr.status, "event":event, "readyState":xhr.readyState});
+	
+	rpc.progress( function( xhr, event ) {
+		p.notify( event );
 	});
-	rpc.progress(function(xhr, event){
-		p.notify(event);
-	});
+	
 	rpc.execute();
 	
 	return p;
@@ -92,12 +97,12 @@ wp.api.build = function(method, params, url) {
 		string username
 		string password 
 */
-wp.api.getUsersBlogs = function(url, username, password) {
+wp.api.getUsersBlogs = function( url, username, password ) {
 	var params = [
 		username,
 		password
 	];
-	return wp.api.build("wp.getUsersBlogs", params, url);
+	return wp.api.build( 'wp.getUsersBlogs', params, url );
 };
 
 
@@ -109,9 +114,9 @@ wp.api.getUsersBlogs = function(url, username, password) {
 		string password
 		array options: List of option names to retrieve. If omitted, all options will be retrieved. 
 */
-wp.api.getOptions = function(options) {
-	var params = this.getParams(options);
-	return wp.api.build("wp.getOptions", params, this.getUrl());
+wp.api.getOptions = function( options ) {
+	var params = this.getParams( options );
+	return wp.api.build( 'wp.getOptions', params, this.getUrl() );
 };
 
 
@@ -177,37 +182,37 @@ wp.api.getOptions = function(options) {
 
 
 */
-wp.api.getPosts = function(offset) {
-	offset = Math.floor(offset) || 0;
+wp.api.getPosts = function( offset ) {
+	offset = Math.floor( offset ) || 0;
 
 	var filter = {
-		'number':20,
-		'offset':offset
+		'number': 20,
+		'offset': offset
 	};
 
-	var params = wp.api.getParams(filter);
-	return wp.api.build("wp.getPosts", params, this.getUrl());
+	var params = wp.api.getParams( filter );
+	return wp.api.build( 'wp.getPosts', params, this.getUrl() );
 };
 
-wp.api.newPost = function(content) {
-	var params = wp.api.getParams(content);	
-	return wp.api.build("wp.newPost", params, this.getUrl());
+wp.api.newPost = function( content ) {
+	var params = wp.api.getParams( content );
+	return wp.api.build( 'wp.newPost', params, this.getUrl() );
 };
 
-wp.api.getPost = function(post_id) {
-	var params = wp.api.getParams(post_id);
-	return wp.api.build("wp.getPost", params, this.getUrl());
+wp.api.getPost = function( post_id ) {
+	var params = wp.api.getParams( post_id );
+	return wp.api.build( 'wp.getPost', params, this.getUrl() );
 };
 
-wp.api.getPostFormats = function(filter) {
-	var params = wp.api.getParams(filter);
-	return wp.api.build("wp.getPostFormats", params, this.getUrl());
+wp.api.getPostFormats = function( filter ) {
+	var params = wp.api.getParams( filter );
+	return wp.api.build( 'wp.getPostFormats', params, this.getUrl() );
 
 };
 
 wp.api.getPostStatusList = function() {
 	var params = wp.api.getParams();
-	return wp.api.build("wp.getPostStatusList", params, this.getUrl());
+	return wp.api.build( 'wp.getPostStatusList', params, this.getUrl() );
 };
 
 
@@ -240,12 +245,12 @@ wp.api.getPostStatusList = function() {
 			string type
 
 */
-wp.api.getMediaLibrary = function(filter) {
-	var params = wp.api.getParams(filter);
-	return wp.api.build("wp.getMediaLibrary", params, this.getUrl());
+wp.api.getMediaLibrary = function( filter ) {
+	var params = wp.api.getParams( filter );
+	return wp.api.build( 'wp.getMediaLibrary', params, this.getUrl() );
 };
 	
-wp.api.uploadFile = function(data) {
-	var params = wp.api.getParams(data);
-	return wp.api.build("wp.uploadFile", params, this.getUrl());
+wp.api.uploadFile = function( data ) {
+	var params = wp.api.getParams( data );
+	return wp.api.build( 'wp.uploadFile', params, this.getUrl() );
 };

@@ -17,11 +17,11 @@
 */
 "use strict";
 
-if(typeof wp === "undefined") { 
+if( typeof wp === 'undefined' ) {
 	var wp = {};
 }
 
-wp.XHR = function(options) {
+wp.XHR = function( options ) {
 	options = options || {};
 
 	this.xhr	= null;
@@ -33,53 +33,53 @@ wp.XHR = function(options) {
 	this.headers = options.headers || false;
 
 	this._callbacks = {
-		success:[],
-		fail:[],
-		always:[],
-		progress:[]
+		'success': [],
+		'fail': [],
+		'always': [],
+		'progress': []
 	};
 };
 
 
-wp.XHR.get = function(options) {
-	var req = new wp.XHR(options);
-	req.httpMethod = "GET";
+wp.XHR.get = function( options ) {
+	var req = new wp.XHR( options );
+	req.httpMethod = 'GET';
 	req.execute();
 	return req;
 };
 
 
-wp.XHR.post = function(options) {
-	var req = new wp.XHR(options);
-	req.httpMethod = "POST";
+wp.XHR.post = function( options ) {
+	var req = new wp.XHR( options );
+	req.httpMethod = 'POST';
 	req.execute();
 	return req;
 };
 
 
 // Add a callback for success.
-wp.XHR.prototype.success = function(f) {
-	this._callbacks.success.push(f);
+wp.XHR.prototype.success = function( f ) {
+	this._callbacks.success.push( f );
 	return this;
 };
 
 
 // Add a callback for failure.
-wp.XHR.prototype.fail = function(f) {
-	this._callbacks.fail.push(f);
+wp.XHR.prototype.fail = function( f ) {
+	this._callbacks.fail.push( f );
 	return this;
 };
 
 
 // Add a callback that will always trigger in the event of success or failure.
-wp.XHR.prototype.always = function(f) {
-	this._callbacks.always.push(f);
+wp.XHR.prototype.always = function( f ) {
+	this._callbacks.always.push( f );
 	return this;
 };
 
 
-wp.XHR.prototype.progress = function(f) {
-	this._callbacks.progress.push(f);
+wp.XHR.prototype.progress = function( f ) {
+	this._callbacks.progress.push( f );
 	return this;
 };
 
@@ -92,90 +92,90 @@ wp.XHR.prototype.clean = function() {
 
 
 wp.XHR.prototype.abort = function() {
-	if (this.xhr.status > 0 && this.xhr.status < 4) {
+	if ( this.xhr.status > 0 && this.xhr.status < 4 ) {
 		this.xhr.abort();
 	}
 };
 
 wp.XHR.prototype.status = function() {
-	return this.xhr.status;	
+	return this.xhr.status;
 };
 
-wp.XHR.prototype.execute = function(headers) {
+wp.XHR.prototype.execute = function( headers ) {
 	var self = this;
-	var xhr = new XMLHttpRequest({mozSystem: true});
+	var xhr = new XMLHttpRequest( { 'mozSystem': true } );
 	
 	this.xhr = xhr;
 	
-	var docallbacks = function(event, arr) {
-		for (var i = 0; i < arr.length; i++) {
+	var docallbacks = function( event, arr ) {
+		for ( var i = 0; i < arr.length; i++ ) {
 			try {
-				arr[i](self.xhr, event);
-			} catch(ignore){
-				console.log(ignore);
+				arr[i]( self.xhr, event );
+			} catch( ignore ){
+				wp.log( ignore );
 			}
 		}
 	};
 
 	try {
-		xhr.open(this.httpMethod, this.url, true);
-	} catch(e) {
-		docallbacks(e, this._callbacks.fail);
+		xhr.open( this.httpMethod, this.url, true );
+	} catch( e ) {
+		docallbacks( e, this._callbacks.fail );
 		return;
 	}
 	
-	if(this.headers) {
-		for(var key in this.headers) {
-			xhr.setRequestHeader(key, this.headers[key]);
+	if( this.headers ) {
+		for( var key in this.headers ) {
+			xhr.setRequestHeader( key, this.headers[key] );
 		}
 	}
 	
-	if(this.format) {
+	if( this.format ) {
 		xhr.responseType = this.format;
 	}
 	
 	
-	xhr.addEventListener("progress", function(event){
-		docallbacks(event, self._callbacks.progress);
+	xhr.addEventListener( 'progress', function( event ) {
+		docallbacks( event, self._callbacks.progress );
 	}, false);
 	
 	
-	xhr.onabort = function(event) {
+	xhr.onabort = function( event ) {
 		// TODO: Do we need to call always?
 		// TODO: ?
 		self.clean();
 	};
 	
-	xhr.onloadstart = function(event) {
-		console.log("xhr.onloadStart");
+	xhr.onloadstart = function( event ) {
+		wp.log( 'xhr.onloadStart' );
 		// TODO: ?
 	};
 	
-	xhr.onload = function(event) {
+	xhr.onload = function( event ) {
 		self.result = self.xhr.response;
-		docallbacks(event, self._callbacks.success);
+		docallbacks( event, self._callbacks.success );
 	};
 	
-	xhr.onloadend = function(event) {
-		docallbacks(event, self._callbacks.always);
+	xhr.onloadend = function( event ) {
+		docallbacks( event, self._callbacks.always );
 		self.clean();
 	};
 	
-	xhr.onerror = function(event) {
+	xhr.onerror = function( event ) {
 		// TODO: Listeners?
-		docallbacks(event, self._callbacks.fail);
+		docallbacks( event, self._callbacks.fail );
 	};
 	
-	xhr.ontimeout = function(event) {
-		docallbacks(event, self._callbacks.fail);
+	xhr.ontimeout = function( event ) {
+		docallbacks( event, self._callbacks.fail );
 	};
 	
-	xhr.onreadystatechange = function(event) {
-		console.log("xhr.readyState", xhr.readyState);
+	xhr.onreadystatechange = function( event ) {
+		wp.log( 'xhr.readyState', xhr.readyState );
 	};
 	
 	// Don't send empty strings.
-	xhr.send(this.data ? this.data : null);
+	xhr.send( this.data ? this.data : null );
 	
 	return this;
 };

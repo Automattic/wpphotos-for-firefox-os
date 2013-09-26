@@ -29,31 +29,31 @@
 		Callbacks added after a promise is resolved or discarded are invoked immediately.
 */
                      
-if(typeof wp === "undefined") { 
+if( typeof wp === 'undefined' ) { 
 	var wp = {};
 }
 
 wp.promise = function() {
-	'use strict';	 
-	var _status = "incomplete"; // complete, failed
+	"use strict";
+	var _status = 'incomplete'; // complete, failed
 	var _result = null;
 	var _fail = [];
 	var _success = [];
 	var _always = [];
 	var _progress = [];
 	 
-	var perform = function(arr, obj) {
-		if (!arr) {
+	var perform = function( arr, obj ) {
+		if ( ! arr ) {
 			return;
 		}
 		
-		for (var i = 0; i < arr.length; i++) {
+		for ( var i = 0; i < arr.length; i++ ) {
 			var func = arr[i];
-			if (func instanceof Function) {
+			if ( func instanceof Function ) {
 				try {
-					func(obj);
-				} catch(ignore) {
-					console.log(ignore);
+					func( obj );
+				} catch( ignore ) {
+					wp.log( ignore );
 				}
 			}
 		}
@@ -61,32 +61,32 @@ wp.promise = function() {
 	 
 	var p = {
 		 
-		success:function(f) {
-			if (f instanceof Function) {
-				if (_status === "complete") {
-					perform([f]);
-				} else if(_status === "incomplete") {
-					_success.push(f);
+		success: function( f ) {
+			if ( f instanceof Function ) {
+				if ( _status === 'complete' ) {
+					perform( [f] );
+				} else if( _status === 'incomplete' ) {
+					_success.push( f );
 				}
 			}
 			return p;
 		},
 		 
-		fail:function(f) {
-			if (f instanceof Function) {
-				if (_status === "failed") {
-					perform([f]);
-				} else if(_status === "incomplete") {
-					_fail.push(f);
+		fail: function( f ) {
+			if ( f instanceof Function ) {
+				if ( _status === 'failed' ) {
+					perform( [f] );
+				} else if( _status === 'incomplete' ) {
+					_fail.push( f );
 				}
 			}
 			return p;
 		},
 		
-		always:function(f) {
-			if (f instanceof Function) {
-				if (_status !== "incomplete") {
-					perform([f]);
+		always: function( f ) {
+			if ( f instanceof Function ) {
+				if ( _status !== 'incomplete' ) {
+					perform( [f] );
 				} else {
 					_always.push(f);
 				}
@@ -94,39 +94,39 @@ wp.promise = function() {
 			return p;
 		},
 		
-		progress:function(f) {
+		progress: function( f ) {
 			if (f instanceof Function) {
-				_progress.push(f);
+				_progress.push( f );
 			}
 			return p;
 		},
 		
-		status:function() {
+		status: function() {
 			return _status;
 		},
 		 
-		result:function() {
+		result: function() {
 			return _result;
 		},
 		
-		discard:function(obj) {
+		discard: function( obj ) {
 			_result = obj;
-			_status = "failed";
+			_status = 'failed';
  
-			perform(_fail);
-			perform(_always);
+			perform( _fail );
+			perform( _always );
 		},
 		 
-		resolve:function(obj) {
+		resolve: function( obj ) {
 			_result = obj;
-			_status = "complete";
+			_status = 'complete';
 
-			perform(_success);
-			perform(_always);
+			perform( _success );
+			perform( _always );
 		},
 		
-		notify:function(obj) {
-			perform(_progress, obj);
+		notify: function( obj ) {
+			perform( _progress, obj );
 		}
 	};
 	
@@ -144,23 +144,23 @@ wp.promiseQueue = function() {
 	var arr = [];
 	
 	function checkQueue() {
-		for (var i = 0; i < arr.length; i++) {
+		for ( var i = 0; i < arr.length; i++ ) {
 			var promise = arr[i];
-			if (promise.status() === "incomplete") {
+			if ( promise.status() === 'incomplete' ) {
 				return;
 			}
 		}
-		while(arr.pop() != null) {
+		while( arr.pop() != null ) {
 			continue;
 		}
 		q.resolve();
 	}
 	
-	q.add = function(promise) {
-		promise.always(function() {
+	q.add = function( promise ) {
+		promise.always( function() {
 			checkQueue();
-		});
-		arr.push(promise);
+		} );
+		arr.push( promise );
 	};
 
 	return q;

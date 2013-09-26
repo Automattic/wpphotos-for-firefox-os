@@ -6,19 +6,19 @@
 
 "use strict";
 
-wp.views.StartPage = wp.views.Page.extend({
-	template_name:"start",
+wp.views.StartPage = wp.views.Page.extend( {
+	template_name: 'start',
 	
-	initialize:function() {
+	initialize: function() {
 		this.render();
 	},
 
-	events: _.extend({
-		"click button.login": "showLogin",
-		"click button.create-account": "showCreate"
-	}),
+	events: _.extend( {
+		'click button.login': 'showLogin',
+		'click button.create-account': 'showCreate'
+	} ),
 	
-	render:function() {
+	render: function() {
 		// Underscore's templates flag a CSP warning due to their use of "new Function". 
 		// The CSP interprets this as "eval like" and risky, so it is denied. 
 		// var template = _.template( wp.views.templates[this.template_name].text, {} );
@@ -33,17 +33,15 @@ wp.views.StartPage = wp.views.Page.extend({
 		return this;
 	},
 	
-	showLogin:function() {
-//		wp.app.routes.navigate("login", {trigger:true});
-		wp.nav.push("login");
+	showLogin: function() {
+		wp.nav.push( 'login' );
 	},
 	
 	showCreate:function() {
-		alert(_s("prompt-create-blog"));
-		window.open("https://signup.wordpress.com/signup/?ref=wp-fxos", "", "resizable=yes,scrollbars=yes,status=yes");
-//		wp.app.routes.navigate("login", {trigger:true});
-		wp.nav.push("login");
+		alert( _s( 'prompt-create-blog' ) );
+		window.open( 'https://signup.wordpress.com/signup/?ref=wpphotos', '', 'resizable=yes,scrollbars=yes,status=yes' );
+		wp.nav.push( 'login' );
 	}
-	
-});
-wp.views.registerTemplate("start");
+
+} );
+wp.views.registerTemplate( 'start' );

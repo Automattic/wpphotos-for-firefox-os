@@ -926,7 +926,7 @@ x-shiftbox > section {
 .page-editor .textlabel,
 .page-editor .textfield {
 	background-color: #fff;
-	font-family: OpenSans,Helvetica,arial,sans-serif;
+	font-family: OpenSans, Helvetica, arial, sans-serif;
 	font-size: 1.4rem;
 	line-height: 2.5rem;
 }
@@ -960,7 +960,7 @@ x-shiftbox > section {
 	overflow: hidden;
 }
 
-#editor {
+.page-editor #editor {
 	display: block;
 	position: absolute;
 	top: 44px;

@@ -22,57 +22,59 @@
 */
 "use strict";
 
-if(typeof(wp) == "undefined") { var wp = {} };
+if ( typeof wp === 'undefined' ) {
+	var wp = {}
+};
 
-wp.XMLRPC = function(options) {
+wp.XMLRPC = function( options ) {
 	var self = this;
 	var options = options || {};
 	options.headers  = options.headers || {};
-	options.headers["Content-Type"] = "text/xml";
+	options.headers['Content-Type'] = 'text/xml';
 	
 	this.result = null;
 	this.fault = false;	
-	this.params = options["params"] || [];
-	this.xmlrpcMethod = options["xmlrpcMethod"] || null;
+	this.params = options['params'] || [];
+	this.xmlrpcMethod = options['xmlrpcMethod'] || null;
 
-	this.xhr = new wp.XHR(options);
+	this.xhr = new wp.XHR( options );
 	
-	this.xhr.success(function(){
+	this.xhr.success( function() {
 		self.parseResponseXML();
-	});	
+	} );
 };
 
-wp.XMLRPC.Base64 = function(value, encode) {
-	if (encode) {
-		value = btoa(value);
-	};
+wp.XMLRPC.Base64 = function( value, encode ) {
+	if ( encode ) {
+		value = btoa( value );
+	}
 	this.value = value;
 };
 
 // Add a callback for success.
-wp.XMLRPC.prototype.success = function(f) {
-	this.xhr.success(f);
+wp.XMLRPC.prototype.success = function( f ) {
+	this.xhr.success( f );
 	return this;
 };
 
 
 // Add a callback for failure.
-wp.XMLRPC.prototype.fail = function(f){
-	this.xhr.fail(f);
+wp.XMLRPC.prototype.fail = function( f ){
+	this.xhr.fail( f );
 	return this;
 };
 
 
 // Add a callback that will always trigger in the event of success or failure.
-wp.XMLRPC.prototype.always = function(f) {
-	this.xhr.always(f);
+wp.XMLRPC.prototype.always = function( f ) {
+	this.xhr.always( f );
 	return this;
 };
 
 
 // Add a callback that will trigger on a progress event
-wp.XMLRPC.prototype.progress = function(f) {
-	this.xhr.progress(f);
+wp.XMLRPC.prototype.progress = function( f ) {
+	this.xhr.progress( f );
 	return this;
 };
 
@@ -80,82 +82,86 @@ wp.XMLRPC.prototype.progress = function(f) {
 // Execute the request.
 wp.XMLRPC.prototype.execute = function() {
 	var req_body = this.formatRequestBody();
-	console.log("XMLRPC.execute: Request body length", req_body.length);
+	wp.log( 'XMLRPC.execute: Request body length', req_body.length );
 	this.xhr.data = req_body;
-	this.xhr.httpMethod = "POST";
+	this.xhr.httpMethod = 'POST';
 	this.xhr.execute();
 };
 
 
-wp.XMLRPC.prototype.addParam = function(obj) {
-	this.params.push(obj);
+wp.XMLRPC.prototype.addParam = function( obj ) {
+	this.params.push( obj );
 };
 
 
 wp.XMLRPC.prototype.formatRequestBody = function() {
-	var str = "";
+	var str = '';
 	for (var i = 0; i < this.params.length; i++) {
-    	str += "<param><value>" + this.formatParam(this.params[i]) + "</value></param>\n";
-    };
+    	str += '<param><value>' + this.formatParam( this.params[i] ) + '</value></param>\n';
+    }
 
-	var xml = "<?xml version=\"1.0\"?>\n" +
-    "<methodCall>\n<methodName>" + this.xmlrpcMethod + "</methodName>\n" +
-    "<params>\n" + str + "</params>\n</methodCall>";
+	var xml = '<?xml version="1.0"?>\n' +
+    '<methodCall>\n<methodName>' + this.xmlrpcMethod + '</methodName>\n' +
+    '<params>\n' + str + '</params>\n</methodCall>';
     return xml;
 };
 
 
-wp.XMLRPC.prototype.formatParam = function(param){
-	if (param == null) param = "";
+wp.XMLRPC.prototype.formatParam = function( param ) {
+	if (param == null) {
+		param = '';
+	}
 	
 	// Arrays
-	if (param instanceof Array) {
-		var arr = "<array>\n<data>\n";
-		for (var i = 0; i < param.length; i++) {
-			if(null == param[i]) continue;
-			arr += "<value>" + this.formatParam(param[i]) + "</value>\n";
-		};
-		arr += "</data>\n</array>\n";
+	if ( param instanceof Array ) {
+		var arr = '<array>\n<data>\n';
+		for ( var i = 0; i < param.length; i++ ) {
+			if( null == param[i] ) {
+				continue;
+			}
+			arr += '<value>' + this.formatParam( param[i] ) + '</value>\n';
+		}
+		arr += '</data>\n</array>\n';
 		return arr;
-	};
+	}
 	
 	// Numbers
-	if (typeof(param) == "number" || param instanceof Number) {
-		if (Math.round(param) == param) {
-			return "<i4>" + param + "</i4>\n"
+	if ( typeof param == 'number' || param instanceof Number) {
+		if ( Math.round( param ) == param ) {
+			return '<i4>' + param + '</i4>\n';
 		} else {
-			return "<double>" + param + "</double>\n"
-		};
-	};
+			return '<double>' + param + '</double>\n';
+		}
+	}
 	
 	// Dates
-	if (param instanceof Date || param.__proto__ instanceof Date || param.__proto__.constructor.name == 'Date') {
+	if ( param instanceof Date || param.__proto__ instanceof Date || param.__proto__.constructor.name == 'Date' ) {
 		var d = param.toISOString();
-		d = d.split("-").join("");
-		return "<dateTime.iso8601>" + d + "</dateTime.iso8601>\n";
-	};
+		d = d.split( '-' ).join( '' );
+		return '<dateTime.iso8601>' + d + '</dateTime.iso8601>\n';
+	}
 	
 	// String
-	if (typeof(param) == "string") {
-		return "<string><![CDATA[" + param + "]]></string>\n";
-	};
+	if ( typeof param === 'string' ) {
+		return '<string><![CDATA[' + param + ']]></string>\n';
+	}
 	
-	if (param instanceof wp.XMLRPC.Base64) {
-		return "<base64>" + param.value + "</base64>";	
-	};
+	if ( param instanceof wp.XMLRPC.Base64 ) {
+		return '<base64>' + param.value + '</base64>';
+	}
 	
 	// Functions
-	if (param instanceof Function) {
-		return this.formatParam(param());
+	if ( param instanceof Function ) {
+		return this.formatParam( param() );
 	};
 
 	// Structs
-	var struct = "<struct>\n";
-	for (var key in param) {
-		struct += "<member>\n<name>" + key + "</name>\n";
-		struct += "<value>" + this.formatParam(param[key]) + "</value>\n</member>\n";
-	};
-	struct += "</struct>";
+	var struct = '<struct>\n';
+	for ( var key in param ) {
+		struct += '<member>\n<name>' + key + '</name>\n';
+		struct += '<value>' + this.formatParam(param[key]) + '</value>\n</member>\n';
+	}
+	struct += '</struct>';
 	return struct;
 };
 
@@ -163,42 +169,43 @@ wp.XMLRPC.prototype.formatParam = function(param){
 wp.XMLRPC.prototype.parseResponseXML = function() {
 	var str = this.xhr.result;
 	try {
-	// clean response document
-	str = wp.XMLRPC.cleanDocument(str);
-	
-	// clean the BOM
-
-	str = wp.XMLRPC.cleanBOM(str);
-	} catch(e) {
-		console.log(e);
+		// clean response document
+		str = wp.XMLRPC.cleanDocument( str );
+		
+		// clean the BOM
+		str = wp.XMLRPC.cleanBOM( str );
+		
+	} catch( e ) {
+		wp.log( e );
 	}
+	
 	// protect strings
 	// wrap the strings in <![CDATA[ ]]>
 	// We are treating all string values as potentially malformed XML. The parser will not attempt to process any of the
 	// potentially dangerous copy
-	str = str.replace(/<string>([\s]+<\!\[CDATA\[)?/gi, "<string><![CDATA[").replace(/<\/string>/gi, "]]></string>");
+	str = str.replace( /<string>([\s]+<\!\[CDATA\[)?/gi, '<string><![CDATA[' ).replace( /<\/string>/gi, ']]></string>' );
 
 	// Convert to a DOM object
-	var doc = new DOMParser().parseFromString(str, 'text/xml');
+	var doc = new DOMParser().parseFromString( str, 'text/xml' );
 
 	// Check for faults
-	if(this.hasFaults(doc)){
+	if( this.hasFaults( doc ) ) {
 		return;
-	};
+	}
 	
 	// No faults, get the result
-	var val = doc.querySelector("methodResponse params param value *");
-	this.result = this.parseNode(val);
+	var val = doc.querySelector( 'methodResponse params param value *' );
+	this.result = this.parseNode( val );
 };
 
 
-wp.XMLRPC.prototype.hasFaults = function(doc) {
-	var faultnode = doc.querySelector("methodResponse fault value *");
-	if (faultnode) {
+wp.XMLRPC.prototype.hasFaults = function( doc ) {
+	var faultnode = doc.querySelector( 'methodResponse fault value *' );
+	if ( faultnode ) {
 		this.fault = true;
-		this.result = this.parseNode(faultnode);
+		this.result = this.parseNode( faultnode );
 		return true;
-	};
+	}
 
 	//checks for DOM fault
 	/*
@@ -213,18 +220,18 @@ wp.XMLRPC.prototype.hasFaults = function(doc) {
 	<h3>​Below is a rendering of the page up to the first error.​</h3>​
 	</parsererror>​
 	<params>​…​</params>​*/
-	faultnode = doc.getElementsByTagName("parsererror")[0];
-	if(faultnode) {
+	faultnode = doc.getElementsByTagName( 'parsererror' )[0];
+	if( faultnode ) {
 		this.fault = true;
-		this.result = {"faultCode":32700,"faultString":"Parse Error, not well formed"};
+		this.result = { 'faultCode': 32700, 'faultString': 'Parse Error, not well formed' };
 		return true;
-	};
+	}
 	
 	return false;
 };
 
 
-wp.XMLRPC.cleanDocument = function(str) {
+wp.XMLRPC.cleanDocument = function( str ) {
 	var pairs = [
 		['methodResponse', 'params'],
 		['params', 'param'],
@@ -233,80 +240,80 @@ wp.XMLRPC.cleanDocument = function(str) {
 		['struct', 'member']
 	];
 
-	var values = ['array','string', 'i4', 'int', 'dateTime\\.iso8601', 'double', 'struct'];
-	pairs.push(['value', values.join("|")]);
+	var values = ['array', 'string', 'i4', 'int', 'dateTime\\.iso8601', 'double', 'struct'];
+	pairs.push( ['value', values.join( '|' )] );
   
 	var pair, reg, open;  
-	for (var i = 0; i < pairs.length; i++) {
+	for ( var i = 0; i < pairs.length; i++ ) {
 		pair = pairs[i];
-		open = new RegExp("<" + pair[0] + ">.*?<(" + pair[1] + ")>",'gmi');
-		str = str.replace(open,"<"+pair[0]+"><$1>");
-	};
+		open = new RegExp( '<' + pair[0] + '>.*?<(' + pair[1] + ')>','gmi' );
+		str = str.replace( open, '<' + pair[0] + '><$1>' );
+	}
   
-	return str.replace(/>\n[\s]+\n</g, '><');
+	return str.replace( />\n[\s]+\n</g, '><' );
 };
 
 
 // Removes all characters before the opening XLM declaration
-wp.XMLRPC.cleanBOM = function(str) {
-	var leading_removed = str.substring(str.indexOf("<"));
-	return leading_removed.replace(/^[^<]{0,}<\?xml([^>]+)>[^<]+<methodResponse/, "<?xml version=\"1.0\" ?>\n<methodResponse");
+wp.XMLRPC.cleanBOM = function( str ) {
+	var leading_removed = str.substring( str.indexOf( '<' ) );
+	return leading_removed.replace( /^[^<]{0,}<\?xml([^>]+)>[^<]+<methodResponse/, '<?xml version="1.0" ?>\n<methodResponse' );
 };
 
 
-wp.XMLRPC.prototype.parseNode = function(node) {
+wp.XMLRPC.prototype.parseNode = function( node ) {
 
-	switch(node.nodeName) {
+	switch( node.nodeName ) {
 
 		case 'array':
 			var data = node.firstChild;
 			var children = data.children;
 			var array = [];
-			for (var i=0; i < children.length; i++) {
+			for ( var i = 0; i < children.length; i++ ) {
 				var child = children[i].firstChild;
-				array.push(this.parseNode(child));
-			};
+				array.push( this.parseNode( child ) );
+			}
 			return array;
 			break;
 			    
 		case 'struct':
 			var struct = {};
 			var children = node.children;
-			for (var i = 0; i < children.length; i++) {
-				var name = children[i].querySelector("name");
-				var value = children[i].querySelector("value").firstChild;
-				struct[name.firstChild.nodeValue] = this.parseNode(value);
-			};
+			for ( var i = 0; i < children.length; i++ ) {
+				var name = children[i].querySelector( 'name' );
+				var value = children[i].querySelector( 'value' ).firstChild;
+				struct[name.firstChild.nodeValue] = this.parseNode( value );
+			}
 			return struct;
 			break;
       
 		case 'string':
 			var s = node.firstChild ? node.firstChild.nodeValue : '';
-			s = s.replace(/&amp;([a-z]+|\#[\d]+);/ig, '&$1;').replace(/&gt;/gi,'>').replace(/&lt;/gi,'<').replace(/&quot;/gi,'"');
-			return s.split('&#039;').join("'");
+			s = s.replace( /&amp;([a-z]+|\#[\d]+);/ig, '&$1;' ).replace( /&gt;/gi, '>' ).replace( /&lt;/gi, '<' ).replace( /&quot;/gi, '"' );
+			return s.split( '&#039;' ).join( "'" );
 			break;
       
 		case 'boolean':
-			return node.firstChild ? node.firstChild.nodeValue == "1" : false;
+			return node.firstChild ? node.firstChild.nodeValue == '1' : false;
 			break;
 		
 		case 'i4':
 		case 'int':
 		case 'double':
-			return node.firstChild ? parseInt(node.firstChild.nodeValue) : null;
+			return node.firstChild ? parseInt( node.firstChild.nodeValue ) : null;
 			break;
       
 		case 'dateTime.iso8601':
 			var iso = node.firstChild.nodeValue;
-			if(iso.indexOf("-") == -1) {
-				iso = iso.slice(0, 6) + "-" + iso.slice(6);
-				iso = iso.slice(0, 4) + "-" + iso.slice(4);
+			if( iso.indexOf( '-' ) == -1 ) {
+				iso = iso.slice( 0, 6 ) + '-' + iso.slice( 6 );
+				iso = iso.slice( 0, 4 ) + '-' + iso.slice( 4 );
 			}
-			return node.firstChild ? new Date(iso) : null;
+			return node.firstChild ? new Date( iso ) : null;
 			break;
       
 		default:
-			throw("Don't know how to parse node: " + node.nodeName);
+			throw( "Don't know how to parse node: " + node.nodeName );
 			break;
     };
 
