@@ -32,9 +32,9 @@ wp.views.SettingsPublishPage = wp.views.Page.extend( {
 		var pubSetting = localStorage.publishSetting || 0;
 		var ul = this.el.querySelector( 'ul' );
 
-		for( var idx in this.publish_settings_options ) {
+		for ( var idx in this.publish_settings_options ) {
 			className = '';
-			if ( pubSetting == idx ) {
+			if ( pubSetting === idx ) {
 				className = 'selected';
 			}
 			html += '<li class="list-button ' + className + '" data-opt="' + idx + '">' + _s( this.publish_settings_options[idx] ) + '</li>';
@@ -50,7 +50,7 @@ wp.views.SettingsPublishPage = wp.views.Page.extend( {
 		
 		var li = evt.target;
 		var opt = li.getAttribute( 'data-opt' );
-		localStorage.publishSetting = parseInt( opt );
+		localStorage.publishSetting = parseInt( opt, 10 );
 		
 		var lis = this.el.querySelectorAll( 'li' );
 		for ( var i = 0; i < lis.length; i++ ) {

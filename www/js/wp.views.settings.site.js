@@ -62,7 +62,7 @@ wp.views.SettingsSitePage = wp.views.Page.extend( {
 		var self = this;
 		var p = this.model.save();
 		p.success( function() {
-			if( self.model.id == wp.app.currentBlog.id ) {
+			if( self.model.id === wp.app.currentBlog.id ) {
 				wp.api.setCurrentBlog( self.model.attributes );
 			}
 

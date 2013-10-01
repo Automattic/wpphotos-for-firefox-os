@@ -34,7 +34,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		this.listenTo( this.posts, 'add', this.render );
 		this.listenTo( this.posts, 'remove', this.render );
 				
-		if ( this.posts.length == 0 ) {
+		if ( this.posts.length === 0 ) {
 			this.refresh();
 		} else {
 			this.render();
@@ -79,7 +79,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		for( var i = 0; i < wp.app.blogs.length; i++ ) {
 			var blog = wp.app.blogs.at( i );
 			var cls = 'menu-item';
-			if ( blog == wp.app.currentBlog ) {
+			if ( blog === wp.app.currentBlog ) {
 				cls += ' current-blog';
 			}
 			html += '<li class="' + cls + '" data-idx="' + i + '">' + blog.get( 'blogName' ) + '</li>';
@@ -91,11 +91,11 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	switchBlog: function( event ) {
 		try {
 			var el = event.target;
-			var idx = parseInt(el.getAttribute("data-idx"));
+			var idx = parseInt( el.getAttribute( 'data-idx' ), 10 );
 				
-			var blog = wp.app.blogs.at(idx);
-			if (blog != wp.app.currentBlog) {
-				wp.app.setCurrentBlog(blog);
+			var blog = wp.app.blogs.at( idx );
+			if ( blog !== wp.app.currentBlog ) {
+				wp.app.setCurrentBlog( blog );
 			}
         
 			this.toggleMenu();
@@ -116,7 +116,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		$( 'x-shiftbox' )[0].toggle();
 	},
 	
-	viewPost:function(model) {
+	viewPost:function( model ) {
 		// if we are not pulling to refresh...
 		if( this.dragging ) {
 			return;
@@ -199,7 +199,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 			if( typeof MozActivity === 'undefined' ) {
 				wp.nav.push( 'editor' );
 				return;
-			};
+			}
 			
 			var self = this;
 			// Start a Moz picker activity for the user to select an image to upload
@@ -274,7 +274,7 @@ wp.views.Post = Backbone.View.extend( {
 		postContent = ele.textContent;
 
 		// Look for a caption
-		if( postContent.indexOf( '[/caption]' ) != -1 ) {
+		if( postContent.indexOf( '[/caption]' ) !== -1 ) {
 			var pos = postContent.indexOf( '[/caption]' ) + 10;
 
 			captionStr = postContent.substring( 0, postContent.indexOf( '[/caption]' ) );
@@ -321,7 +321,7 @@ wp.views.Post = Backbone.View.extend( {
 		var img = div.querySelector( '.photo img' );
 		var image = this.model.image();
 		if( image && image.link ) {
-			if( image.link.indexOf( 'data:image' ) == 0 ) {
+			if( image.link.indexOf( 'data:image' ) === 0 ) {
 				// data url so don't use photon.
 				img.src = image.link;
 			} else {
@@ -358,12 +358,7 @@ wp.views.Post = Backbone.View.extend( {
 				var progressStr = this.model.sync_status;
 				if( progress ) {
 					progressStr = progress.status;
-/*
-					if(progress.percent ) {
-						progressStr += (" " + progress.percent + "%");
-					}
-*/
-				};
+				}
 				el.innerHTML = progressStr;
 				
 			} else {

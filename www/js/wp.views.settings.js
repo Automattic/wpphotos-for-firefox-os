@@ -52,7 +52,7 @@ wp.views.SettingsPage = wp.views.Page.extend( {
 	},
 	
 	blogRemoved: function() {
-		if( wp.app.blogs.length == 0 ) {
+		if( wp.app.blogs.length === 0 ) {
 			wp.nav.setPage( 'start' );
 		} else {
 			this.render();

@@ -24,7 +24,7 @@ function _s( text ) {
 	try {
 		if ( navigator && navigator.mozL10n ) {
 			return navigator.mozL10n.get.apply( null, arguments ) || text;
-		};
+		}
 	} catch( ignore ) {}
 	return text;
 }
@@ -37,7 +37,7 @@ wp.views = {
 	
 	templates: {},
 	
-	registerTemplate: function( template_name, root ) {
+	registerTemplate: function( template_name ) {
 		this.templates[template_name] = {};
 	},
 	
@@ -48,9 +48,8 @@ wp.views = {
 		var xhrs = [];
 		
 		function isFinishedLoading() {
-			for ( var idx in xhrs ) {
-				var xhr = xhrs[idx];
-				if ( ! xhr.result ) {
+			for ( var i = 0; i < xhrs.length; i++ ) {
+				if ( ! xhrs[i].result ) {
 					return;
 				}
 			}
@@ -58,10 +57,10 @@ wp.views = {
 		}
 		
 		function getTemplate( key ) {
-	 		var url = 'templates/' + key + '.html';
-	 		
-		 	var xhr = wp.XHR.get( { 'url': url } );
-		 	xhr.success( function( res ) {
+			var url = 'templates/' + key + '.html';
+
+			var xhr = wp.XHR.get( { 'url': url } );
+			xhr.success( function( res ) {
 
 				var div = document.createElement( 'div' );
 				div.innerHTML = res.response;
@@ -72,28 +71,31 @@ wp.views = {
 				}
 				
 				var text = div.querySelector( '#template' ).innerHTML;
-				wp.views.templates[key].text = text
+				wp.views.templates[key].text = text;
 				isFinishedLoading();
-		 	} );
-		 	xhr.fail( function( err ) {
-			 	wp.log( err );
-			 	
-			 	isFinishedLoading();
-		 	} );
-			
+			} );
+			xhr.fail( function( err ) {
+				wp.log( err );
+
+				isFinishedLoading();
+			} );
+
 			return xhr;
 		}
 		
 		for ( var key in this.templates ) {
 		 	xhrs.push( getTemplate( key ) );
-	 	}
+		 }
 		
 		return p;
 	},
 	
 	normalizeUrl: function( url ) { 
 		// make sure it has a protocol
-		if(!(/^https?:\/\//i).test(url)) url = 'https://' + url;
+		if ( ! ( /^https?:\/\//i ).test( url ) ) {
+			url = 'https://' + url;
+		}
+		
 		// add the /xmlrpc.php
 		if ( ! ( /\/xmlrpc\.php$/i ).test( url ) ) {
 			url = url + '/xmlrpc.php';

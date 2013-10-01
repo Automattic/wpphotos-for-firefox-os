@@ -23,8 +23,8 @@
 "use strict";
 
 if ( typeof wp === 'undefined' ) {
-	var wp = {}
-};
+	var wp = {};
+}
 
 wp.XMLRPC = function( options ) {
 	var self = this;
@@ -34,8 +34,8 @@ wp.XMLRPC = function( options ) {
 	
 	this.result = null;
 	this.fault = false;	
-	this.params = options['params'] || [];
-	this.xmlrpcMethod = options['xmlrpcMethod'] || null;
+	this.params = options.params || [];
+	this.xmlrpcMethod = options.xmlrpcMethod || null;
 
 	this.xhr = new wp.XHR( options );
 	
@@ -97,12 +97,12 @@ wp.XMLRPC.prototype.addParam = function( obj ) {
 wp.XMLRPC.prototype.formatRequestBody = function() {
 	var str = '';
 	for (var i = 0; i < this.params.length; i++) {
-    	str += '<param><value>' + this.formatParam( this.params[i] ) + '</value></param>\n';
+		str += '<param><value>' + this.formatParam( this.params[i] ) + '</value></param>\n';
     }
 
 	var xml = '<?xml version="1.0"?>\n' +
-    '<methodCall>\n<methodName>' + this.xmlrpcMethod + '</methodName>\n' +
-    '<params>\n' + str + '</params>\n</methodCall>';
+	'<methodCall>\n<methodName>' + this.xmlrpcMethod + '</methodName>\n' +
+	'<params>\n' + str + '</params>\n</methodCall>';
     return xml;
 };
 
@@ -126,7 +126,7 @@ wp.XMLRPC.prototype.formatParam = function( param ) {
 	}
 	
 	// Numbers
-	if ( typeof param == 'number' || param instanceof Number) {
+	if ( typeof param === 'number' || param instanceof Number) {
 		if ( Math.round( param ) == param ) {
 			return '<i4>' + param + '</i4>\n';
 		} else {
@@ -153,7 +153,7 @@ wp.XMLRPC.prototype.formatParam = function( param ) {
 	// Functions
 	if ( param instanceof Function ) {
 		return this.formatParam( param() );
-	};
+	}
 
 	// Structs
 	var struct = '<struct>\n';
@@ -243,7 +243,7 @@ wp.XMLRPC.cleanDocument = function( str ) {
 	var values = ['array', 'string', 'i4', 'int', 'dateTime\\.iso8601', 'double', 'struct'];
 	pairs.push( ['value', values.join( '|' )] );
   
-	var pair, reg, open;  
+	var pair, open;  
 	for ( var i = 0; i < pairs.length; i++ ) {
 		pair = pairs[i];
 		open = new RegExp( '<' + pair[0] + '>.*?<(' + pair[1] + ')>','gmi' );
@@ -274,8 +274,7 @@ wp.XMLRPC.prototype.parseNode = function( node ) {
 				array.push( this.parseNode( child ) );
 			}
 			return array;
-			break;
-			    
+
 		case 'struct':
 			var struct = {};
 			var children = node.children;
@@ -285,36 +284,30 @@ wp.XMLRPC.prototype.parseNode = function( node ) {
 				struct[name.firstChild.nodeValue] = this.parseNode( value );
 			}
 			return struct;
-			break;
-      
+
 		case 'string':
 			var s = node.firstChild ? node.firstChild.nodeValue : '';
 			s = s.replace( /&amp;([a-z]+|\#[\d]+);/ig, '&$1;' ).replace( /&gt;/gi, '>' ).replace( /&lt;/gi, '<' ).replace( /&quot;/gi, '"' );
 			return s.split( '&#039;' ).join( "'" );
-			break;
-      
+
 		case 'boolean':
 			return node.firstChild ? node.firstChild.nodeValue == '1' : false;
-			break;
-		
+
 		case 'i4':
 		case 'int':
 		case 'double':
-			return node.firstChild ? parseInt( node.firstChild.nodeValue ) : null;
-			break;
+			return node.firstChild ? parseInt( node.firstChild.nodeValue, 10 ) : null;
       
 		case 'dateTime.iso8601':
 			var iso = node.firstChild.nodeValue;
-			if( iso.indexOf( '-' ) == -1 ) {
+			if( iso.indexOf( '-' ) === -1 ) {
 				iso = iso.slice( 0, 6 ) + '-' + iso.slice( 6 );
 				iso = iso.slice( 0, 4 ) + '-' + iso.slice( 4 );
 			}
 			return node.firstChild ? new Date( iso ) : null;
-			break;
-      
+
 		default:
 			throw( "Don't know how to parse node: " + node.nodeName );
-			break;
     };
 
 };

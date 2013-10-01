@@ -77,7 +77,7 @@ wp.app = _.extend( {
 	blogsLoaded: function() {
 		wp.log( 'blogs loaded' );
 
-		if ( this.blogs.length == 0 ) {
+		if ( this.blogs.length === 0 ) {
 			// no blogs, show start/signup
 			wp.nav.setPage( 'start', 'none' );
 			return;
@@ -89,7 +89,7 @@ wp.app = _.extend( {
 	},
 	
 	findCurrentBlog: function() {
-		// check local storage for the key of the current blog. 	
+		// check local storage for the key of the current blog.
 		var blogKey = localStorage.blogKey;
 		var blog;
 		if ( blogKey ) {
@@ -118,7 +118,7 @@ wp.app = _.extend( {
 	},
 	
 	setCurrentBlog: function( blog ) {
-		if( this.currentBlog && ( this.currentBlog.id == blog.id ) ){
+		if( this.currentBlog && ( this.currentBlog.id === blog.id ) ){
 			// same blog.  nothing to see here. move along.
 			return;
 		}

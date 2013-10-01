@@ -15,7 +15,7 @@ wp.Routes = Backbone.Router.extend( {
 	
 	stage: null,
 
-	initialize: function( options ) {
+	initialize: function() {
 		this.stage = document.getElementById( 'stage' );
 	},
 		
@@ -78,8 +78,8 @@ wp.Routes = Backbone.Router.extend( {
 		}
 
 		// Just incase...
-		while ( stage.firstChild ) {
-			stage.removeChild( stage.firstChild );
+		while ( this.stage.firstChild ) {
+			this.stage.removeChild( this.stage.firstChild );
 		}
 		
 		this.currentPage = view;

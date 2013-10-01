@@ -103,7 +103,7 @@ wp.views.LoginPage = wp.views.Page.extend( {
 	},
 	
 	goBack: function() {
-	    wp.nav.pop();
+		wp.nav.pop();
 	},
 	
 	showCreate: function() {
@@ -114,7 +114,7 @@ wp.views.LoginPage = wp.views.Page.extend( {
 	// Result is a blogs collection
 	onLoggedIn: function( blogs ) {
 	
-		if ( blogs.length == 0 ) {
+		if ( blogs.length === 0 ) {
 			alert( _s( 'prompt-no-blogs' ) );
 			return;
 		}
@@ -142,9 +142,9 @@ wp.views.LoginPage = wp.views.Page.extend( {
 					for( var x = 0; x < blogs.length; x++ ) {
 						var blog = blogs.at( x );
 						
-						if ( selectedBlogId == blog.get( 'blogid' ) ) {
+						if ( selectedBlogId === blog.get( 'blogid' ) ) {
 						
-							if ( selectedBlogCtr == 0 ) {
+							if ( selectedBlogCtr === 0 ) {
 								firstBlog = blog;
 							}
 							

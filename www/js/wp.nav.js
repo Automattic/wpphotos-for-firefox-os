@@ -33,7 +33,7 @@ wp.nav = {
 	init: function() {
 		this.stage = document.getElementById( 'stage' );
 		var self = this;
-		this.stage.addEventListener( 'shuffleend', function( e ) {
+		this.stage.addEventListener( 'shuffleend', function() {
 			self._trimDeck();
 		} );
 	},
@@ -75,7 +75,7 @@ wp.nav = {
 		var currentCard = this.stage.getSelectedCard();
 		for ( var i = allCards.length; i > 0; i-- ) {
 			var card = this.stage.getCardAt( i - 1 );
-			if ( card != currentCard ) {
+			if ( card !== currentCard ) {
 				this.stage.removeChild( card );
 			} else {
 				return;
@@ -84,11 +84,11 @@ wp.nav = {
 	},
   
 	_fetchCard: function( page, transition ) {
-		var view;
+		var view, card;
 		if ( typeof page === 'string' ) {
 			var allCards = this.stage.getAllCards();
 			for( var card in allCards ) {
-				if ( card.cardName == page ) {
+				if ( card.cardName === page ) {
 					if ( this._isValidTransition( transition ) ) {
 						card.desiredTransition = transition;
 						card.transitionOverride = transition;
@@ -107,7 +107,7 @@ wp.nav = {
 			page = view.template_name;
 		}
 
-		var card = document.createElement( 'x-card' );
+		card = document.createElement( 'x-card' );
 		card.cardName = page;
 		if ( this._isValidTransition( transition ) ) {
 			card.desiredTransition = transition;
@@ -123,7 +123,7 @@ wp.nav = {
 		}
 	
 		for( var t in this.transitions ) {
-			if ( this.transitions[t] == transition ) {
+			if ( this.transitions[t] === transition ) {
 				return true;
 			}
 		}

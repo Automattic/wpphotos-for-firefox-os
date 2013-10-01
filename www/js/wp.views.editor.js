@@ -55,7 +55,7 @@ wp.views.EditorPage = wp.views.Page.extend( {
 	
 	showEditor: function( evt ) {
 		var btn;
-		var target = ( evt.target.nodeName == 'label' ) ? evt.target : evt.target.parentNode;
+		var target = ( evt.target.nodeName === 'label' ) ? evt.target : evt.target.parentNode;
 		var header = this.el.querySelector( 'header' );
 		header.innerHTML = target.querySelector( 'span' ).textContent;
 		
@@ -69,7 +69,7 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		textarea.focus();
 		
 		btn = this.el.querySelector( '.back' );
-		$(btn).addClass("hidden");
+		$( btn ).addClass( "hidden" );
 		
 		btn = this.el.querySelector( '.save' );
 		$( btn ).addClass( 'hidden' );
@@ -78,7 +78,7 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		$( btn ).removeClass( 'hidden' );
 
 		btn = this.el.querySelector( '.cancel' );
-		$(btn).removeClass( 'hidden' );
+		$( btn ).removeClass( 'hidden' );
 		
 	},
 	
@@ -93,16 +93,16 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		$( textarea ).addClass( 'hidden' );
 		
 		btn = this.el.querySelector( '.back' );
-		$(btn).removeClass( 'hidden' );
+		$( btn ).removeClass( 'hidden' );
 		
 		btn = this.el.querySelector( '.save' );
-		$(btn).removeClass( 'hidden' );
+		$( btn ).removeClass( 'hidden' );
 		
 		btn = this.el.querySelector( '.done' );
-		$(btn).addClass( 'hidden' );
+		$( btn ).addClass( 'hidden' );
 
 		btn = this.el.querySelector( '.cancel' );
-		$(btn).addClass( 'hidden' );
+		$( btn ).addClass( 'hidden' );
 		
 	},
 	
@@ -195,7 +195,7 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		};
 
 		if ( tags.innerHTML.trim().length > 0 ){
-			attrs['terms_names'] = { 'post_tag': tags.innerHTML.trim().split( ',' ) };
+			attrs.terms_names = { 'post_tag': tags.innerHTML.trim().split( ',' ) };
 		}
 		
 		var post = new wp.models.Post( attrs );
