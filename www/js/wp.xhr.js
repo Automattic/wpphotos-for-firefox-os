@@ -56,6 +56,15 @@ wp.XHR.post = function( options ) {
 	return req;
 };
 
+wp.XHR.prototype.docallbacks = function( event, arr ) {
+	for ( var i = 0; i < arr.length; i++ ) {
+		try {
+			arr[i]( this.xhr, event );
+		} catch( ignore ){
+			wp.log( ignore );
+		}
+	}
+};
 
 // Add a callback for success.
 wp.XHR.prototype.success = function( f ) {
@@ -101,21 +110,43 @@ wp.XHR.prototype.status = function() {
 	return this.xhr.status;
 };
 
+wp.XHR.prototype.onProgress = function( event ) {
+	this.docallbacks( event, this._callbacks.progress )
+};
+
+wp.XHR.prototype.onAbort = function( event ) {
+	this.clean();
+};
+
+wp.XHR.prototype.onLoadStart = function( event ) {
+	wp.log( 'xhr.onloadStart' );
+};
+
+wp.XHR.prototype.onLoad = function( event ) {
+	this.result = this.xhr.response;
+	this.docallbacks( event, this._callbacks.success );
+};
+
+wp.XHR.prototype.onLoadEnd = function( event ) {
+	this.docallbacks( event, this._callbacks.always );
+	this.clean();
+};
+
+wp.XHR.prototype.onFail = function( event ) {
+	// TODO: Listeners?
+	this.docallbacks( event, this._callbacks.fail );
+};
+
+wp.XHR.prototype.onReadyStateChange = function( event ) {
+	wp.log( 'xhr.readyState', this.xhr.readyState );
+};
+
 wp.XHR.prototype.execute = function( headers ) {
-	var self = this;
 	var xhr = new XMLHttpRequest( { 'mozSystem': true } );
 	
 	this.xhr = xhr;
 	
-	var docallbacks = function( event, arr ) {
-		for ( var i = 0; i < arr.length; i++ ) {
-			try {
-				arr[i]( self.xhr, event );
-			} catch( ignore ){
-				wp.log( ignore );
-			}
-		}
-	};
+	var docallbacks = this.docallbacks.bind( this );
 
 	try {
 		xhr.open( this.httpMethod, this.url, true );
@@ -133,47 +164,21 @@ wp.XHR.prototype.execute = function( headers ) {
 	if( this.format ) {
 		xhr.responseType = this.format;
 	}
-	
-	
-	xhr.addEventListener( 'progress', function( event ) {
-		docallbacks( event, self._callbacks.progress );
-	}, false);
-	
-	
-	xhr.onabort = function( event ) {
-		// TODO: Do we need to call always?
-		// TODO: ?
-		self.clean();
-	};
-	
-	xhr.onloadstart = function( event ) {
-		wp.log( 'xhr.onloadStart' );
-		// TODO: ?
-	};
-	
-	xhr.onload = function( event ) {
-		self.result = self.xhr.response;
-		docallbacks( event, self._callbacks.success );
-	};
-	
-	xhr.onloadend = function( event ) {
-		docallbacks( event, self._callbacks.always );
-		self.clean();
-	};
-	
-	xhr.onerror = function( event ) {
-		// TODO: Listeners?
-		docallbacks( event, self._callbacks.fail );
-	};
-	
-	xhr.ontimeout = function( event ) {
-		docallbacks( event, self._callbacks.fail );
-	};
-	
-	xhr.onreadystatechange = function( event ) {
-		wp.log( 'xhr.readyState', xhr.readyState );
-	};
-	
+
+	// Attach bound event handlers.
+	var onProgress = this.onProgress.bind( this );
+	xhr.addEventListener( 'progress', onProgress, false);
+
+	xhr.onreadystatechange = this.onReadyStateChange.bind( this );	
+	xhr.onabort = this.onAbort.bind( this );
+	xhr.onloadstart = this.onLoadStart;
+	xhr.onload = this.onLoad.bind( this );
+	xhr.onloadend = this.onLoadEnd.bind( this );
+
+	var onFail = this.onFail.bind( this );
+	xhr.onerror = onFail;
+	xhr.ontimeout = onFail;
+
 	// Don't send empty strings.
 	xhr.send( this.data ? this.data : null );
 	

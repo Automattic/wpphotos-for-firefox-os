@@ -27,7 +27,6 @@ if ( typeof wp === 'undefined' ) {
 }
 
 wp.XMLRPC = function( options ) {
-	var self = this;
 	var options = options || {};
 	options.headers  = options.headers || {};
 	options.headers['Content-Type'] = 'text/xml';
@@ -39,9 +38,8 @@ wp.XMLRPC = function( options ) {
 
 	this.xhr = new wp.XHR( options );
 	
-	this.xhr.success( function() {
-		self.parseResponseXML();
-	} );
+	var onSuccess = this.onSuccess.bind( this );
+	this.xhr.success( onSuccess );
 };
 
 wp.XMLRPC.Base64 = function( value, encode ) {
@@ -56,7 +54,6 @@ wp.XMLRPC.prototype.success = function( f ) {
 	this.xhr.success( f );
 	return this;
 };
-
 
 // Add a callback for failure.
 wp.XMLRPC.prototype.fail = function( f ){
@@ -88,6 +85,9 @@ wp.XMLRPC.prototype.execute = function() {
 	this.xhr.execute();
 };
 
+wp.XMLRPC.prototype.onSuccess = function() {
+	this.parseResponseXML();
+};
 
 wp.XMLRPC.prototype.addParam = function( obj ) {
 	this.params.push( obj );

@@ -62,34 +62,40 @@ wp.api = {
 
 wp.api.build = function( method, params, url) {
 	
-	var p = wp.promise();
+	var promise = wp.promise();
 	var headers = { 'X-User-Agent' : 'wpphotos/' + wp.app.version };
 	var rpc = new wp.XMLRPC( { 'xmlrpcMethod': method, 'params': params, 'url': url, 'headers': headers } );
-	rpc.success( function() {
-		
-		if( rpc.fault ) {
-			p.discard( rpc.result );
-			
-		} else {
-			p.resolve( rpc.result );	
-		}
-		
-	} );
 	
-	rpc.fail( function( xhr, event ) {
-		wp.log( 'xhr failed', xhr.status, event, xhr.readyState );
-		p.discard( { 'status': xhr.status, 'event': event, 'readyState': xhr.readyState } );
-	});
+	var onSuccess = this.onSuccess.bind( this, promise );
+	rpc.success = onsuccess;
 	
-	rpc.progress( function( xhr, event ) {
-		p.notify( event );
-	});
+	var onFail = this.onFail.bind( this, promise );
+	rpc.fail( onFail );
 	
+	var onProgress = this.onProgress.bind( this, promise );
+	rpc.progress( onProgress );
+
 	rpc.execute();
 	
-	return p;
+	return promise;
 };
 
+wp.api.onSuccess = function( promise, rpc) {
+	if( rpc.fault ) {
+		promise.discard( rpc.result );
+	} else {
+		promise.resolve( rpc.result );	
+	}
+};
+
+wp.api.onFail = function( promise, xhr, event ) {
+	wp.log( 'xhr failed', xhr.status, event, xhr.readyState );
+	promise.discard( { 'status': xhr.status, 'event': event, 'readyState': xhr.readyState } );
+};
+
+wp.api.onProgress = function( promise, xhr, event ) {
+	promise.notify( event );
+};
 
 /*
 	user: http://codex.wordpress.org/XML-RPC_WordPress_API/Users

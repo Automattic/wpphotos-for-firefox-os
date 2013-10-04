@@ -59,12 +59,11 @@ wp.models.Blog = Backbone.Model.extend( {
 		return response;
 	},
 	
-	fetchRemoteOptions:function() {
+	fetchRemoteOptions: function() {
 		wp.log( 'fetching remote options' );
-		var self = this;
 		
 		// Limit options returned to just the ones we're interested in:
-		var ops = [
+		var opts = [
 			'blogname',
 			'software_version',
 			'gmt_offset',
@@ -76,15 +75,21 @@ wp.models.Blog = Backbone.Model.extend( {
 			'large_size_h'
 		];
 
-		var p = wp.api.getOptions( ops );
-		p.success( function() {
-			wp.log( 'options success', p.result() );
-			self.set( 'options', p.result() );
-			self.save();
-		} );
-		p.fail( function() {
-			wp.log( 'options failed', p.result() );
-		} );
+		var promise = wp.api.getOptions( opts );
+		var onSuccess = this.onGetOptionsSuccess.bind( this, promise );
+		var onFail = this.onGetOptionsFail.bind( this, promise );
+		promise.success( onSuccess );
+		promise.fail( onFail );
+	},
+	
+	onGetOptionsSuccess: function( promise ) {
+		wp.log( 'options success', promise.result() );
+		this.set( 'options', promise.result() );
+		this.save();
+	},
+	
+	onGetOptionsFail: function( promise ) {
+		wp.log( 'options failed', promise.result() );
 	},
 	
 	isWPCom: function() {
@@ -98,21 +103,29 @@ wp.models.Blog = Backbone.Model.extend( {
 		Calls destroy to remove the blog from its collection.
 	*/
 	remove: function() {
-		var self = this;
-		var p = wp.db.removeAll( 'posts', 'blogkey', this.id );
-		p.success( function() {
-			wp.log( "all blog's posts deleted");
-			var p1 = self.destroy();
-			p1.success( function() {
-				wp.log( 'the blog was removed' );
-			});
-			p1.fail( function() {
-				wp.log( 'Failed to delete blog' );
-			});
-		});
-		p.fail( function() {
-			wp.log( 'failed to delete posts' );
-		});
+		var promise = wp.db.removeAll( 'posts', 'blogkey', this.id );
+		var onSuccess = this._onDbRemoveAllSuccess.bind( this );
+		promise.success( onSuccess );
+		promise.fail( this._onDbRemoveAllFail );
+	},
+	
+	_onDbRemoveAllSuccess: function() {
+		wp.log( "all blog's posts deleted");
+		this.destroy()
+		.success( this._onDestroySuccess )
+		.fail( this._onDestroyFail );
+	},
+	
+	_onDbRemoveAllFail: function() {
+		wp.log( 'failed to delete posts' );
+	},
+	
+	_onDestroySuccess: function() {
+		wp.log( 'Blog was removed' );
+	},
+	
+	_onDestroyFail: function() {
+		wp.log( 'Failed to delete blog' );
 	}
 	
 }, {} );
@@ -126,42 +139,43 @@ wp.models.Blogs = Backbone.Collection.extend( {
 	
 }, {
 	fetchRemoteBlogs: function( url, username, password ) {
-		
-		var p = wp.promise();
-
+		var promise = wp.promise();
 		var rpc = wp.api.getUsersBlogs( url, username, password );
-		
-		rpc.success( function() {
-			wp.log( 'blogs rpc success' );
-			try {
-				var res = rpc.result();
-				var collection = new wp.models.Blogs( res );
-				for( var idx in collection.models ) {
-					var model = collection.models[idx];
-					
-					// encrypt password
-					var enc = CryptoJS.AES.encrypt( password, username );
-					var pass = enc.toString();
-					
-					model.set( 'username', username );
-					model.set( 'password', pass );
-					// Fetching only, don't save. Let the caller decide whether to save.
-				}
-				wp.log( 'resolving' );
-				p.resolve( collection );
-				
-			} catch( e ) {
-				wp.log( e );
-			}
-		});
-		
-		rpc.fail( function() {
-			// TODO:
-			wp.log( 'failed', rpc.result() );
-			p.discard( rpc.result() );
-		});
+		var onSuccess = this.onFetchRemoteBlogsSuccess.bind( this, promise, rpc );
+		var onFail = this.onFetchRemoteBlogsFail.bind( this, promise, rpc );
+		rpc.success( onSuccess );
+		rpc.fail( onFail );
+		return promise;
+	},
 
-		return p;
+	onFetchRemoteBlogsSuccess: function( promise, rpc ) {
+		wp.log( 'blogs rpc success' );
+		try {
+			var res = rpc.result();
+			var collection = new wp.models.Blogs( res );
+			for( var idx in collection.models ) {
+				var model = collection.models[idx];
+				
+				// encrypt password
+				var enc = CryptoJS.AES.encrypt( password, username );
+				var pass = enc.toString();
+				
+				model.set( 'username', username );
+				model.set( 'password', pass );
+				// Fetching only, don't save. Let the caller decide whether to save.
+			}
+			wp.log( 'resolving' );
+			promise.resolve( collection );
+			
+		} catch( e ) {
+			wp.log( e );
+		}
+	},
+	
+	onFetchRemoteBlogsFail: function( promise, rpc ) {
+		// TODO:
+		wp.log( 'failed', rpc.result() );
+		promise.discard( rpc.result() );
 	}
 	
 });
@@ -257,21 +271,22 @@ wp.models.Post = Backbone.Model.extend( {
 		if ( this.get( 'link' ) === '' ) {
 			obj.link = wp.models.Post.GUID();
 		}
-		
+
 		if( this.get( 'post_date' ) == null ) {
 			obj.post_date = new Date();
 			obj.post_date_gmt = new Date(); //new Date(obj.post_date.valueOf() - (obj.post_date.getTimezoneOffset() * 60000));
 			obj.local_date = new Date();
 		}
-		
+
 		if ( this.get( 'blogkey' ) === '' ) {
 			obj.blogkey = wp.app.currentBlog.id;
 		}
+
 		this.set( obj );
 	},
 	
 	isLocalDraft: function(){
-		return (this.get("link").indexOf("http") === -1);
+		return ( this.get( 'link' ).indexOf( 'http' ) === -1 );
 	},
 	
 	isSyncing: function() {
@@ -298,7 +313,6 @@ wp.models.Post = Backbone.Model.extend( {
 	},
 	
 	fetchRemoteMedia: function() {
-		var self = this;
 
 		var p = wp.promise();
 		var filter = {
@@ -308,22 +322,24 @@ wp.models.Post = Backbone.Model.extend( {
 		};
 		
 		var rpc = wp.api.getMediaLibrary( filter );
-		rpc.success( function() {
+		var onSuccess = function() {
 			var res = rpc.result();
 			
 			if ( ( res instanceof Array ) && ( res.length > 0 ) ) {
 				// Clear pending media here just incase something bad happened during an upload.
-				self.set( { photo: res[0], pending_photo: null } ); 
+				this.set( { photo: res[0], pending_photo: null } ); 
 			}
 
-			var p1 = self.save();
+			var p1 = this.save();
 			p1.success( function() {
 				p.resolve();
 			} );
 			p1.fail( function() {
 				wp.log( 'Failed saving from remote media' );
 			} );
-		} );
+		};
+		onSuccess = onSuccess.bind( this );
+		rpc.success( onSuccess );
 
 		return p;
 	},
@@ -355,15 +371,15 @@ wp.models.Post = Backbone.Model.extend( {
 		
 		if ( ! this.get(' pending_photo' ) ) {
 			// No photo provided, and no photo pending.  This could be an interrupted save. 
-			this.uploadAndSave_SaveRemote();
+			this._saveRemote();
 		} else {
-			this.uploadAndSave_Upload();		
+			this._upload();		
 		}
 	
 		return this.upload_promise;
 	},
 		
-	uploadAndSave_Upload: function() {
+	_upload: function() {
 		wp.log( 'post.uploadAndSave_Upload' );
 		// Upload the image.
 		// And report progress
@@ -384,16 +400,33 @@ wp.models.Post = Backbone.Model.extend( {
 			'bits':new wp.XMLRPC.Base64( bits, false ) // Its already base64 encoded, so just wrap it, don't encode again.
 		};
 
-		var self = this;
-		var p = wp.api.uploadFile( data );
+		var promise = wp.api.uploadFile( data );
 		wp.log( 'post.uploadAndSave_Upload: uploadFile called' );
-		p.success( function() {
-			wp.log( 'post.uploadAndSave_Upload: Success' );
+		
+		var onSuccess = this._onUploadSuccess.bind( this, promise );
+		var onProgress = this._onUploadProgress.bind( this );
+		var onFail = this.onErrorSaving.bind( this );
+		
+		promise.success( onSucess );
+		promise.progress( onProgress);
+		promise.fail( onFail );
+
+	},
+	
+	_onUploadProgress: function( obj ) {
+		// obj will be a progress event. 
+		var percent = Math.floor( ( obj.loaded / obj.total ) * 100 );
+		wp.log( 'Progress', percent, obj );
+		this.trigger( 'progress', { 'status': 'Uploading...', 'percent': percent } );
+	},
+	
+	_onUploadSuccess: function( promise ) {
+		wp.log( 'post._uploadSuccess' );
 			// Update content here while we have it just in case there is 
 			// an error saving to the db in the next step. 
-			var result = p.result();
+			var result = promise.result();
 			var url = result.url;
-			
+			var pending_photo = this.get( 'pending_photo' );
 			var html = '';
 			var img = '<a href="' + url + '"><img src="' + url + '" /></a>';
 			if ( pending_photo.caption ) {
@@ -405,49 +438,38 @@ wp.models.Post = Backbone.Model.extend( {
 				html = img + "<br /><br />";
 			}
 			
-			var content = self.get( 'post_content' );
+			var content = this.get( 'post_content' );
 			content = html + content;
 
 			// Update content. Hang onto the pending photo until we've finished synching.
-			self.set( { 'post_content': content } );
+			this.set( { 'post_content': content } );
 
-			self.uploadAndSave_SaveRemote();
-		} );
-		p.progress( function( obj ) {
-			// obj will be a progress event. 
-			var percent = Math.floor( ( obj.loaded / obj.total ) * 100 );
-			wp.log( 'Progress', percent, obj );
-			self.trigger( 'progress', { 'status': 'Uploading...', 'percent': percent } );
-		} );
-		p.fail( function() {
-			wp.log( 'Upload Failed' );
-			self.onErrorSaving();
-		} );
-
+			this._saveRemote();
 	},
 	
-	uploadAndSave_SaveRemote: function() {
-		wp.log( 'post.uploadAndSave_SaveRemote' );
+	_saveRemote: function() {
+		wp.log( 'post._saveRemote' );
 		
 		this.sync_status = _s( 'publishing' );
 		this.trigger( 'progress', { 'status': 'Publishing...' } );
 		
-		var self = this;
-		var p = wp.api.newPost( this.getUploadHash() );
-		p.success( function() {
-			wp.log( 'post.uploadAndSave_SaveRemote:  Success' );
-			var post_id = p.result();
-			self.uploadAndSave_SyncRemote( post_id );
-		} );
-		p.fail( function() {
-			self.onErrorSaving();
-		} );
-		
-		return p;
+		var promise = wp.api.newPost( this.getUploadDict() );
+		var onSuccess = this._onSaveRemoteSuccess.bind( this, promise );
+		var onFail = this.onErrorSaving.bind( this );
+		promise.success( onSuccess );
+		promise.fail( onFail );
+
+		return promise;
 	},
 	
-	uploadAndSave_SyncRemote: function( post_id ) {
-		wp.log( 'post.uploadAndSave_SyncRemote' );
+	_onSaveRemoteSuccess: function( promise ) {
+		wp.log( 'post.uploadAndSave_SaveRemote:  Success' );
+		var post_id = promise.result();
+		this._syncRemote( post_id );
+	},
+	
+	_syncRemote: function( post_id ) {
+		wp.log( 'post._syncRemote' );
 		
 		this.sync_status = _s( 'syncing' );
 		this.trigger( 'progress', { 'status': 'Syncing...' } );
@@ -456,25 +478,16 @@ wp.models.Post = Backbone.Model.extend( {
 		// for the full post content. Its cannonical after all. 
 		// We'll use a promise queue to also get the updated media library
 		// which should have the media item for the photo we uploaded.
-		var self = this;
-		var q = wp.promiseQueue();
+		var queue = wp.promiseQueue();
 
 		// Fetch the cannonical post.
-		var p = wp.api.getPost( post_id );
-		p.success( function() {
-			wp.log( 'post.uploadAndSave_SyncRemote: Synced cannonical post' );
-			
-			// Save the guid used as a temporary link. We'll want to delete this record after we save.
-			self.temp_link = self.get( 'link' );
-
-			// update all attributes.
-			self.set( self.parse( p.result() ) );
-		} );
-		p.fail( function() {
-			self.onErrorSaving();
-		} );
+		var promise = wp.api.getPost( post_id );
+		var onSuccess = this._onGetPostSuccess.bind( this, promise );
+		var onFail = this.onErrorSaving.bind( this );
+		promise.success( onSuccess );
+		promise.fail( onFail );
 		
-		q.add( p );
+		queue.add( promise );
 
 		// Fetch the media library
 		var filter = {
@@ -482,52 +495,67 @@ wp.models.Post = Backbone.Model.extend( {
 			'parent_id': post_id,
 			'mime_type': 'image/*'
 		};
-		var p1 = wp.api.getMediaLibrary( filter );
-		p1.success( function() {
-			wp.log( 'post.uploadAndSave_SyncRemote: retrieved media item', p1.result() );
-			
-			var res = p1.result();
-			if ( ( res instanceof Array ) && ( res.length > 0 ) ) {
-				self.set( { 'photo': res[0], 'pending_photo': null } );
-			}
-		} );
+		var promise = wp.api.getMediaLibrary( filter );
+		onSuccess = this._onGetMediaLibrarySuccess.bind( this, promise );
+		promise.success( onSuccess );
 		
-		q.add( p1 );
+		queue.add( promise );
+
+		// Finalize the save process
+		onSuccess = this._saveFinal.bind( this );
 		
-		q.success( function() {
-			self.uploadAndSave_SaveFinal();
-		} );
-		q.fail( function(){
-			self.onErrorSaving();
-		} );
+		queue.success( onSuccess );
+		queue.fail( onFail );
 	},
 	
-	uploadAndSave_SaveFinal: function() {
+	_onGetPostSuccess: function( promise ) {
+		wp.log( 'post.uploadAndSave_SyncRemote: Synced cannonical post' );
+		
+		// Save the guid used as a temporary link. We'll want to delete this record after we save.
+		this.temp_link = this.get( 'link' );
+
+		// update all attributes.
+		this.set( this.parse( promise.result() ) );
+	},
+	
+	_onGetMediaLibrarySuccess: function( promise ) {
+		wp.log( 'post.uploadAndSave_SyncRemote: retrieved media item', p1.result() );
+
+		var res = promise.result();
+		if ( ( res instanceof Array ) && ( res.length > 0 ) ) {
+			this.set( { 'photo': res[0], 'pending_photo': null } );
+		}
+	},
+	
+	_saveFinal: function() {
 		wp.log( 'post.uploadAndSave_SaveFinal' );
 		
-		var self = this;
-		var p = this.save();
-		p.success( function() {
-			// Yay! Finally all done!
-			wp.log( 'post.uploadAndSave_SaveFinal: Success' );
-			self._isSyncing = false;
-			// this.upload_promise.notify({"status":"success"});
-			self.sync_status = null;
-			self.trigger( 'progress', { 'status': 'success' } );
-			self.upload_promise.resolve(self);
-			
-			// We saved after updating the link.  Since this is also the db key, 
-			// we need to remove the old record.
-			if ( self.temp_link ) {
-				if( self.temp_link !== self.get( 'link' ) ) {
-					wp.db.remove( self.store, self.temp_link );
-				}
+		var promise = this.save();
+		var onSuccess = this._onSave.bind( this );
+		var onFail = this.onErrorSaving.bind( this );
+
+		promise.success( onSuccess );
+		promise.fail( onFail );
+	},
+	
+	_onSave: function() {
+		// Yay! Finally all done!
+		wp.log( 'post.uploadAndSave_SaveFinal: Success' );
+		this._isSyncing = false;
+		// this.upload_promise.notify({"status":"success"});
+		this.sync_status = null;
+		this.trigger( 'progress', { 'status': 'success' } );
+		this.upload_promise.resolve( this );
+		this.upload_promise = null;
+		
+		// We saved after updating the link.  Since this is also the db key, 
+		// we need to remove the old record.
+		if ( this.temp_link ) {
+			if( this.temp_link !== this.get( 'link' ) ) {
+				wp.db.remove( this.store, this.temp_link );
 			}
-		} );
-		p.fail( function() {
-			//OMG ORLY?
-			self.onErrorSaving();
-		} );
+		}
+
 	},
 	
 	onErrorSaving: function(){
@@ -541,12 +569,12 @@ wp.models.Post = Backbone.Model.extend( {
 
 	},
 	
-	getUploadHash:function() {
+	getUploadDict:function() {
 		var obj = {};
-		var hash = this.attributes;
-		for ( var key in hash ) {
-			if( hash[key] != '' && hash[key] != null) {
-				obj[key] = hash[key];
+		var dict = this.attributes;
+		for ( var key in dict ) {
+			if( dict[key] != '' && dict[key] != null) {
+				obj[key] = dict[key];
 			}
 		}
 
@@ -625,6 +653,7 @@ wp.models.Posts = Backbone.Collection.extend({
 					if( m.get( 'post_thumbnail' ) != null ) {
 						p1 = m.save();
 					} else {
+						// TODO : Queue this up for a system.multicall instead of individual xhrs.
 						p1 = m.fetchRemoteMedia(); // no featured image
 					}
 					
@@ -645,7 +674,6 @@ wp.models.Posts = Backbone.Collection.extend({
 		} );
 
 		return p;
-
 	},
 	
 	cleanup: function( keepers ) {

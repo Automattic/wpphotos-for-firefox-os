@@ -32,12 +32,10 @@ wp.nav = {
 	
 	init: function() {
 		this.stage = document.getElementById( 'stage' );
-		var self = this;
-		this.stage.addEventListener( 'shuffleend', function() {
-			self._trimDeck();
-		} );
+		var onShuffleEnd = this._trimDeck.bind( this );
+		this.stage.addEventListener( 'shuffleend', onShuffleEnd );
 	},
-	
+
 	push: function( page, transition ) {
 		var card = this._fetchCard( page, transition );
 		this.stage.appendChild( card );
@@ -45,7 +43,7 @@ wp.nav = {
 		var allCards = this.stage.getAllCards();
 		this.stage.shuffleTo( allCards.indexOf( card ) );
 	},
-	
+
 	pop: function() {
 		// When popping we want to play current/top card's animation in reverse.
 		// The deck is going to play the previous cards animation in reverse. (doH!)
@@ -59,7 +57,7 @@ wp.nav = {
 		}
 		this.stage.historyBack();
 	},
-	
+
 	setPage: function( page, transition, forceForward ) {
 		var card = this._fetchCard( page, transition );
 		var progress = forceForward ? 'forward' : null;
@@ -69,7 +67,7 @@ wp.nav = {
 		var allCards = this.stage.getAllCards();
 		this.stage.shuffleTo( allCards.indexOf( card ), progress );
 	},
-	
+
 	_trimDeck: function() {
 		var allCards = this.stage.getAllCards();
 		var currentCard = this.stage.getSelectedCard();

@@ -150,12 +150,9 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		// We don't want the app to look unresponsive so show the loading indicator, 
 		// give the DOM a chance to refresh, then get the image data.
 		wp.app.showLoadingIndicator( _s( 'Formatting...' ) );
-		
-		var self = this;
-		setTimeout( function() {
-			self.performSave( upload_now );
-			wp.app.hideLoadingIndicator();
-		}, 100 );
+
+		var onTimeout = this.performSave.bind( this, upload_now );
+		setTimeout( onTimeout, 100 );
 	},
 
 	performSave: function( upload_now ) {
@@ -200,32 +197,37 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		
 		var post = new wp.models.Post( attrs );
 		
-		var p;
+		var promise;
 		if( upload_now ) {
-			p = post.uploadAndSave( image_data, caption.innerHTML.trim() ); // saves
+			promise = post.uploadAndSave( image_data, caption.innerHTML.trim() ); // saves
 		} else {
 			post.setPendingPhoto( image_data, caption.innerHTML.trim() );
-			p = post.save();
+			promise = post.save();
 		}
 		
-		p.fail( function() {
-			var result = p.result();
-			var msg = _s( 'prompt-problem-publishing' );
-			if ( result.status == 0 && result.readyState == 0 ) {
-				msg = 'bad url';
-			} else if( result.faultCode ){
-				if ( result.faultCode == 403 ) {
-					msg = _s( 'prompt-bad-username-password' );
-				} else {
-					msg = result.faultString;
-				}
-			}
-			alert( _s( msg ) );
-		});
+		var onFail = this.onSaveFail.bind( this, promise );
+		promise.fail( onFail );
 		
 		wp.app.posts.add( post, { 'at': 0 } );
 
 		wp.nav.pop();
+		
+		wp.app.hideLoadingIndicator();
+	},
+	
+	onSaveFail: function( promise ) {
+		var result = promise.result();
+		var msg = _s( 'prompt-problem-publishing' );
+		if ( result.status == 0 && result.readyState == 0 ) {
+			msg = 'bad url';
+		} else if( result.faultCode ){
+			if ( result.faultCode == 403 ) {
+				msg = _s( 'prompt-bad-username-password' );
+			} else {
+				msg = result.faultString;
+			}
+		}
+		alert( _s( msg ) );
 	}
 	
 });

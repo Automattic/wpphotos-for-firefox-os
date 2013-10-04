@@ -6,18 +6,20 @@
 "use strict";
 
 if( typeof wp === 'undefined' ) { 
-	var wp = {
-		debug: true, 
-		
-		log: function() {
-			if ( ! wp.debug ) {
-				return;
-			}
-			
-			console.log.apply( console, arguments );
-		}
-	};
+	var wp = {};
 }
+
+wp = _.extend( {
+	debug: true, 
+	
+	log: function() {
+		if ( ! wp.debug ) {
+			return;
+		}
+		
+		console.log.apply( console, arguments );
+	} 
+}, wp );
 
 wp.app = _.extend( {
 	version: '1.1',
@@ -26,36 +28,28 @@ wp.app = _.extend( {
 	blogs: null, // collection
 	
 	init: function() {
-
+		_.bindAll( this, 'loadBlogs', 'blogsLoaded', 'hideLoadingIndicator' );
+		
 		wp.nav.init();
 		
 		// Queue up some our async tasks and load blogs when they are done.
-		var q = wp.promiseQueue();
-		q.success( function() {
-			wp.app.loadBlogs();	
-		} );
+		var queue = wp.promiseQueue();
+		queue.success( this.loadBlogs );
 
 		// Load Templates
-		var p = wp.views.loadTemplates();
-		p.success( function(){
-			// noop
-		} );
-		p.fail(function() {
+		var promise = wp.views.loadTemplates();
+		promise.fail( function() {
 			// couldn't load templates
 			alert( 'Failed to load view templates.' );
 		} );
-		q.add(p);
-		
+		queue.add(promise);
 		
 		// Open database 
-		p = wp.db.open();
-		p.success( function() {
-			// noop
-		} );
-		p.fail( function() {
+		promise = wp.db.open();
+		promise.fail( function() {
 			alert( 'Failed to open database.' );
 		} );
-		q.add(p);
+		queue.add( promise );
 	},
 	
 	loadBlogs: function() {
@@ -66,12 +60,8 @@ wp.app = _.extend( {
 			this.listenTo( this.blogs, 'remove', this.findCurrentBlog );
 		}
 		
-		var self = this;
-		var p = this.blogs.fetch();
-		p.always( function() {
-			// loaded blogs
-			self.blogsLoaded();
-		} );
+		var promise = this.blogs.fetch();
+		promise.always( this.blogsLoaded );
 	},
 	
 	blogsLoaded: function() {

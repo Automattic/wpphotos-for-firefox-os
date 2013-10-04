@@ -16,6 +16,8 @@ wp.views.SettingsSitePage = wp.views.Page.extend( {
 	} ),
 	
 	initialize: function( options ) {
+		_.bindAll( this, 'onSave' );
+		
 		this.model = options.model;
 		
 		this.render();
@@ -59,15 +61,16 @@ wp.views.SettingsSitePage = wp.views.Page.extend( {
 			'username': username,
 			'password': pass
 		} );
-		var self = this;
-		var p = this.model.save();
-		p.success( function() {
-			if( self.model.id === wp.app.currentBlog.id ) {
-				wp.api.setCurrentBlog( self.model.attributes );
-			}
 
-			self.goBack();
-		} );
+		var promise = this.model.save();
+		promise.success( this.onSave );
+	},
+	
+	onSave: function() {
+		if( this.model.id === wp.app.currentBlog.id ) {
+			wp.api.setCurrentBlog( this.model.attributes );
+		}
+		this.goBack();
 	},
 	
 	validateField: function( field ) {

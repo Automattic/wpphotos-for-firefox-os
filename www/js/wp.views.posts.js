@@ -116,7 +116,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		$( 'x-shiftbox' )[0].toggle();
 	},
 	
-	viewPost:function( model ) {
+	viewPost: function( model ) {
 		// if we are not pulling to refresh...
 		if( this.dragging ) {
 			return;
@@ -126,32 +126,32 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	},
 	
 	refresh: function() {
+		var promise = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id } } );
+		var onSuccess = this.onPostFetchSuccess.bind( this );
+		var onFail = this.onPostFetchFail.bind( this, promise );
+		promise.success( onSuccess );
+		promise.fail( onFail );
 
-		var self = this;
-		var p = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id } } );
-		p.success( function() {
-			
-			self.render();
-					
-			if( self.posts.length == 0 && ! self.syncedonce ) {
-				// If we haven't tried to sync at least once, do so. 
-				if( self.syncing ) {
-					return; 
-				}
+		return promise;
+	},
+	
+	onPostFetchSuccess: function() {
+		this.render();
 				
-				wp.app.showLoadingIndicator();
-				var promise = self.sync();
-				promise.always( function() {
-					wp.app.hideLoadingIndicator();
-				} );
+		if( this.posts.length == 0 && ! this.syncedonce ) {
+			// If we haven't tried to sync at least once, do so. 
+			if( this.syncing ) {
+				return; 
 			}
-
-		} );
-		p.fail( function() {
-			alert( p.result() );
-		} );
-
-		return p;
+			
+			wp.app.showLoadingIndicator();
+			var promise = this.sync();
+			promise.always( wp.app.hideLoadingIndicator );
+		}
+	},
+	
+	onPostFetchFail: function( promise ) {
+		alert( promise.result() );
 	},
 	
 	sync: function() {
@@ -165,34 +165,43 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		
 		$( '.refresh' ).addClass( 'refreshing' );
 		
-		var self = this;
-		var p = wp.models.Posts.fetchRemotePosts();
-		p.success( function() {
-			self.syncedonce = true;
-			self.refresh();
-		} );
-		p.fail(function() {
-			var result = p.result();
-			var msg = _s( 'prompt-problem-syncing' );
-			if ( result.status == 0 && result.readyState == 0 ) {
-				msg = _s( 'prompt-bad-url' );
-			} else if( result.faultCode ){
-				if ( result.faultCode == 403 ) {
-					msg = _s( 'prompt-bad-username-password' );
-				} else {
-					msg = result.faultString;
-				}
-			}
-			alert( _s( msg ) );
-		} );
-		p.always( function() {
-			self.syncing = false;
-			$( '.refresh' ).removeClass( 'refreshing' );
-		} );
+		var promise = wp.models.Posts.fetchRemotePosts();
+		var onSuccess = this.onSyncSuccess.bind( this );
+		var onFail = onSyncFail.bind( this, promise );
+		var onAlways = onSyncAlways.bind( this );
+		
+		promise.success( onSuccess );
+		promise.fail( onFail );
+		promise.always( onAlways );
 
-		return p;
+		return promise;
 	},
 	
+	onSyncSuccess: function() {
+		this.syncedonce = true;
+		this.refresh();
+	},
+	
+	onSyncFail: function( promise ) {
+		var result = promise.result();
+		var msg = _s( 'prompt-problem-syncing' );
+		if ( result.status == 0 && result.readyState == 0 ) {
+			msg = _s( 'prompt-bad-url' );
+		} else if( result.faultCode ){
+			if ( result.faultCode == 403 ) {
+				msg = _s( 'prompt-bad-username-password' );
+			} else {
+				msg = result.faultString;
+			}
+		}
+		alert( _s( msg ) );
+	},
+	
+	onSyncAlways: function() {
+		this.syncing = false;
+		$( '.refresh' ).removeClass( 'refreshing' );
+	},
+
 	showEditor: function() {
 		
 		try {
@@ -201,7 +210,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 				return;
 			}
 			
-			var self = this;
 			// Start a Moz picker activity for the user to select an image to upload
 			// either from the gallery or the camera. 
 			var activity = new MozActivity( {
@@ -210,15 +218,10 @@ wp.views.PostsPage = wp.views.Page.extend( {
 					'type': 'image/jpeg'
 				}
 			} );
-					
-			activity.onsuccess = function() {
-				wp.app.selected_image_blob = activity.result.blob;
-				wp.nav.push( 'editor' );
-			};
-	
-			activity.onerror = function() {
-				wp.log( 'There was an error picking an image with the picker.' );
-			};
+
+			var onSuccess = this.onPickSuccess.bind( this, activity );
+			activity.onsuccess = onSuccess;
+			activity.onerror = this.onPickError;
 			
 		} catch( e ) {
 			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
@@ -226,6 +229,15 @@ wp.views.PostsPage = wp.views.Page.extend( {
 			wp.nav.push( 'editor' );
 			return; 
 		}
+	},
+	
+	onPickSuccess: function( activity ) {
+		wp.app.selected_image_blob = activity.result.blob;
+		wp.nav.push( 'editor' );
+	},
+	
+	onPickError: function() {
+		wp.log( 'There was an error picking an image with the picker.' );
 	},
 
 	showAbout: function() {
