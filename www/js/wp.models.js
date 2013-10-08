@@ -141,14 +141,14 @@ wp.models.Blogs = Backbone.Collection.extend( {
 	fetchRemoteBlogs: function( url, username, password ) {
 		var promise = wp.promise();
 		var rpc = wp.api.getUsersBlogs( url, username, password );
-		var onSuccess = this.onFetchRemoteBlogsSuccess.bind( this, promise, rpc );
+		var onSuccess = this.onFetchRemoteBlogsSuccess.bind( this, promise, rpc, username, password );
 		var onFail = this.onFetchRemoteBlogsFail.bind( this, promise, rpc );
 		rpc.success( onSuccess );
 		rpc.fail( onFail );
 		return promise;
 	},
 
-	onFetchRemoteBlogsSuccess: function( promise, rpc ) {
+	onFetchRemoteBlogsSuccess: function( promise, rpc, username, password ) {
 		wp.log( 'blogs rpc success' );
 		try {
 			var res = rpc.result();

@@ -115,6 +115,11 @@ wp.promise = function() {
  
 			perform( _fail );
 			perform( _always );
+
+			_fail = null;
+			_progress = null;
+			_success = null;
+			_always = null;
 		},
 		 
 		resolve: function( obj ) {
@@ -123,6 +128,11 @@ wp.promise = function() {
 
 			perform( _success );
 			perform( _always );
+			
+			_fail = null;
+			_progress = null;
+			_success = null;
+			_always = null;
 		},
 		
 		notify: function( obj ) {

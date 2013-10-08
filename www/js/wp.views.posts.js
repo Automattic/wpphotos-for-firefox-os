@@ -167,8 +167,8 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		
 		var promise = wp.models.Posts.fetchRemotePosts();
 		var onSuccess = this.onSyncSuccess.bind( this );
-		var onFail = onSyncFail.bind( this, promise );
-		var onAlways = onSyncAlways.bind( this );
+		var onFail = this.onSyncFail.bind( this, promise );
+		var onAlways = this.onSyncAlways.bind( this );
 		
 		promise.success( onSuccess );
 		promise.fail( onFail );

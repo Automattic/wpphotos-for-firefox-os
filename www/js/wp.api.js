@@ -66,8 +66,8 @@ wp.api.build = function( method, params, url) {
 	var headers = { 'X-User-Agent' : 'wpphotos/' + wp.app.version };
 	var rpc = new wp.XMLRPC( { 'xmlrpcMethod': method, 'params': params, 'url': url, 'headers': headers } );
 	
-	var onSuccess = this.onSuccess.bind( this, promise );
-	rpc.success = onsuccess;
+	var onSuccess = this.onSuccess.bind( this, promise, rpc );
+	rpc.success( onSuccess );
 	
 	var onFail = this.onFail.bind( this, promise );
 	rpc.fail( onFail );

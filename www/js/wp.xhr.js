@@ -97,6 +97,7 @@ wp.XHR.prototype.clean = function() {
 	this._callbacks.success = [];
 	this._callbacks.fail = [];
 	this._callbacks.always = [];
+	this._callbacks.progress = [];
 };
 
 
@@ -135,6 +136,7 @@ wp.XHR.prototype.onLoadEnd = function( event ) {
 wp.XHR.prototype.onFail = function( event ) {
 	// TODO: Listeners?
 	this.docallbacks( event, this._callbacks.fail );
+	this.clean();
 };
 
 wp.XHR.prototype.onReadyStateChange = function( event ) {
