@@ -200,6 +200,11 @@ wp.db = {
 	
 	/*
 		Get all the objects for the specified model, optionally filtered by the specified index and key value.
+		
+		Key can be a string, or an array.  
+		If the index is a multikey index then the key should be an array and each index should also be an array.
+		
+		.findAll( "post", "date", [[blogkey, post_date_gmt], [blogkey, post_date_gmt]] for a range.
 	*/
 	findAll: function( model, index, key ) {
 		wp.log( 'wp.db.findAll: ', model, index, key );
@@ -492,11 +497,12 @@ wp.db.migrations = [
 			var store; 
 			// blogs
 			// key is autoincrementing integer
-			store = db.createObjectStore( 'blogs', { keyPath: 'xmlrpc' } );
+			store = db.createObjectStore( 'blogs', { 'keyPath': 'xmlrpc' } );
 			
 			// posts
-			store = db.createObjectStore( 'posts', { keyPath: 'link' } );
+			store = db.createObjectStore( 'posts', { 'keyPath': 'link' } );
 			store.createIndex( 'blogkey', 'blogkey' );
+			store.createIndex( 'date', ['blogkey', 'post_date_gmt'] );
 		}
 	}
 ];
