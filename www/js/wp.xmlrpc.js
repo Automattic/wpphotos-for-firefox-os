@@ -32,7 +32,7 @@ wp.XMLRPC = function( options ) {
 	options.headers['Content-Type'] = 'text/xml';
 	
 	this.result = null;
-	this.fault = false;	
+	this.fault = false;
 	this.params = options.params || [];
 	this.xmlrpcMethod = options.xmlrpcMethod || null;
 
