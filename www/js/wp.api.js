@@ -51,7 +51,7 @@ wp.api = {
 	setCurrentBlog: function( blog ) {
 		// blog.attributes handles backbone objects vs a hash
 		this.blog = blog.attributes || blog;
-		
+
 		// if the object passed specified a url instead of an xmlrpc property, reassign
 		if ( ! this.blog.xmlrpc && this.blog.url ) {
 			this.blog.xmlrpc = this.blog.url;
@@ -259,4 +259,29 @@ wp.api.getMediaLibrary = function( filter ) {
 wp.api.uploadFile = function( data ) {
 	var params = wp.api.getParams( data );
 	return wp.api.build( 'wp.uploadFile', params, this.getUrl() );
+};
+
+
+/*
+	system.multicall
+	Batch request multiple XML-RPC requests.  The response has the result of each call in the order it was made.
+	
+	calls: An array of XML-RPC request bodies.  Compse
+	
+	return: array
+*/
+wp.api.systemMulticall = function( calls ) {
+	return wp.api.build( 'system.multicall', calls, this.getUrl() );
+};
+
+/*
+	getRequestBody
+	Format a request body to be used in a system.multicall request.
+*/
+wp.api.formatForSystemMulticall = function( method ) {
+
+	var arr = Array.prototype.slice.call( arguments, 1 );
+	var params = wp.api.getParams.apply( wp.api, arr );
+
+	return { 'methodName': method, 'params': params };
 };
