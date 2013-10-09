@@ -613,7 +613,130 @@ wp.models.Posts = Backbone.Collection.extend({
 	
 }, {
 
+	/*
+		Fetch remote posts.
+		offset: 
+	*/
+	fetchRemote: function( offset ) {
+		var promise = wp.promise();
+		
+		// Fetch the list of posts.
+		var rpc = wp.api.getPosts( offset );
+		var onSuccess = this._onGetPostsSuccess.bind( this, promise, rpc );
+		var onFail = this._onGetPostsFail.bind( this, promise, rpc );
+		rpc.success( onSuccess );
+		rpc.fail( onFail );
+		
+		return promise;
+	},
+	
+	_onGetPostsSuccess: function( promise, rpc ) {
+		
+		var res = rpc.result();
+		
+		// Create a new posts collection	
+		var collection = new wp.models.Posts( res, { 'parse': true } );
+
+		var blog = wp.app.currentBlog;
+
+		var posts = []; // Posts that need an image.
+		var calls = []; // Array of requests formated for system.multicall
+		
+		for ( var i = 0; i < collection.length; i++ ) {
+			var post = collection.at( i );
+			
+			// set the blog key for the results
+			post.set( 'blogkey', blog.id );
+			
+			// for each post, if it does not have a featured image add it to the multicall.
+			if ( post.get( 'post_thumbnail' ) == null ) {
+				var filter = {
+					number: 1,
+					parent_id: post.get( 'post_id' ),
+					mime_type: 'image/*'
+				};
+				
+				var call = wp.api.formatForSystemMulticall( 'wp.getMediaLibrary', filter );
+				calls.push( call );
+				posts.push( post );
+			}
+		}
+
+		// if there is nothing for the multicall save the posts.
+		if ( posts.length === 0 ) {
+			this.saveFetchedPosts( promise, collection );
+			return;
+		}
+
+		// Perform the multicall to get post media.
+		var multicall = wp.api.systemMulticall( calls );
+		var onSuccess = this._onMulticallSuccess.bind( this, multicall, promise, collection, posts );
+		var onFail = this._onMulticallFail.bind( this, promise, collection );
+		multicall.success( onSuccess );
+		multicall.fail( onFail );
+	},
+	
+	_onGetPostsFail: function( promise, rpc ) {
+		wp.log( 'Fetch remote posts failed.', rpc.result() );
+		promise.discard( rpc.result() );
+	},
+	
+	_onMulticallSuccess: function( multicall, promise, collection, posts ) {
+		var res = multicall.result(); // should be an array of wp.getMediaLibrary responses.
+
+		for ( var i = 0; i < posts.length; i++ ) {
+			var post = posts[i];
+			var media;
+			try {
+				media = res[i][0];
+			} catch ( e ) {
+				media = res[i];
+			}
+			if ( ( media instanceof Array ) && ( media.length > 0 ) ) {
+				// Clear pending media here just incase something bad happened during an upload.
+				post.set( { photo: media[0], pending_photo: null } ); 
+			}
+		}
+
+		this._saveFetchedPosts( promise, collection );
+	},
+
+	_onMulticallFail: function( promise, collection ) {
+		wp.log( 'System Multicall to fetch media libraries failed.' );
+		this._saveFetchedPosts( promise, collection );
+	},
+
+	_saveFetchedPosts: function( promise, collection ) {
+		
+		var queue = wp.promiseQueue();
+		var onSuccess = this._onSaveFetchedPostsSuccess.bind( this, promise, collection );
+		queue.success( onSuccess );
+
+		for( var i = 0; i < collection.length; i++ ) {
+			var post = collection.at( i );
+			queue.add( post.save() );
+		}
+	},
+	
+	_onSaveFetchedPostsSuccess: function( promise, collection ) {
+		// Finally!
+		promise.resolve( collection );
+	},
+	
+	removeOld: function( date ) {
+		
+		// get posts after date
+		
+		// for each post, if it is not a local draft, add it to the list to delete.
+		
+		// batch delete
+		
+		
+	},
+	
+
 	fetchRemotePosts: function( offset ) {
+		return this.fetchRemote( offset );
 		// Define collection outside of any closure so we can pass it to the
 		// promise's resolve method, but other closures can work with it.
 		var collection;
