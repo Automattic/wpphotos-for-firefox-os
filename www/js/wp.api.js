@@ -192,7 +192,7 @@ wp.api.getPosts = function( offset ) {
 	offset = Math.floor( offset ) || 0;
 
 	var filter = {
-		'number': 20,
+		'number': 12,
 		'offset': offset
 	};
 

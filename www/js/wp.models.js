@@ -613,13 +613,18 @@ wp.models.Posts = Backbone.Collection.extend({
 	
 }, {
 
+	needsCleanup: false,
+	
 	/*
 		Fetch remote posts.
 		offset: 
 	*/
 	fetchRemote: function( offset ) {
+		// Clean up only if no offset ( loading more )
+		this.needsCleanup = ! Boolean( offset );
+
 		var promise = wp.promise();
-		
+
 		// Fetch the list of posts.
 		var rpc = wp.api.getPosts( offset );
 		var onSuccess = this._onGetPostsSuccess.bind( this, promise, rpc );
@@ -664,7 +669,7 @@ wp.models.Posts = Backbone.Collection.extend({
 
 		// if there is nothing for the multicall save the posts.
 		if ( posts.length === 0 ) {
-			this.saveFetchedPosts( promise, collection );
+			this._saveFetchedPosts( promise, collection );
 			return;
 		}
 
@@ -707,7 +712,17 @@ wp.models.Posts = Backbone.Collection.extend({
 	},
 
 	_saveFetchedPosts: function( promise, collection ) {
-		
+		if ( this.needsCleanup ) {
+			this._cleanup( promise, collection );
+			return;
+		}
+	
+		// No posts to save so we can skip the promise queue.
+		if ( collection.length === 0 ) {
+			this._onSaveFetchedPostsSuccess( promise, collection );
+			return;
+		}
+
 		var queue = wp.promiseQueue();
 		var onSuccess = this._onSaveFetchedPostsSuccess.bind( this, promise, collection );
 		queue.success( onSuccess );
@@ -723,128 +738,45 @@ wp.models.Posts = Backbone.Collection.extend({
 		promise.resolve( collection );
 	},
 	
-	removeOld: function( date ) {
-		
-		// get posts after date
-		
-		// for each post, if it is not a local draft, add it to the list to delete.
-		
-		// batch delete
-		
-		
-	},
-	
+	// Clear posts from the database.
+	// Bascially we'll purge everything that is not a local draft since we're just replacing it with the 
+	// most current version retrieved during a sync. Never call _cleanup when performing a "load more".
+	_cleanup: function( promise, collection ) {
+		this.needsCleanup = false;
 
-	fetchRemotePosts: function( offset ) {
-		return this.fetchRemote( offset );
-		// Define collection outside of any closure so we can pass it to the
-		// promise's resolve method, but other closures can work with it.
-		var collection;
-		
-		var keepers = [];
-		
-		// This promise is returned to the user.
-		var p = wp.promise();		
-		
-		// The promise queue is for saving all the models.
-		var q = wp.promiseQueue();
-		q.success( function() {
-			p.resolve( collection );
-		} );
-
-		var rpc = wp.api.getPosts( offset );
-		rpc.success( function() {
-			var res = rpc.result();
-			
-			collection = new wp.models.Posts( res, { 'parse': true } );
-
-			var blog = wp.app.currentBlog;
-			for ( var i = 0; i < collection.length; i++ ) {
-			
-				// Wrapper to preserve model scope in the closure.
-				( function( j ) {
-					var m = collection.at( j );
-					m.set( 'blogkey', blog.id );
-					
-					keepers.push( m.get( 'link' ) );
-					
-					var p1;
-
-					// If the post has a featured image we're good. Save the post. 
-					// If no featured image, then fetch its media library.
-
-					if( m.get( 'post_thumbnail' ) != null ) {
-						p1 = m.save();
-					} else {
-						// TODO : Queue this up for a system.multicall instead of individual xhrs.
-						p1 = m.fetchRemoteMedia(); // no featured image
-					}
-					
-					// Add the save promise to the promise queue.
-					q.add(p1);
-
-				} )( i );
-			}
-			
-			q.add( wp.models.Posts.cleanup( keepers ) );
-			
-			
-		} );
-		
-		rpc.fail( function() {
-			wp.log( 'Fetch remote posts failed.', rpc.result() );
-			p.discard( rpc.result() );
-		} );
-
-		return p;
-	},
-	
-	cleanup: function( keepers ) {
-
-		var promise = wp.promise();
-		
 		var p = wp.db.findAll( 'posts', 'blogkey', wp.app.currentBlog.id );
-		p.success( function() {
-			
-			var posts = p.result();
-			var oldposts = [];
-			
-			for ( var i = 0; i < posts.length; i++ ) {
-				if ( posts[i].link.indexOf( 'http' ) !== 0 ) {
-					// this is a local draft, don't delete it.
-					continue;
-				}
-							
-				// Wrapper to preserve model scope in the closure.
-				( function( j ) {
-					var link = posts[j].link;
-					var found = false;
-					for ( var k = 0; k < keepers.length; k++ ) {
-						if ( link === keepers[k] ) {
-							found = true;
-							break;
-						}
-					}
-					if ( ! found ) {
-						oldposts.push( link );
-					}
-				} )( i );
-			}
-			
-			// Delete the old posts.
-			if( oldposts.length > 0 ) {
-				wp.db.removeAll( 'posts', 'blogkey', wp.app.currentBlog.id, oldposts, 'link' );
-				promise.resolve();
-			} else {
-				promise.resolve();
-			}
-		} );
-		p.fail( function() {
-			wp.log( 'Clean up after sync failed' );
-			promise.discard();
-		} );
-		
-		return promise;
-	}
+		var onSuccess = this._onCleanupFindSuccess.bind( this, p, promise, collection );
+		var onFail = this._saveFetchedPosts.bind( this, promise, collection );
+		p.success( onSuccess );
+		p.fail( onFail );
+	},
 	
+	_onCleanupFindSuccess: function( p, promise, collection ) {
+		var posts = p.result();
+		var oldposts = [];
+		
+		for ( var i = 0; i < posts.length; i++ ) {
+			if ( posts[i].link.indexOf( 'http' ) !== 0 ) {
+				// this is a local draft, don't delete it.
+				continue;
+			}
+			oldposts.push( posts[i].link );
+		}
+
+		if ( oldposts.length == 0 ) {
+			this._saveFetchedPosts( promise, collection );
+			return;
+		}
+
+		// Delete the old posts.
+		p = wp.db.removeAll( 'posts', 'blogkey', wp.app.currentBlog.id, oldposts, 'link' );
+		var onFail = this._onCleanupRemoveFail;
+		var onAlways = this._saveFetchedPosts.bind( this, promise, collection );
+		p.always( onAlways );
+	},
+	
+	_onCleanupRemoveFail: function() {
+		wp.log( "Error removing old posts" );
+	}
+		
 } );

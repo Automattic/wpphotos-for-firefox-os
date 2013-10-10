@@ -131,7 +131,7 @@ wp.views.LoginPage = wp.views.Page.extend( {
 		wp.app.blogs.add( blog );
 		wp.app.setCurrentBlog( blog );
 		
-		var promise = wp.models.Posts.fetchRemotePosts();
+		var promise = wp.models.Posts.fetchRemote();
 		var onAlways = this.onPostsFetched.bind( this, promise );
 		promise.always( onAlways );
 	},
@@ -190,7 +190,7 @@ wp.views.LoginPage = wp.views.Page.extend( {
 					}
 				
 					wp.app.showLoadingIndicator();
-					var p = wp.models.Posts.fetchRemotePosts();
+					var p = wp.models.Posts.fetchRemote();
 					p.success( function() {
 						wp.app.posts.fetch( { 'where': { 'index': 'blogkey', value:wp.app.currentBlog.id } } );
 					} );

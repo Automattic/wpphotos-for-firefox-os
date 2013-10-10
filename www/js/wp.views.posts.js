@@ -13,6 +13,10 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	
 	syncing: false,
 	
+	loadingMore: false,
+	
+	hasMoreContent: true,
+	
 	rendered: false,
 	
 	dragging: false,
@@ -23,7 +27,8 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		'click button.logo'     : 'showAbout',
 		'click button.menu'     : 'toggleMenu',
 		'click button.refresh'  : 'sync',
-		'click li.menu-item'    : 'switchBlog'
+		'click li.menu-item'    : 'switchBlog',
+		'click button.load-more' : 'loadMore'
 	} ),
 	
 	initialize: function() {
@@ -65,6 +70,9 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	renderPosts: function() {
 		var collection = this.posts;
 		var content = this.el.querySelector( '.content' );
+		var scroll = this.el.querySelector( '.scroll' );
+		var scrollTop = scroll.scrollTop;
+		
 		content.innerHTML = '';
 
 		for( var i = 0; i < collection.length; i++ ) {
@@ -72,6 +80,8 @@ wp.views.PostsPage = wp.views.Page.extend( {
 			var view = new wp.views.Post( { 'model': post } );
 			content.appendChild( view.el );
 		}
+		
+		scroll.scrollTop = scrollTop;
 	},
 	
 	renderMenu: function() {
@@ -125,17 +135,18 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		window.open( model.get( 'link' ), '', 'resizable=yes,scrollbars=yes,status=yes' );
 	},
 	
+	// Refresh the post list. 
 	refresh: function() {
 		var promise = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id } } );
-		var onSuccess = this.onPostFetchSuccess.bind( this );
-		var onFail = this.onPostFetchFail.bind( this, promise );
+		var onSuccess = this._onRefreshSuccess.bind( this );
+		var onFail = this._onRefreshFail.bind( this, promise );
 		promise.success( onSuccess );
 		promise.fail( onFail );
 
 		return promise;
 	},
 	
-	onPostFetchSuccess: function() {
+	_onRefreshSuccess: function() {
 		this.render();
 				
 		if( this.posts.length == 0 && ! this.syncedonce ) {
@@ -150,25 +161,32 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		}
 	},
 	
-	onPostFetchFail: function( promise ) {
+	_onRefreshFail: function( promise ) {
 		alert( promise.result() );
 	},
 	
-	sync: function() {
+	// Fetches the latest posts from the remote server and removes oldest posts from the database.
+	sync: function( event, loadMore ) {
 
 		if( ! wp.app.isNetworkAvailable() ) {
 			alert( _s( 'prompt-network-missing' ) );
 			return;
 		}
 		
-		this.syncing = true;
-		
+		if ( this.syncing ) {
+			return;
+		}
+				
 		$( '.refresh' ).addClass( 'refreshing' );
-		
-		var promise = wp.models.Posts.fetchRemotePosts();
-		var onSuccess = this.onSyncSuccess.bind( this );
-		var onFail = this.onSyncFail.bind( this, promise );
-		var onAlways = this.onSyncAlways.bind( this );
+
+		this.syncing = true;
+		this.loadingMore = loadMore || false;
+
+		var offset = this.loadingMore ? this.posts.length : null;
+		var promise = wp.models.Posts.fetchRemote( offset );
+		var onSuccess = this._onSyncSuccess.bind( this, promise );
+		var onFail = this._onSyncFail.bind( this, promise );
+		var onAlways = this._onSyncAlways.bind( this );
 		
 		promise.success( onSuccess );
 		promise.fail( onFail );
@@ -177,12 +195,23 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		return promise;
 	},
 	
-	onSyncSuccess: function() {
+	_onSyncSuccess: function( promise ) {
 		this.syncedonce = true;
+		if ( ! this.loadingMore ) {
+			// TODO: Clean up old posts.
+			this.hasMoreContent = true;
+		} else {
+			// Check if if more content exists.
+			var collection = promise.result();
+			if ( collection.length == 0 || collection.length % 12 ) {
+				this.hasMoreContent = false;
+			}
+		}
+		this.showLoadMore( this.hasMoreContent );
 		this.refresh();
 	},
 	
-	onSyncFail: function( promise ) {
+	_onSyncFail: function( promise ) {
 		var result = promise.result();
 		var msg = _s( 'prompt-problem-syncing' );
 		if ( result.status == 0 && result.readyState == 0 ) {
@@ -197,11 +226,17 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		alert( _s( msg ) );
 	},
 	
-	onSyncAlways: function() {
+	_onSyncAlways: function() {
 		this.syncing = false;
+		this.loadingMore = false;
 		$( '.refresh' ).removeClass( 'refreshing' );
 	},
-
+	
+	// Load more posts from the remote server.
+	loadMore: function( event ) {
+		this.sync.apply( this, [event, true] );
+	},
+	
 	showEditor: function() {
 		
 		try {
@@ -219,9 +254,9 @@ wp.views.PostsPage = wp.views.Page.extend( {
 				}
 			} );
 
-			var onSuccess = this.onPickSuccess.bind( this, activity );
+			var onSuccess = this._onPickSuccess.bind( this, activity );
 			activity.onsuccess = onSuccess;
-			activity.onerror = this.onPickError;
+			activity.onerror = this._onPickError;
 			
 		} catch( e ) {
 			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
@@ -231,12 +266,12 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		}
 	},
 	
-	onPickSuccess: function( activity ) {
+	_onPickSuccess: function( activity ) {
 		wp.app.selected_image_blob = activity.result.blob;
 		wp.nav.push( 'editor' );
 	},
 	
-	onPickError: function() {
+	_onPickError: function() {
 		wp.log( 'There was an error picking an image with the picker.' );
 	},
 
@@ -247,6 +282,15 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	showSettings: function() {
 		this.toggleMenu();
 		wp.nav.push('settings', 'coverUp');
+	},
+	
+	showLoadMore: function( bool ) {
+		var btn = this.el.querySelector('button.load-more');
+		if ( bool ) {
+			$( btn ).removeClass( 'hidden' );
+		} else {
+			$( btn ).addClass( 'hidden' );
+		}
 	}
 	
 } );

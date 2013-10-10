@@ -400,7 +400,7 @@ wp.db = {
 			p.discard( err );
 		}
 		
-		return p;		
+		return p;
 	},
 		
 	/*
@@ -470,7 +470,7 @@ wp.db = {
 				success( p.result() );
 			}
 			model.trigger( 'sync', model, p.result(), options );
-		});
+		} );
 		
 		p.fail( function() {
 			if( error ) {
@@ -502,7 +502,6 @@ wp.db.migrations = [
 			// posts
 			store = db.createObjectStore( 'posts', { 'keyPath': 'link' } );
 			store.createIndex( 'blogkey', 'blogkey' );
-			store.createIndex( 'date', ['blogkey', 'post_date_gmt'] );
 		}
 	}
 ];

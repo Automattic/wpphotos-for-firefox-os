@@ -442,7 +442,7 @@ x-shiftbox > section {
 	bottom: 0;
 	top: 0;
 	width:100%;
-	background-color: #101010;
+	background-color: #eee;
 }
 
 .page-posts section.content {
@@ -645,6 +645,18 @@ x-shiftbox > section {
 	display:table;
 }
 
+button.load-more {
+	width: 100%;
+	border: none;
+	text-align: center;
+	line-height: 44px;
+	color: #fff;
+	font-size: 2rem;
+}
+
+button.load-more:active {
+	background-color: rgb(46, 162, 204);
+}
 
 
 /* about page */
@@ -1010,7 +1022,7 @@ x-shiftbox > section {
 	Brought to you by a merry band of mobile engineers.
 	Apply for Automattic at automattic.com/work-with-us */
 
-.page-posts section.content > div:last-child::after {
+.page-posts section.load-more:after {
 	content: "∞";
 	display: block;
 	width: 100%;
