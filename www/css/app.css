@@ -323,10 +323,11 @@ x-appbar .force-right > *:before {
 }
 
 
-/* start & login pages */
+/* start login & sites pages */
 
 .page-start .content,
 .page-login .content,
+.page-sites .content,
 .page-about .content,
 .page-settings .content {
 	padding: 44px 20px 5px;
@@ -334,7 +335,8 @@ x-appbar .force-right > *:before {
 }
 
 .page-start footer,
-.page-login footer {
+.page-login footer,
+.page-sites footer {
 	position: absolute;
 	bottom: 0px;
 	height: 64px;
@@ -350,7 +352,8 @@ x-appbar .force-right > *:before {
 }
 
 .page-start x-appbar,
-.page-login x-appbar {
+.page-login x-appbar,
+.page-sites x-appbar {
 	box-shadow: none;
 }
 
@@ -417,10 +420,57 @@ x-appbar .force-right > *:before {
 	font-size: 1.5rem;
 }
 
+/* hide the footer when a keyboard is visible */
 @media (max-height: 400px) {
 	.page-login footer {
 		display: none;
 	}
+}
+
+/* sites page */
+
+.page-sites button.add-selected {
+	position: absolute;
+	right: 10px;
+}
+
+.page-sites button.select-all {
+	position: absolute;
+	left: 10px;
+}
+
+.page-sites ul {
+	margin: 0;
+	padding: 0;
+}
+
+.page-sites li {
+	padding:14px 0;
+	list-style: none;
+	border-top: 1px solid #2691C0;
+	border-bottom: 1px solid #2085B5;
+	color: #bbddee;
+	font-size: 1.4rem;
+	line-height: 1.6rem;
+}
+
+.page-sites li:active {
+	background-color: #78c8e6;
+	color: #222;
+}
+
+.page-sites .scroll {
+	height: calc(100% - 64px);
+}
+
+.page-sites ul li.selected:after {
+	content: '\f418'; /* check mark */
+	border: none;
+	background: none;
+	display: inline-block;
+	position:absolute;
+	right: 20px;
+	font: 30px/30px 'Noticons';
 }
 
 /*	posts page */
@@ -852,9 +902,7 @@ button.load-more:active {
 
 .page-settings .bloglist li button:active {
 	background-color: #f1831e;
-	transform: translateY(0);
 }
-
 
 .page-publish-settings ul {
 	margin-top: 10px;

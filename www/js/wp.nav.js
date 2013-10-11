@@ -139,6 +139,9 @@ wp.nav = {
 			case 'login':
 				view = new wp.views.LoginPage();
 				break;
+			case 'sites':
+				view = new wp.views.SitesPage();
+				break;
 			case 'posts':
 				view = new wp.views.PostsPage();
 				break;
