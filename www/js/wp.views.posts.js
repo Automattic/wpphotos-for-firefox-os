@@ -369,9 +369,9 @@ wp.views.Post = Backbone.View.extend( {
 		}
 		
 		// Date
-		var formattedDate = this.formatGMTDate( this.model.get( 'local_date' ) );
+		var date = this.model.get( 'post_date_gmt' );
 		var dateEl = div.querySelector( '.post-date' );
-		dateEl.innerHTML = formattedDate;
+		dateEl.innerHTML = date.toLocaleDateString();
 		
 		// Photo
 		var img = div.querySelector( '.photo img' );
@@ -430,38 +430,6 @@ wp.views.Post = Backbone.View.extend( {
 		this.$el.html( div.querySelector( 'div' ) );
 	
 		return this;
-	},
-	
-	formatGMTDate: function( date ) {
-		
-		return date.toLocaleDateString();
-	
-		// Fix the gmt time.
-/*
-		var gmt = new Date();
-		var offset = date.getTimezoneOffset() * 60000;
-		gmt = new Date(gmt.valueOf() + offset);
-				
-		var diff = gmt - date.valueOf();
-*/
-		var diff = Date.now() - date.valueOf();
-				
-		var d = '';
-		if ( diff < 60000 ) {
-		    // seconds
-		    d = Math.floor( diff / 1000 ) + 's';
-		} else if ( diff < 3600000) {
-		    // minutes
-		    d = Math.floor(diff / 60000 ) + 'm';
-		} else if ( diff < 86400000 ) {
-		    // hours
-		    d = Math.floor( diff / 3600000 ) + 'h';
-		} else {
-		    // days 
-		    d = Math.floor( diff / 86400000 ) + 'd';
-		}
-		
-		return d;
 	},
 	
 	showPost: function( evt ) {

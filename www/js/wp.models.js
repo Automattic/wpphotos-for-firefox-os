@@ -256,8 +256,6 @@ wp.models.Post = Backbone.Model.extend( {
 		'post_id': '',
 		'post_title': '',
 		'post_date_gmt': null,
-		'post_date': null,
-		'local_date': null,
 		'post_status': 'publish',
 		'link': '',
 		'terms_names': null,
@@ -272,10 +270,8 @@ wp.models.Post = Backbone.Model.extend( {
 			obj.link = wp.models.Post.GUID();
 		}
 
-		if( this.get( 'post_date' ) == null ) {
-			obj.post_date = new Date();
-			obj.post_date_gmt = new Date(); //new Date(obj.post_date.valueOf() - (obj.post_date.getTimezoneOffset() * 60000));
-			obj.local_date = new Date();
+		if( this.get( 'post_date_gmt' ) == null ) {
+			obj.post_date_gmt = new Date();
 		}
 
 		if ( this.get( 'blogkey' ) === '' ) {
@@ -301,14 +297,14 @@ wp.models.Post = Backbone.Model.extend( {
 		if( ( attr.post_thumbnail instanceof Array ) && ( attr.post_thumbnail.length === 0 ) ) {
 			attr.post_thumbnail = null;
 		}
-
-		if( attr.link && attr.link.indexOf( 'http' ) !== -1 ) {
-			if( attr.post_date_gmt ) {
-				var gmt = attr.post_date_gmt;
-				attr.local_date = new Date( gmt.valueOf() - ( gmt.getTimezoneOffset() * 60000 ) );
-			}
+		
+		if( attr.link && attr.link.indexOf( 'http' ) !== -1 && attr.post_date_gmt ) {
+			// The ISO date string returned by the xmlrpc api gets converted to a date object when parsed.
+			// However, the timezone offset is not considered and instead it is treated as having the system
+			// timezone offet. Make the necessary adjustment so the date is actually correct.
+			var gmt = attr.post_date_gmt;
+			attr.post_date_gmt = new Date( gmt.getTime() - ( gmt.getTimezoneOffset() * 60000 ) );
 		}
-
 		return attr;
 	},
 	
@@ -545,12 +541,15 @@ wp.models.Post = Backbone.Model.extend( {
 				obj[key] = dict[key];
 			}
 		}
-
+		
+		// Adjust the gmt date since we're going to loose the offset when parsed.
+		var gmt = this.post_date_gmt;
+		obj.post_date_gmt = new Date( gmt.getTime() + ( gmt.getTimezoneOffset() * 60000 ) );
+		
 		delete obj.blogkey;
 		delete obj.photo;
 		delete obj.pending_photo;
 		delete obj.link;
-		delete obj.local_date;
 		
 		return obj;
 	}
@@ -573,7 +572,7 @@ wp.models.Posts = Backbone.Collection.extend({
 		// Sorts the list from newest to oldest.
 		// Local drafts should always be first so we return the negative of the current date.
 		try{
-			return - post.get( 'local_date' ).valueOf();
+			return - post.get( 'post_date_gmt' ).valueOf();
 		} catch( e ) {
 			return 0;
 		}
