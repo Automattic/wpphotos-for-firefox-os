@@ -10,7 +10,7 @@ if( typeof wp === 'undefined' ) {
 }
 
 wp = _.extend( {
-	debug: true, 
+	debug: false,
 	
 	log: function() {
 		if ( ! wp.debug ) {
