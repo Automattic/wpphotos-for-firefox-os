@@ -312,38 +312,6 @@ wp.models.Post = Backbone.Model.extend( {
 		return attr;
 	},
 	
-	fetchRemoteMedia: function() {
-
-		var p = wp.promise();
-		var filter = {
-			number: 1,
-			parent_id: this.get( 'post_id' ),
-			mime_type: 'image/*'
-		};
-		
-		var rpc = wp.api.getMediaLibrary( filter );
-		var onSuccess = function() {
-			var res = rpc.result();
-			
-			if ( ( res instanceof Array ) && ( res.length > 0 ) ) {
-				// Clear pending media here just incase something bad happened during an upload.
-				this.set( { photo: res[0], pending_photo: null } ); 
-			}
-
-			var p1 = this.save();
-			p1.success( function() {
-				p.resolve();
-			} );
-			p1.fail( function() {
-				wp.log( 'Failed saving from remote media' );
-			} );
-		};
-		onSuccess = onSuccess.bind( this );
-		rpc.success( onSuccess );
-
-		return p;
-	},
-	
 	image: function() {
 		return this.get( 'pending_photo' ) || this.get( 'post_thumbnail' ) || this.get( 'photo' );
 	},
