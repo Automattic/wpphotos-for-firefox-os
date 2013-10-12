@@ -18,7 +18,6 @@ wp.views.EditorPage = wp.views.Page.extend( {
 		'click button.save': 'save',
 		'click button.back': 'goBack',
 		'click label': 'showEditor',
-		'click span': 'showEditor',
 		'click button.cancel': 'hideEditor',
 		'click button.done': 'updateText'
 	} ),
@@ -55,7 +54,7 @@ wp.views.EditorPage = wp.views.Page.extend( {
 	
 	showEditor: function( evt ) {
 		var btn;
-		var target = ( evt.target.nodeName === 'label' ) ? evt.target : evt.target.parentNode;
+		var target = evt.currentTarget;
 		var header = this.el.querySelector( 'header' );
 		header.innerHTML = target.querySelector( 'span' ).textContent;
 		
