@@ -85,7 +85,7 @@ wp.views.SitesPage = wp.views.Page.extend( {
 		var selected = this.el.querySelectorAll( '.selected' );
 		var first;
 		for ( var i = 0; i < selected.length; i++ ) {
-			var idx = parseInt( selected[i].getAttribute( 'data-blog-id' ) );
+			var idx = parseInt( selected[i].getAttribute( 'data-idx' ) );
 			var site = this.sites.at( idx );
 			site.save();
 			
