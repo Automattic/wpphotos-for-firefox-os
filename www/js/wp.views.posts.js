@@ -380,11 +380,24 @@ wp.views.Post = Backbone.View.extend( {
 			if( image.link.indexOf( 'data:image' ) === 0 ) {
 				// data url so don't use photon.
 				img.src = image.link;
+			} if ( wp.app.currentBlog.isPrivate() ) {
+				// We can't use photon with private blogs. 
+				// Try go grab a reasonably sized photo from the photo metadata.
+				// If that doesn't work, default to the image link. 
+				var file; 
+				try {
+					file = post.photo.metadata.sizes.medium.file;
+				} catch( ignore ){}
+				if ( file ) {
+					img.src = image.link.substr( 0, image.link.lastIndexOf('/') + 1 ) + file;
+				} else {
+					img.src = image.link;
+				}
+
 			} else {
-				// TODO: If private blog then do not use photon.
+				// Public blog, use photon to grab an image that will fit the alloted space.
 				img.src = 'http://i0.wp.com/' + image.link.replace( /.*?:\/\//g, '' ) + '?w=' + $( '.photo' ).width();
 			}
-
 		} else {
 			img.src = "";
 			// Hide image and caption if there is no image
@@ -395,7 +408,6 @@ wp.views.Post = Backbone.View.extend( {
 			var postBody = div.querySelector( '.post-content' );
 			postBody.className += ' noimage';
 		}
-		
 
 		//if local draft
 		var mask = div.querySelector( '.upload-mask' );

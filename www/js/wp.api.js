@@ -34,7 +34,7 @@ wp.api = {
 		];
 		
 		for ( var i = 0; i < arguments.length; i++ ) {
-			if ( arguments[i] === null ) {
+			if ( arguments[i] == null ) {
 				continue;
 			}
 

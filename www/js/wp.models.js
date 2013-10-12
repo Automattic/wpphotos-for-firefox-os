@@ -75,16 +75,24 @@ wp.models.Blog = Backbone.Model.extend( {
 			'large_size_h'
 		];
 
-		var promise = wp.api.getOptions( opts );
+		var promise = wp.api.getOptions();
 		var onSuccess = this.onGetOptionsSuccess.bind( this, promise );
 		var onFail = this.onGetOptionsFail.bind( this, promise );
 		promise.success( onSuccess );
 		promise.fail( onFail );
+		
+		return promise;
 	},
 	
 	onGetOptionsSuccess: function( promise ) {
-		wp.log( 'options success', promise.result() );
-		this.set( 'options', promise.result() );
+		var res = promise.result();
+		
+		for (var key in res ) {
+			wp.log( key, res[key] );
+		}
+		
+		wp.log( 'options success', res );
+		this.set( 'options', res );
 		this.save();
 	},
 	
@@ -93,9 +101,24 @@ wp.models.Blog = Backbone.Model.extend( {
 	},
 	
 	isWPCom: function() {
+		var options = this.get( 'options' );
+		
+		try {
+			return options.blog_public.value;
+		} catch(e){}
+		
 		// TODO: Check options instead of url.
 		var xmlrpc = this.get( 'xmlrpc' );
 		return ( xmlrpc.indexOf( 'wordpress.com' ) !== -1 );
+	},
+	
+	isPrivate: function() {
+		var options = this.get( 'options' );
+		try  {
+			return options['wordpress.com'].value;
+		} catch(e){}
+		
+		return false;
 	},
 	
 	/*
@@ -543,7 +566,7 @@ wp.models.Post = Backbone.Model.extend( {
 		}
 		
 		// Adjust the gmt date since we're going to loose the offset when parsed.
-		var gmt = this.post_date_gmt;
+		var gmt = this.get( 'post_date_gmt' );
 		obj.post_date_gmt = new Date( gmt.getTime() + ( gmt.getTimezoneOffset() * 60000 ) );
 		
 		delete obj.blogkey;
@@ -655,7 +678,6 @@ wp.models.Posts = Backbone.Collection.extend({
 	
 	_onMulticallSuccess: function( multicall, promise, collection, posts ) {
 		var res = multicall.result(); // should be an array of wp.getMediaLibrary responses.
-
 		for ( var i = 0; i < posts.length; i++ ) {
 			var post = posts[i];
 			var media;

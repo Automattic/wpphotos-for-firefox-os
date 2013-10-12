@@ -28,7 +28,7 @@ wp.app = _.extend( {
 	blogs: null, // collection
 	
 	init: function() {
-		_.bindAll( this, 'loadBlogs', 'blogsLoaded', 'hideLoadingIndicator' );
+		_.bindAll( this, 'loadBlogs', 'blogsLoaded', 'hideLoadingIndicator', 'authCurrentBlog', '_onAuthCurrentBlogAlways' );
 		
 		wp.nav.init();
 		
@@ -119,15 +119,40 @@ wp.app = _.extend( {
 		
 		// Clear the posts list since we changed blogs. Suppress change events since we're dispatching our own. 
 		this.posts.set( [], { silent: true } );
+
+		var promise = this.currentBlog.fetchRemoteOptions();
+		promise.always( this.authCurrentBlog );
+
+		this.showLoadingIndicator();
+	},
 		
+	// Try to authentiate to the current blog. Useful if the blog is private so we can 
+	// still load images.
+	authCurrentBlog: function() {
+		this.showLoadingIndicator();
+		
+		var headers = {'Content-type': 'application/x-www-form-urlencoded'};
+		var url = this.currentBlog.get( 'url' );
+		var uname = this.currentBlog.get( 'username')
+		var pwd = this.currentBlog.get( 'password');
+		var dec = CryptoJS.AES.decrypt( pwd, uname );
+		pwd = dec.toString( CryptoJS.enc.Utf8 );
+		var data = 'log=' + uname + '&pwd=' + pwd + '&redirect_to=' + url ;
+
+		url = url + "/wp-login.php";
+		
+		var xhr = wp.XHR.post( {'url': url, 'data': data, 'headers': headers} );
+		xhr.always( this._onAuthCurrentBlogAlways );
+	},
+	
+	_onAuthCurrentBlogAlways: function() {
+		this.hideLoadingIndicator();
 		this.trigger("currentBlogChanged");
 	},
 	
 	isNetworkAvailable: function() {
 		try {
-		
 			return ( window.navigator.mozConnection.bandwidth > 0 );
-		
 		} catch( ignore ) {}
 		
 		return false;
