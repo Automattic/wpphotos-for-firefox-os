@@ -196,6 +196,7 @@ x-appbar button:active {
 x-appbar header {
 	position: relative;
 	padding:0 5px;
+	height: 42px;
 	color: #fff;
 	font-size: 22px;
 	font-weight: lighter;
@@ -698,6 +699,7 @@ x-shiftbox > section {
 button.load-more {
 	width: 100%;
 	border: none;
+	background: none;
 	text-align: center;
 	line-height: 44px;
 	color: #fff;
