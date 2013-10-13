@@ -26,6 +26,7 @@ wp.app = _.extend( {
 	currentBlog: null, // model
 	posts: null, // collection
 	blogs: null, // collection
+	_loadingIndicatorCount: 0,
 	
 	init: function() {
 		_.bindAll( this, 'loadBlogs', 'blogsLoaded', 'hideLoadingIndicator', 'authCurrentBlog', '_onAuthCurrentBlogAlways' );
@@ -160,7 +161,7 @@ wp.app = _.extend( {
 	
 	showLoadingIndicator: function( msg ) {
 		msg = msg || _s( 'control-loading' );
-	
+		this._loadingIndicatorCount++;
 		// There can be only one! 
 		var loadingAlert = document.getElementById( 'loading-modal' );
 		if( loadingAlert ){
@@ -179,6 +180,11 @@ wp.app = _.extend( {
 	},
 	
 	hideLoadingIndicator: function() {
+		this._loadingIndicatorCount--;
+		if ( this._loadingIndicatorCount > 0 ) {
+			return;
+		} 
+		
 		var loadingAlert = document.getElementById( 'loading-modal' );
 		if ( loadingAlert != undefined ) {
 			document.body.removeChild( loadingAlert );

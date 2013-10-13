@@ -39,8 +39,8 @@ wp.views.SitesPage = wp.views.Page.extend( {
 	},
 	
 	updateButtons: function() {
-		var selectAllBtn = $( 'button.select-all' );
-		var addSelectedBtn = $( 'button.add-selected' );
+		var selectAllBtn = this.el.querySelector( 'button.select-all' );
+		var addSelectedBtn = this.el.querySelector( 'button.add-selected' );
 		var selected = this.el.querySelectorAll( '.selected' ).length;
 
 		addSelectedBtn.innerHTML = _s( 'control-add-selected' ) + ' (' + selected + ')';
@@ -105,8 +105,8 @@ wp.views.SitesPage = wp.views.Page.extend( {
 		wp.app.showLoadingIndicator();
 
 		var promise = wp.models.Posts.fetchRemote();
-		promise.success( _onAddSelectedSuccess );
-		promise.always( _onAddSelectedAlways );
+		promise.success( this._onAddSelectedSuccess );
+		promise.always( this._onAddSelectedAlways );
 
 	},
 	
