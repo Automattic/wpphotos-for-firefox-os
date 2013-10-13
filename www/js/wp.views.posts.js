@@ -351,6 +351,7 @@ wp.views.Post = Backbone.View.extend( {
 			captionEl.innerHTML = captionStr;
 		} else {
 			captionEl.className += ' hidden';
+			div.querySelector( '.photo' ).className += ' no-box-shadow';
 		}
 		
 		// Title 

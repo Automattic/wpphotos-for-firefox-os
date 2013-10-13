@@ -46,7 +46,6 @@ button {
 }
 
 h1 {
-	color: #eee;
 	font-family: OpenSansLight, Helvetica, sans-serif;
 	font-size: 2.2rem;
 	font-weight: normal;
@@ -87,10 +86,10 @@ textarea {
 button.push {
 	min-width: 100px;
 	margin: 15px auto 5px;
-	padding: 5px 10px;
+	padding: 4px 8px;
 	border: none;
 	border-radius: 3px;
-	font-size: 1.4rem;
+	font-size: 1.6rem;
 	line-height: 2.4rem;
 }
 
@@ -133,6 +132,10 @@ section.content {
 
 .hidden {
 	display:none !important;
+}
+
+.no-box-shadow {
+	box-shadow: 0px 0px 0px transparent !important;
 }
 
 x-modal {
@@ -180,7 +183,7 @@ x-appbar button {
 	border: none;
 	background-color: transparent;
 	color: #fff;
-	font: 24px/42px 'Noticons';
+	font: 30px/40px 'dashicons';
 	text-align: center;
 }
 
@@ -195,10 +198,10 @@ x-appbar button:active {
 
 x-appbar header {
 	position: relative;
-	padding:0 5px;
-	height: 42px;
+	padding:0 12px;
+	height: 44px;
 	color: #fff;
-	font-size: 22px;
+	font-size: 24px;
 	font-weight: lighter;
 	line-height: 42px;
 	text-align: left;
@@ -214,7 +217,9 @@ x-appbar header .logo {
 
 x-appbar header .logo:before {
 	content: '\f205'; /* WordPress logo */
-	margin-right: 5px;
+	position: relative;
+	top: -1px;
+	margin-right: 4px;
 	font: 32px/42px 'Noticons';
 	text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
 	vertical-align: middle;
@@ -224,9 +229,10 @@ x-appbar button.back:after {
 	content: '\f431'; /* chevron */
 	width:auto;
 	margin-top: 5px;
-	font: 34px/34px 'Noticons';
+	font: 32px/32px 'Noticons';
+	font-weight: bold;
 	transform: rotate(90deg);
-	transform-origin: 17px 17px 0;
+	transform-origin: 16px 16px 0;
 }
 
 x-appbar button.menu {
@@ -234,17 +240,24 @@ x-appbar button.menu {
 }
 
 x-appbar button.menu:after {
-	content: '\f419'; /* menu */
+	content: '\f228'; /* menu */
 	width: auto;
-	font: 20px/42px 'Noticons';
+	font: 20px/40px 'dashicons';
+	position: relative;
+	left: -6px;
+	top: -4px;
 }
 
 x-appbar button.add:after {
-	content: '\f102'; /* camera */
+	content: '\f132'; /* plus */
+	position: relative;
+	top: 1px;
 }
 
 x-appbar button.refresh:after {
-	content: '\f420'; /* refresh */
+	content: '\f113'; /* refresh */
+	position: relative;
+	top: -1px;
 }
 
 x-appbar button.refreshing:after {
@@ -257,18 +270,17 @@ x-appbar button.cancel:before {
 }
 
 x-appbar button.cancel:after {
-	content: '\f405'; /* x */
-	font-size: 30px;
+	content: '\f158'; /* x */
 }
 
 x-appbar button.done:after {
-	content: '\f418'; /* check mark */
-	font-size: 30px;
+	content: '\f147'; /* check mark */
+	font-size: 40px;
+	line-height: 44px;
 }
 
 x-appbar button.save:after {
-	content: '\f411'; /* pencil */
-	font-size: 30px;
+	content: '\f109'; /* pencil */
 }
 
 /*
@@ -331,7 +343,7 @@ x-appbar .force-right > *:before {
 .page-sites .content,
 .page-about .content,
 .page-settings .content {
-	padding: 44px 20px 5px;
+	padding: 44px 16px 4px;
 	min-height: 0;
 }
 
@@ -480,6 +492,10 @@ x-shiftbox > section {
 	box-shadow: -1px 0px 20px rgba(0, 0, 0, 0.5);
 }
 
+.page-posts x-appbar header {
+	padding-left: 8px;
+}
+
 .page-posts aside {
 	width: 100%;
 	height: 100%;
@@ -544,7 +560,7 @@ x-shiftbox > section {
 .page-posts .post .photo-btn {
 	display: block;
 	margin: 0;
-	padding: 0 10px;
+	padding: 0 8px;
 	border: none;
 	background: none;
 }
@@ -555,15 +571,15 @@ x-shiftbox > section {
 
 .page-posts .post {
 	position: relative;
-	margin-bottom: 10px;
-	padding-bottom: 10px;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
 	background-color: #fff;
 }
 
 .page-posts .photo {
 	position: relative;
 	z-index: 10;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 	background-color: #fff;
 	box-shadow: 0 0 1px #999 inset;
 }
@@ -575,7 +591,7 @@ x-shiftbox > section {
 
 .page-posts .photo-box {
 	position: relative;
-	min-height: 175px;
+	min-height: 176px;
 }
 
 .page-posts .photo-shadow {
@@ -583,7 +599,7 @@ x-shiftbox > section {
 	top: 0;
 	left: 0;
 	right: 0;
-	bottom: 2px;
+	bottom: 3px;
 	box-shadow: 0px 0px 1px #999 inset;
 	z-index: 10px;
 }
@@ -591,13 +607,14 @@ x-shiftbox > section {
 .page-posts .photo .caption {
 	font-size: 10pt;
 	color: #999;
-	padding: 10px;
+	padding: 8px;
+	padding-top: 5px;
 	font-family: OpenSansLight;
 }
 
 .page-posts .post .post-title {
 	margin: 0;
-	padding: 0 0 5px;
+	padding: 0 0 4px;
 	color: #999;
 	font-size: 16pt;
 	font-family: OpenSansLight;
@@ -614,7 +631,7 @@ x-shiftbox > section {
 }
 
 .page-posts .post .post-date {
-	padding: 5px 0;
+	padding: 4px 0;
 	color: #ddd;
 	font-size: 10pt;
 }
@@ -719,12 +736,12 @@ button.load-more:active {
 }
 
 .page-about .content header {
-	margin-top: 10px;
+	margin-top: 12px;
 	text-align: center;
 }
 
 .page-about .content section {
-	padding-bottom: 10px;
+	padding-bottom: 12px;
 	text-align: center;
 }
 
@@ -735,11 +752,15 @@ button.load-more:active {
 }
 
 .page-about #tos {
-	margin-top:30px;
+	display: block;
+	min-width: 160px;
+	margin-top:32px;
 }
 
 .page-about #privacy {
-	margin-bottom:30px;
+	display: block;
+	min-width: 160px;
+	margin-bottom:24px;
 }
 
 .page-about h1 {
@@ -763,7 +784,7 @@ button.load-more:active {
 .page-about ul li {
 	opacity: 0;
 	margin: 0;
-	padding: 0 0 6px 0;
+	padding: 0 0 4px 0;
 	-moz-animation:fade-in 2s linear; 
 	-moz-animation-fill-mode:forwards;
 }
@@ -789,7 +810,7 @@ button.load-more:active {
 
 .page-settings #settings-version {
 	position: absolute;
-	right: 10px;
+	right: 8px;
 }
 
 .page-settings ul {
@@ -804,13 +825,13 @@ button.load-more:active {
 .page-settings .bloglist li div {
 	position: relative;
 	height: 42px;
-	padding: 0 10px;
+	padding: 0 8px;
 	border: none;
 	border-radius: 3px;
 	background-color: #eee;
 	color: #464646;
 	font-family: OpenSans, Helvetica, sans-serif;
-	font-size: 1.5rem;
+	font-size: 1.6rem;
 	font-weight: normal;
 	line-height: 42px;
 	text-shadow: 0 1px 0 rgba(255,255,255,1);
@@ -829,13 +850,13 @@ button.load-more:active {
 	content: '\f431'; /* chevron */
 	display: inline-block;
 	position: absolute;
-	right: 0px;
-	top: 6px;
+	right: 4px;
+	top: 4px;
 	width:30px;
 	background: none;
-	font: 30px/30px 'Noticons';
+	font: 32px/32px 'Noticons';
 	transform: rotate(-90deg);
-	transform-origin: 15px 15px 0;
+	transform-origin: 16px 16px 0;
 	vertical-align: top;
 }
 
@@ -872,7 +893,7 @@ button.load-more:active {
 
 .bloglist li span {
 	display: block;
-	margin-right:40px;
+	margin-right: 40px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -880,13 +901,13 @@ button.load-more:active {
 
 .page-settings .bloglist li button {
 	position: absolute;
-	top:0;
-	right:0;
+	top: 0;
+	right: 4px;
 	height: 42px;
-	width: 36px;
+	width: 32px;
 	padding: 0;
 	border: none;
-	background:none;
+	background: none;
 }
 
 .page-settings .bloglist li button:before {
@@ -895,7 +916,7 @@ button.load-more:active {
 	border: none;
 	background: none;
 	color: #d54e21;
-	font: 30px/30px 'Noticons';
+	font: 32px/32px 'Noticons';
 }
 
 .page-settings .bloglist li button:active:before {
@@ -921,7 +942,7 @@ button.load-more:active {
 }
 
 .page-settings .content section {
-	margin-bottom:30px;
+	margin-bottom:24px;
 }
 .page-settings .content section h2 {
 	margin-bottom: 1rem;
@@ -958,7 +979,7 @@ button.load-more:active {
 	position: relative;
 	display: block;
 	background-color: #fff;
-	margin:10px;
+	margin:8px 8px 0;
 }
 
 .page-editor .photo img {
@@ -972,16 +993,15 @@ button.load-more:active {
 
 .page-editor .post-body {
 	color: rgb(34,34,34);
-	margin: 0 10px 10px;
+	margin: 0 8px 8px;
 }
 
 .page-editor .textlabel:before {
 	content: '\f411';
 	background: none;
 	display: inline-block;
-	font: 24px/30px 'Noticons';
+	font: 24px/24px 'Noticons';
 	color: #999;
-	width: 24px;
 	vertical-align: top;
 }
 
@@ -989,13 +1009,13 @@ button.load-more:active {
 .page-editor .textfield {
 	background-color: #fff;
 	font-family: OpenSans, Helvetica, arial, sans-serif;
-	font-size: 1.4rem;
-	line-height: 2.5rem;
+	font-size: 1.6rem;
+	line-height: 2.4rem;
 }
 
 .page-editor .textlabel {
 	display: block;
-	padding: 10px;
+	padding: 8px;
 	color: #999;
 	margin-bottom:1px;
 }
