@@ -89,7 +89,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		for( var i = 0; i < wp.app.blogs.length; i++ ) {
 			var blog = wp.app.blogs.at( i );
 			var cls = 'menu-item';
-			if ( blog === wp.app.currentBlog ) {
+			if ( blog.xmlrpc === wp.app.currentBlog.xmlrpc ) {
 				cls += ' current-blog';
 			}
 			html += '<li class="' + cls + '" data-idx="' + i + '">' + blog.get( 'blogName' ) + '</li>';
