@@ -394,7 +394,7 @@ wp.models.Post = Backbone.Model.extend( {
 		var onProgress = this._onUploadProgress.bind( this );
 		var onFail = this.onErrorSaving.bind( this );
 		
-		promise.success( onSucess );
+		promise.success( onSuccess );
 		promise.progress( onProgress);
 		promise.fail( onFail );
 
