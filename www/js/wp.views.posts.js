@@ -24,7 +24,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	events: _.extend( {
 		'click button.add'      : 'showEditor',
 		'click button.settings' : 'showSettings',
-		'click button.logo'     : 'showAbout',
 		'click button.menu'     : 'toggleMenu',
 		'click button.refresh'  : 'sync',
 		'click li.menu-item'    : 'switchBlog',
@@ -47,7 +46,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	},
 	
 	render: function() {
-
 		// Ensure that no loading spinner is showing
 		wp.app.hideLoadingIndicator();
 		
@@ -137,7 +135,7 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	
 	// Refresh the post list. 
 	refresh: function() {
-		var promise = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id } } );
+		var promise = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id }, 'silent':true } );
 		var onSuccess = this._onRefreshSuccess.bind( this );
 		var onFail = this._onRefreshFail.bind( this, promise );
 		promise.success( onSuccess );
@@ -167,7 +165,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	
 	// Fetches the latest posts from the remote server and removes oldest posts from the database.
 	sync: function( event, loadMore ) {
-
 		if( ! wp.app.isNetworkAvailable() ) {
 			alert( _s( 'prompt-network-missing' ) );
 			return;
@@ -238,13 +235,12 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	},
 	
 	showEditor: function() {
-		
 		try {
 			if( typeof MozActivity === 'undefined' ) {
 				wp.nav.push( 'editor' );
 				return;
 			}
-			
+
 			// Start a Moz picker activity for the user to select an image to upload
 			// either from the gallery or the camera. 
 			var activity = new MozActivity( {
@@ -273,10 +269,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	
 	_onPickError: function() {
 		wp.log( 'There was an error picking an image with the picker.' );
-	},
-
-	showAbout: function() {
-		wp.nav.push( 'about', 'coverUp' );
 	},
 	
 	showSettings: function() {
@@ -381,7 +373,7 @@ wp.views.Post = Backbone.View.extend( {
 			if( image.link.indexOf( 'data:image' ) === 0 ) {
 				// data url so don't use photon.
 				img.src = image.link;
-			} if ( wp.app.currentBlog.isPrivate() ) {
+			} else if ( wp.app.currentBlog.isPrivate() ) {
 				// We can't use photon with private blogs. 
 				// Try go grab a reasonably sized photo from the photo metadata.
 				// If that doesn't work, default to the image link. 
@@ -453,6 +445,10 @@ wp.views.Post = Backbone.View.extend( {
 	},
 	
 	upload: function() {
+		if( ! wp.app.isNetworkAvailable() ) {
+			alert( _s( 'prompt-network-missing' ) );
+			return;
+		}
 		this.model.uploadAndSave();		
 	},
 	
