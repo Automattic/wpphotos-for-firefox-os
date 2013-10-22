@@ -102,12 +102,10 @@ wp.models.Blog = Backbone.Model.extend( {
 	
 	isWPCom: function() {
 		var options = this.get( 'options' );
-		
 		try {
-			return options.blog_public.value;
+			return options['wordpress.com'].value;
 		} catch(e){}
 		
-		// TODO: Check options instead of url.
 		var xmlrpc = this.get( 'xmlrpc' );
 		return ( xmlrpc.indexOf( 'wordpress.com' ) !== -1 );
 	},
@@ -115,7 +113,7 @@ wp.models.Blog = Backbone.Model.extend( {
 	isPrivate: function() {
 		var options = this.get( 'options' );
 		try  {
-			return options['wordpress.com'].value;
+			return options.blog_public.value;
 		} catch(e){}
 		
 		return false;
@@ -356,7 +354,7 @@ wp.models.Post = Backbone.Model.extend( {
 
 		this.upload_promise = wp.promise();
 		
-		if ( ! this.get(' pending_photo' ) ) {
+		if ( ! this.get( 'pending_photo' ) ) {
 			// No photo provided, and no photo pending.  This could be an interrupted save. 
 			this._saveRemote();
 		} else {
@@ -375,6 +373,8 @@ wp.models.Post = Backbone.Model.extend( {
 		
 		var pending_photo = this.get( 'pending_photo' );
 		if( ! pending_photo ) {
+			// TODO: Delete the local post?
+			this.onErrorSaving();
 			return;
 		}
 		
