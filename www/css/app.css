@@ -88,6 +88,14 @@ textarea:active {
 	background-color: #fff;
 }
 
+a:focus {
+	outline:none;
+}
+
+button::-moz-focus-inner {
+	border: 0;
+}
+
 button.push {
 	min-width: 100px;
 	margin: 15px auto 5px;
