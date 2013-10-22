@@ -74,6 +74,7 @@ input[type="password"] {
 }
 
 textarea {
+	margin: 0;
 	padding: 10px;
 	overflow: hidden;
 	border: none;
@@ -81,6 +82,10 @@ textarea {
 	font-size: 1.4rem;
 	line-height: 2.5rem;
 	resize: none;
+}
+
+textarea:active {
+	background-color: #fff;
 }
 
 button.push {
@@ -203,7 +208,7 @@ x-appbar header {
 	color: #fff;
 	font-size: 24px;
 	font-weight: lighter;
-	line-height: 42px;
+	line-height: 44px;
 	text-align: left;
 	vertical-align: middle;
 }
@@ -218,9 +223,9 @@ x-appbar header .logo {
 x-appbar header .logo:before {
 	content: '\f205'; /* WordPress logo */
 	position: relative;
-	top: -1px;
+	top: 1px;
 	margin-right: 4px;
-	font: 32px/42px 'Noticons';
+	font: 32px/44px 'Noticons';
 	text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
 	vertical-align: middle;
 }
@@ -228,7 +233,7 @@ x-appbar header .logo:before {
 x-appbar button.back:after {
 	content: '\f431'; /* chevron */
 	width:auto;
-	margin-top: 5px;
+	margin-top: 3px;
 	font: 32px/32px 'Noticons';
 	font-weight: bold;
 	transform: rotate(90deg);
@@ -441,6 +446,11 @@ x-appbar .force-right > *:before {
 }
 
 /* sites page */
+
+.page-sites h1 {
+	color: #fff;
+	text-shadow: none;
+}
 
 .page-sites button.add-selected {
 	position: absolute;
