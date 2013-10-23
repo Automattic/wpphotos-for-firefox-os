@@ -306,7 +306,7 @@ x-appbar .force-right {
 	top: 0;
 	margin: 0;
 	padding: 0;
-	background-color: none;
+	background-color: transparent;
 	font-size: 0;
 }
 
@@ -546,7 +546,7 @@ x-shiftbox > section {
 
 .page-posts .menu-item {
 	display: block;
-	margin: none;
+	margin: 0;
 	height: 44px;
 	padding: 0 44px 0 10px;	
 	color: rgb(221, 221, 221);
@@ -619,7 +619,7 @@ x-shiftbox > section {
 	right: 0;
 	bottom: 3px;
 	box-shadow: 0px 0px 1px #999 inset;
-	z-index: 10px;
+	z-index: 10;
 }
 
 .page-posts .photo .caption {
@@ -736,7 +736,7 @@ button.load-more {
 	border: none;
 	background: none;
 	text-align: center;
-	line-height: 44px;
+	line-height: 66px;
 	color: #fff;
 	font-size: 2rem;
 }
@@ -745,6 +745,10 @@ button.load-more:active {
 	background-color: rgb(46, 162, 204);
 }
 
+button.load-more[disabled] {
+	background: none !important;
+	color: #e0e0e0;
+}
 
 /* about page */
 
@@ -920,9 +924,9 @@ button.load-more:active {
 .page-settings .bloglist li button {
 	position: absolute;
 	top: 0;
-	right: 4px;
+	right: 0;
 	height: 42px;
-	width: 32px;
+	width: 34px;
 	padding: 0;
 	border: none;
 	background: none;
@@ -942,7 +946,7 @@ button.load-more:active {
 }
 
 .page-settings .bloglist li button:active {
-	background-color: #f1831e;
+	background-color: #d54e21;
 }
 
 .page-publish-settings ul {
@@ -1110,12 +1114,12 @@ button.load-more:active {
 	Brought to you by a merry band of mobile engineers.
 	Apply for Automattic at automattic.com/work-with-us */
 
-.page-posts section.load-more:after {
+.page-posts section.load-more .infinity {
 	content: "∞";
 	display: block;
 	width: 100%;
-	height: 10rem;
-	line-height: 10rem;
+	height: 66px;
+	line-height: 66px;
 	text-align: center;
 	font-size: 4rem;
 	font-weight: lighter;
