@@ -34,14 +34,13 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		this.posts = wp.app.posts;
 		
 		this.listenTo( wp.app, 'currentBlogChanged', this.onBlogChanged );
+		this.listenTo( wp.app, 'currentBlogChanging', this.onBlogChanging );
 		this.listenTo( this.posts, 'selected', this.viewPost );
 		this.listenTo( this.posts, 'add', this.render );
 		this.listenTo( this.posts, 'remove', this.render );
 				
 		if ( this.posts.length === 0 ) {
 			this.refresh();
-		} else {
-			this.render();
 		}
 	},
 	
@@ -79,6 +78,8 @@ wp.views.PostsPage = wp.views.Page.extend( {
 			content.appendChild( view.el );
 		}
 		
+		this.showLoadMore( this.hasMoreContent );
+		
 		scroll.scrollTop = scrollTop;
 	},
 	
@@ -113,9 +114,16 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		}
 	},
 
-	onBlogChanged: function() {
-		this.render();
+	onBlogChanging: function() {
+		var content = this.el.querySelector( '.content' );
+		content.innerHTML = '';
+		$( '.refresh' ).addClass( 'refreshing' );
+		this.showLoadMore( false );
+	},
 
+	onBlogChanged: function() {
+		this.hasMoreContent = true;
+		$( '.refresh' ).removeClass( 'refreshing' );
 		this.syncedonce = false;
 		this.refresh();
 	},
@@ -170,6 +178,14 @@ wp.views.PostsPage = wp.views.Page.extend( {
 			return;
 		}
 		
+		// Don't sync while we're uploading a post
+		for ( var i = 0; i < this.posts.length; i++ ) {
+			var post = this.posts.at( i );
+			if ( post.isSyncing() ) {
+				return; 
+			}
+		}
+		
 		if ( this.syncing ) {
 			return;
 		}
@@ -178,6 +194,12 @@ wp.views.PostsPage = wp.views.Page.extend( {
 
 		this.syncing = true;
 		this.loadingMore = loadMore || false;
+
+		var loadmoreBtn = this.el.querySelector( 'button.load-more' );
+		if ( this.loadingMore ) {
+			loadmoreBtn.innerHTML = _s( 'control-loading' );
+		}
+		loadmoreBtn.setAttribute( 'disabled', 'disabled' );
 
 		var offset = this.loadingMore ? this.posts.length : null;
 		var promise = wp.models.Posts.fetchRemote( offset );
@@ -204,7 +226,6 @@ wp.views.PostsPage = wp.views.Page.extend( {
 				this.hasMoreContent = false;
 			}
 		}
-		this.showLoadMore( this.hasMoreContent );
 		this.refresh();
 	},
 	
@@ -227,6 +248,10 @@ wp.views.PostsPage = wp.views.Page.extend( {
 		this.syncing = false;
 		this.loadingMore = false;
 		$( '.refresh' ).removeClass( 'refreshing' );
+		
+		var loadmoreBtn = this.el.querySelector( 'button.load-more' );
+		loadmoreBtn.innerHTML = _s( 'control-load-more' );
+		loadmoreBtn.removeAttribute( 'disabled' );
 	},
 	
 	// Load more posts from the remote server.
@@ -273,15 +298,25 @@ wp.views.PostsPage = wp.views.Page.extend( {
 	
 	showSettings: function() {
 		this.toggleMenu();
-		wp.nav.push('settings', 'coverUp');
+		wp.nav.push( 'settings', 'coverUp' );
 	},
 	
 	showLoadMore: function( bool ) {
-		var btn = this.el.querySelector('button.load-more');
+		var btn = this.el.querySelector( 'button.load-more' );
+		var inf = this.el.querySelector( '.infinity' );
+		
+		if ( this.posts.length == 0 ) {
+			$( btn ).addClass( 'hidden' );
+			$( inf ).addClass( 'hidden' );
+			return;
+		}
+
 		if ( bool ) {
 			$( btn ).removeClass( 'hidden' );
+			$( inf ).addClass( 'hidden' );
 		} else {
 			$( btn ).addClass( 'hidden' );
+			$( inf ).removeClass( 'hidden' );
 		}
 	}
 	
