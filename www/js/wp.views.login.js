@@ -9,6 +9,8 @@
 wp.views.LoginPage = wp.views.Page.extend( {
 	template_name: 'login',
 	
+	fallback: false,
+	
 	events: _.extend( {
 		'click button.login': 'performLogin',
 		'click button.back': 'goBack',
@@ -50,7 +52,9 @@ wp.views.LoginPage = wp.views.Page.extend( {
 		}
 	},
 	
-	performLogin: function() {
+	performLogin: function( fallback ) {
+		this.fallback = fallback || false;
+		
 		var username = $( '#username' ).val();
 		var password = $( '#password' ).val();
 		var url = $( '#url' ).val();
@@ -63,6 +67,10 @@ wp.views.LoginPage = wp.views.Page.extend( {
 		
 		// if all's good. 
 		url = wp.views.normalizeUrl( url );
+		
+		if ( ! fallback ) {
+			url = 'https://' + url.split( '//' )[1];
+		}
 		
 		if( ! wp.app.isNetworkAvailable() ) {
 			alert( _s( 'prompt-network-missing' ) );
@@ -80,7 +88,7 @@ wp.views.LoginPage = wp.views.Page.extend( {
 	},
 	
 	validateField: function( field ) {
-		if ( field != '' ) {
+		if ( field.trim() != '' ) {
 			return true;
 		}
 		return false;
@@ -96,6 +104,11 @@ wp.views.LoginPage = wp.views.Page.extend( {
 	},
 	
 	onLoginFail: function( promise ) {
+		if ( ! this.fallback ) {
+			this.performLogin( true );
+			return;
+		}
+	
 		wp.app.hideLoadingIndicator();
 		
 		var result = promise.result();
@@ -116,8 +129,16 @@ wp.views.LoginPage = wp.views.Page.extend( {
 		var blogs = promise.result(); // Result is a blogs collection
 		
 		if ( blogs.length === 0 ) {
+			wp.app.hideLoadingIndicator();
 			alert( _s( 'prompt-no-blogs' ) );
 			return;
+		}
+		
+		if ( ! this.fallback ) {
+			for ( var i = 0; i < blogs.length; i++ ) {
+				var blog = blogs.at( i );
+				blog.set( 'ssl', true );
+			}
 		}
 		
 		if ( blogs.length > 1 ) {

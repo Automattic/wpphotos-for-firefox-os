@@ -37,7 +37,8 @@ wp.models.Blog = Backbone.Model.extend( {
 		blogName: '',
 		url: '',
 		xmlrpc: '',
-		options: []
+		options: [],
+		ssl: false
 	},
 	
 	initialize: function( attributes, options ) {
@@ -117,6 +118,22 @@ wp.models.Blog = Backbone.Model.extend( {
 		} catch(e){}
 		
 		return false;
+	},
+	
+	apiURL: function() {
+		var ssl = this.get( 'ssl' );
+		var xmlrpc = this.get( 'xmlrpc' );
+		if (this.isWPCom() || ssl ) {
+			return 'https://' + xmlrpc.split( '//' )[1];
+		}
+		
+		return xmlrpc;
+	},
+	
+	getAPIDict: function() {
+		var attrs = this.attributes;
+		attrs.xmlrpc = this.apiURL();
+		return attrs;
 	},
 	
 	/*
