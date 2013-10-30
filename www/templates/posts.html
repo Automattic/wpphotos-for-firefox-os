@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width" />
-    <title data-l10n-id="title-wordpress">WordPress</title>
-    <link rel="stylesheet" href="../css/app.css" />
-  </head>
-  <body>
-	<div id="background"></div>
-  	<div id="stage">
-		<div id="template">
-			<div class="page page-posts">
-				<header>
-					<button class="settings left"></button>
-					<button class="logo" data-l10n-id="title-photos">pHotos</button>
-					<button class="add right"></button>
-				</header>
-				<div class="scroll">
-					<div class="iscroller">
-						<div class="pull-down">
-							<span class="scroll-refresh-label">Pull down to refresh...</span>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width" />
+		<title data-l10n-id="title-wordpress">WordPress</title>
+		<link rel="stylesheet" href="../css/app.css" />
+	</head>
+	<body>
+		<div id="stage">
+			<div id="template">
+		
+				<x-shiftbox class="page page-posts">
+					<section>
+						<x-appbar>
+							<button class="menu"></button>
+							<header><h1 class="logo" data-l10n-id="title-photos">pHotos</h1></header>
+							<div class="force-right">
+								<button class="refresh "></button>
+								<button class="add"></button>
+							</div>
+						</x-appbar>
+						<div class="scroll">
+							<section class="content"></section>
+							<section class="load-more">
+								<button class="load-more hidden" data-l10n-id="control-load-more">lOad More</button>
+								<div class="infinity hidden">∞</div>
+							</section>
 						</div>
-						<section class="content">
-						</section>
-					</div>
-				</div>
+					</section>
+					<aside>
+						<ul class="blog-list"></ul>
+						<button class="settings menu-item" data-l10n-id="control-settings">sEttings</button>
+					</aside>
+				</x-shiftbox>
 			</div>
 		</div>
-  	</div>
-  </body>
+	</body>
 </html>

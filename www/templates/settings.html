@@ -1,75 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width" />
-    <title data-l10n-id="title-wordpress">WordPress</title>
-    <link rel="stylesheet" href="../css/app.css" />       
-  </head>
-  <body>
-	<div id="background"></div>
-  	<div id="stage">
-		<div id="template">
-			<div class="page page-settings">
-				<div class="scroll">
-					<header>
-						<button class="back left"></button>
-					</header>
-					<section class="content">
-						<h1 data-l10n-id="title-settings">sEttings</h1>
-						<section>
-							<h2 data-l10n-id="title-blogs">bLogs</h2>
-							<div class="bloglist"> 
-								<ul>
-<!--
-									<li class="list-button dropdown"><span>Blog name </span><span><button>X</button></span></li>
-									<li class="list-button dropdown selected"><span>Blog name </span><span><button>X</button></span></li>
-									<li class="list-button dropdown"><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name asdf asdfasd fasdf asdfa sdfasd fasdf asdfasdf asdfa sdfasdf asdfa sdfas dfasf asdfa sfasfa sdf </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
-									<li><span>Blog name </span><span><button>X</button></span></li>
--->
-								</ul>
-							</div>
-							<button id="settings-add" class="blue small" data-l10n-id="control-add">Add Existing</button>
-							<button id="settings-create" class="small" data-l10n-id="control-create">Create New Blog</button>
-						</section>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width" />
+		<title data-l10n-id="title-wordpress">WordPress</title>
+		<link rel="stylesheet" href="../css/app.css" />
+	</head>
+	<body>
+		<div id="stage">
+			<div id="template">
+				<div class="page page-settings">
+					<x-appbar>
+						<button class="back"></button>
+						<header data-l10n-id="title-settings">sEttings</header>
+					</x-appbar>
+					<div class="scroll">
+						<section class="content">
+							<section>
+								<h2 data-l10n-id="title-blogs">sItes</h2>
+								<div class="bloglist"> 
+									<ul></ul>
+								</div>
+								<button id="settings-add" class="blue push" data-l10n-id="control-add">aDd Existing</button>
+								<button id="settings-create" class="black push" data-l10n-id="control-create">cReate New</button>
+							</section>
 						
-						<section>
-						<h2 data-l10n-id="title-publish-settings">pUblish Settings</h2>
-							<ul>
-								<li id="settings-publish-settings" data-l10n-id="" class="list-button dropdown">cUrrent Settings</li>
-							</ul>
-<!--
-							<x-select-list data-fade-duration="500" data-multi-select="true">
-								<h3>Publish Settings</h3>
+							<section>
+								<h2 data-l10n-id="title-publish-settings">pUblish Settings</h2>
 								<ul>
-									<li>Always Ask</li>
-									<li>Publish Immediately</li>
-									<li>Publish Later</li>
+									<li id="settings-publish-settings" data-l10n-id="" class="list-button disclosure">cUrrent Settings</li>
 								</ul>
-							</x-select-list>
--->
+							</section>
+
+							<section>
+								<h2 data-l10n-id="title-app">aPp Info</h2>
+								<ul>
+									<li id="settings-about" data-l10n-id="label-about" class="list-button disclosure">aBout</li>
+									<li data-l10n-id="label-version">vErsion<span id="settings-version"></span></li>
+<!-- 									<li id="settings-reset" data-l10n-id="label-reset">rEset App</li> -->
+								</ul>
+							</section>					
 						</section>
-						
-						<section>
-							<h2 data-l10n-id="title-app">aPp</h2>
-							<ul>
-								<li id="settings-about" data-l10n-id="label-about" class="list-button">aBout</li>
-<!-- 								<li id="settings-reset" data-l10n-id="label-reset">rEset App</li> -->
-							</ul>
-						</section>					
-					</section>
+					</div>
 				</div>
 			</div>
-	  	</div>
-  	</div>
-  </body>
+		</div>
+	</body>
 </html>

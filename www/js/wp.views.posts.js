@@ -5,496 +5,493 @@
 */
 
 "use strict";
-document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-wp.views.PostsPage = wp.views.Page.extend({
-	template_name:"posts",
+
+wp.views.PostsPage = wp.views.Page.extend( {
+	template_name: 'posts',
 	
-	syncedonce:false, // Have we tried to sync at least once?
+	syncedonce: false, // Have we tried to sync at least once?
 	
-	syncing:false,
+	syncing: false,
 	
-	rendered:false,
+	loadingMore: false,
 	
-	dragging:false,
+	hasMoreContent: true,
 	
-	events:_.extend({
-		"click button.add": "showEditor",
-		"click button.settings": "showSettings",
-		"click button.logo" : "showAbout",
-		"click div.blog-title" : "showPicker"
-	}),
+	rendered: false,
 	
-	initialize:function() {
+	dragging: false,
+	
+	events: _.extend( {
+		'click button.add'      : 'showEditor',
+		'click button.settings' : 'showSettings',
+		'click button.menu'     : 'toggleMenu',
+		'click button.refresh'  : 'sync',
+		'click li.menu-item'    : 'switchBlog',
+		'click button.load-more' : 'loadMore'
+	} ),
+	
+	initialize: function() {
 		this.posts = wp.app.posts;
 		
-		this.listenTo(wp.app, 'currentBlogChanged', this.onBlogChanged);
-		this.listenTo(this.posts, "selected", this.viewPost);
-		this.listenTo(this.posts, "add", this.render);
-		this.listenTo(this.posts, "remove", this.render);
+		this.listenTo( wp.app, 'currentBlogChanged', this.onBlogChanged );
+		this.listenTo( wp.app, 'currentBlogChanging', this.onBlogChanging );
+		this.listenTo( this.posts, 'selected', this.viewPost );
+		this.listenTo( this.posts, 'add', this.render );
+		this.listenTo( this.posts, 'remove', this.render );
 				
-		if(this.posts.length == 0) {
+		if ( this.posts.length === 0 ) {
 			this.refresh();
-		} else {
-			this.render();
-		};
+		}
 	},
 	
-	render:function() {
-
+	render: function() {
 		// Ensure that no loading spinner is showing
 		wp.app.hideLoadingIndicator();
 		
-		if(!this.rendered) {
+		if( ! this.rendered ) {
 			this.rendered = true;
 
 			var template = wp.views.templates[this.template_name].text;
 	
 			// update the dom.
 			this.$el.html( template );
-						
-			var el = this.$el.find(".scroll")[0];
 
-			var self = this;
-			var refreshOffset = 30;
-			this.iscroll = new iScroll(el, {
-				useTransition: true,
-				hScroll:false,
-				vScroll:true,
-				hScrollbar:false,
-				vScrollbar:false,
-				fixedScrollbar:true,
-				fadeScrollbar:false,
-				hideScrollbar:false,
-				bounce:true,
-				momentum:true,
-				lockDirection:true,
-				topOffset: refreshOffset,
-				onRefresh: function () {
-					var $el = $(el);
-					if ($el.hasClass("pulling")) $el.removeClass("pulling");
-					if ($el.hasClass("loading")){
-						$el.removeClass("loading");
-						$el.find(".scroll-refresh-label").text(_s("control-pull-to-refresh"));
-					};
-				},
-				onScrollMove: function () {
-					self.dragging = true;
-					var $el = $(el);
-					$el.addClass("pulling");
-					if (this.y > 5 && !$el.hasClass("flip")){
-						$el.addClass("flip");
-						$el.find(".scroll-refresh-label").text(_s("control-release-to-refresh"));
-						this.minScrollY = 0;
-					} else if (this.y < 5 && $el.hasClass("flip")) {
-						$el.removeClass("flip");
-						$el.find(".scroll-refresh-label").text(_s("control-pull-to-refresh"));
-						this.minScrollY = -refreshOffset;
-					};
-				},
-				onScrollEnd: function () {
-					self.dragging = false;
-					var $el = $(el);
-					$el.removeClass("pulling");
-					if ($el.hasClass("flip")) {
-						$el.removeClass("flip");
-						$el.addClass("loading");
-						$el.find(".scroll-refresh-label").text(_s("control-loading"));
-						self.sync();
-					};
-				}
-			});
-
-			// Need to refresh once we're added to the dom. Since we don't have a good way 
-			// to detect that, use a timeer.
-			setTimeout(function(){
-				self.iscroll.refresh();
-			}, 20);
-			
-		};
-
-		var collection = this.posts;
-		var content = this.el.querySelector(".content");
-		content.innerHTML = "";
+		}
 		
-		if (wp.app.blogs.length > 1) {
-			// Show the blog picker :)
-			
-			var pel = document.createElement("div");
-			pel.className = "blog-title";
-			pel.innerHTML = wp.app.currentBlog.get("blogName");
-			
-			content.appendChild(pel);
-		};
-		
-		for(var i = 0; i < collection.length; i++) {
-			var post = collection.at(i);
-			var view = new wp.views.Post({model:post});
-			content.appendChild(view.el);
-		};
-
-		this.iscroll.refresh();
+		this.renderMenu();
+		this.renderPosts();
 		
 		return this;
 	},
 	
-	onBlogChanged:function() {
-		this.render();
+	renderPosts: function() {
+		var collection = this.posts;
+		var content = this.el.querySelector( '.content' );
+		var scroll = this.el.querySelector( '.scroll' );
+		var scrollTop = scroll.scrollTop;
 		
+		content.innerHTML = '';
+
+		for( var i = 0; i < collection.length; i++ ) {
+			var post = collection.at(i);
+			var view = new wp.views.Post( { 'model': post } );
+			content.appendChild( view.el );
+		}
+		
+		this.showLoadMore( this.hasMoreContent );
+		
+		scroll.scrollTop = scrollTop;
+	},
+	
+	renderMenu: function() {
+		var html = '';
+		for( var i = 0; i < wp.app.blogs.length; i++ ) {
+			var blog = wp.app.blogs.at( i );
+			var cls = 'menu-item';
+			if ( blog.get( 'xmlrpc' ) === wp.app.currentBlog.get( 'xmlrpc' ) ) {
+				cls += ' current-blog';
+			}
+			html += '<li class="' + cls + '" data-idx="' + i + '">' + blog.get( 'blogName' ) + '</li>';
+		}
+    
+		this.el.querySelector( '.blog-list' ).innerHTML = html;
+	},
+	
+	switchBlog: function( event ) {
+		try {
+			var el = event.target;
+			var idx = parseInt( el.getAttribute( 'data-idx' ), 10 );
+				
+			var blog = wp.app.blogs.at( idx );
+			if ( blog !== wp.app.currentBlog ) {
+				wp.app.setCurrentBlog( blog );
+			}
+        
+			this.toggleMenu();
+        
+		} catch( e ) {
+			wp.log( e );
+		}
+	},
+
+	onBlogChanging: function() {
+		var content = this.el.querySelector( '.content' );
+		content.innerHTML = '';
+		$( '.refresh' ).addClass( 'refreshing' );
+		this.showLoadMore( false );
+	},
+
+	onBlogChanged: function() {
+		this.hasMoreContent = true;
+		$( '.refresh' ).removeClass( 'refreshing' );
 		this.syncedonce = false;
 		this.refresh();
 	},
 	
-	showPicker:function(evt) {
-		if(evt) {
-			evt.stopPropagation();
-		};
-		
-		var html = "<h1>" + _s("title-blogs") + "</h1><ul>";
-		for(var i = 0; i < wp.app.blogs.length; i++) {
-			html += '<li data-idx="' + i + '">' + wp.app.blogs.at(i).get("blogName") + "</li>";
-		};
-		html += "</ul>"
-		
-		var list = document.createElement('x-select-list');
-		list.location = 'middle';
-		list.innerHTML = html;
-		
-		list.addEventListener('select', function(event) {
-			try{
-				var el = event.target;
-				var idx = parseInt(el.getAttribute("data-idx"));
-				wp.app.setCurrentBlog(wp.app.blogs.at(idx));
-			} catch(e){console.log(e);};
-		});
-		
-		list.addEventListener('hide', function(event) {
-			list.parentNode.removeChild(list);
-		});
-		
-		document.body.appendChild(list);
-
+	toggleMenu: function( evt ) {
+		$( 'x-shiftbox' )[0].toggle();
 	},
 	
-	viewPost:function(model) {
+	viewPost: function( model ) {
 		// if we are not pulling to refresh...
-		if(this.dragging) return;
-
-		window.open(model.get("link"), "", "resizable=yes,scrollbars=yes,status=yes");
-	},
-	
-	refresh:function() {
-
-		var self = this;
-		var p = this.posts.fetch({where:{index:"blogkey", value:wp.app.currentBlog.id}});
-		p.success(function() {
-			
-			self.render();
-					
-			if(self.posts.length == 0 && !self.syncedonce) {
-				// If we haven't tried to sync at least once, do so. 
-				if(self.syncing) {
-					return; 
-				};
-				
-				wp.app.showLoadingIndicator();
-				var promise = self.sync();
-				promise.always(function(){
-					wp.app.hideLoadingIndicator();
-				});
-			};
-
-		});
-		p.fail(function() {
-			alert(p.result());
-		});
-
-		return p;
-	},
-	
-	sync:function() {
-
-		if(!wp.app.isNetworkAvailable()) {
-			alert(_s('prompt-network-missing'));
-			self.iscroll.refresh();
+		if( this.dragging ) {
 			return;
-		};
-		
-		this.syncing = true;
-		var self = this;
-		var p = wp.models.Posts.fetchRemotePosts();
-		p.success(function() {
-			self.syncedonce = true;
-			self.refresh();
-		});
-		p.fail(function() {
-			var result = p.result();
-			var msg = _s("prompt-problem-syncing");
-			if (result.status == 0 && result.readyState == 0) {
-				msg = _s("prompt-bad-url");
-			} else if(result.faultCode){
-				if (result.faultCode == 403) {
-					msg = _s("prompt-bad-username-password");
-				} else {
-					msg = result.faultString;
-				};
-			};
-			alert(_s(msg));
+		}
 
-		});
-		p.always(function(){
-			self.syncing = false;
-			self.iscroll.refresh();
-		});
-
-		return p;
+		window.open( model.get( 'link' ), '', 'resizable=yes,scrollbars=yes,status=yes' );
 	},
 	
-	showEditor:function() {
-		
-		try {
-			if(typeof(MozActivity) == "undefined") {
-				wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing
-				return;
-			};
+	// Refresh the post list. 
+	refresh: function() {
+		var promise = this.posts.fetch( { 'where': { 'index': 'blogkey', 'value': wp.app.currentBlog.id }, 'silent':true } );
+		var onSuccess = this._onRefreshSuccess.bind( this );
+		var onFail = this._onRefreshFail.bind( this, promise );
+		promise.success( onSuccess );
+		promise.fail( onFail );
+
+		return promise;
+	},
+	
+	_onRefreshSuccess: function() {
+		this.render();
+				
+		if( this.posts.length == 0 && ! this.syncedonce ) {
+			// If we haven't tried to sync at least once, do so. 
+			if( this.syncing ) {
+				return; 
+			}
 			
-			var self = this;
+			wp.app.showLoadingIndicator();
+			var promise = this.sync();
+			promise.always( wp.app.hideLoadingIndicator );
+		}
+	},
+	
+	_onRefreshFail: function( promise ) {
+		alert( promise.result() );
+	},
+	
+	// Fetches the latest posts from the remote server and removes oldest posts from the database.
+	sync: function( event, loadMore ) {
+		if( ! wp.app.isNetworkAvailable() ) {
+			alert( _s( 'prompt-network-missing' ) );
+			return;
+		}
+		
+		// Don't sync while we're uploading a post
+		for ( var i = 0; i < this.posts.length; i++ ) {
+			var post = this.posts.at( i );
+			if ( post.isSyncing() ) {
+				return; 
+			}
+		}
+		
+		if ( this.syncing ) {
+			return;
+		}
+				
+		$( '.refresh' ).addClass( 'refreshing' );
+
+		this.syncing = true;
+		this.loadingMore = loadMore || false;
+
+		var loadmoreBtn = this.el.querySelector( 'button.load-more' );
+		if ( this.loadingMore ) {
+			loadmoreBtn.innerHTML = _s( 'control-loading' );
+		}
+		loadmoreBtn.setAttribute( 'disabled', 'disabled' );
+
+		var offset = this.loadingMore ? this.posts.length : null;
+		var promise = wp.models.Posts.fetchRemote( offset );
+		var onSuccess = this._onSyncSuccess.bind( this, promise );
+		var onFail = this._onSyncFail.bind( this, promise );
+		var onAlways = this._onSyncAlways.bind( this );
+		
+		promise.success( onSuccess );
+		promise.fail( onFail );
+		promise.always( onAlways );
+
+		return promise;
+	},
+	
+	_onSyncSuccess: function( promise ) {
+		this.syncedonce = true;
+		if ( ! this.loadingMore ) {
+			// TODO: Clean up old posts.
+			this.hasMoreContent = true;
+		} else {
+			// Check if if more content exists.
+			var collection = promise.result();
+			if ( collection.length == 0 || collection.length % 12 ) {
+				this.hasMoreContent = false;
+			}
+		}
+		this.refresh();
+	},
+	
+	_onSyncFail: function( promise ) {
+		var result = promise.result();
+		var msg = _s( 'prompt-problem-syncing' );
+		if ( result.status == 0 && result.readyState == 0 ) {
+			msg = _s( 'prompt-bad-url' );
+		} else if( result.faultCode ){
+			if ( result.faultCode == 403 ) {
+				msg = _s( 'prompt-bad-username-password' );
+			} else {
+				msg = result.faultString;
+			}
+		}
+		alert( _s( msg ) );
+	},
+	
+	_onSyncAlways: function() {
+		this.syncing = false;
+		this.loadingMore = false;
+		$( '.refresh' ).removeClass( 'refreshing' );
+		
+		var loadmoreBtn = this.el.querySelector( 'button.load-more' );
+		loadmoreBtn.innerHTML = _s( 'control-load-more' );
+		loadmoreBtn.removeAttribute( 'disabled' );
+	},
+	
+	// Load more posts from the remote server.
+	loadMore: function( event ) {
+		this.sync.apply( this, [event, true] );
+	},
+	
+	showEditor: function() {
+		try {
+			if( typeof MozActivity === 'undefined' ) {
+				wp.nav.push( 'editor' );
+				return;
+			}
+
 			// Start a Moz picker activity for the user to select an image to upload
 			// either from the gallery or the camera. 
-			var activity = new MozActivity({
-				name: 'pick',
-				data: {
-					type: 'image/jpeg'
+			var activity = new MozActivity( {
+				'name': 'pick',
+				'data': {
+					'type': 'image/jpeg'
 				}
-			});
-					
-			activity.onsuccess = function() {
-				wp.app.selected_image_blob = activity.result.blob;
-				wp.app.routes.navigate("editor", {trigger:true});
-			};
-	
-			activity.onerror = function() {
-				console.log("There was an error picking an image with the picker.");
-			};
+			} );
+
+			var onSuccess = this._onPickSuccess.bind( this, activity );
+			activity.onsuccess = onSuccess;
+			activity.onerror = this._onPickError;
 			
-		} catch(e) {
+		} catch( e ) {
 			// Checking typeof(MozActivity) in a browser throws an exception in some versions of Firefox. 
 			// just pass thru.
-			wp.app.routes.navigate("editor", {trigger:true}); // Go ahead and route for browser testing.
+			wp.nav.push( 'editor' );
 			return; 
-		};
-
-	},
-
-	showAbout:function() {
-		wp.app.routes.navigate("about", {trigger:true}); 
+		}
 	},
 	
-	showSettings:function() {
-		wp.app.routes.navigate("settings", {trigger:true}); 
+	_onPickSuccess: function( activity ) {
+		wp.app.selected_image_blob = activity.result.blob;
+		wp.nav.push( 'editor' );
+	},
+	
+	_onPickError: function() {
+		wp.log( 'There was an error picking an image with the picker.' );
+	},
+	
+	showSettings: function() {
+		this.toggleMenu();
+		wp.nav.push( 'settings', 'coverUp' );
+	},
+	
+	showLoadMore: function( bool ) {
+		var btn = this.el.querySelector( 'button.load-more' );
+		var inf = this.el.querySelector( '.infinity' );
+		
+		if ( this.posts.length == 0 ) {
+			$( btn ).addClass( 'hidden' );
+			$( inf ).addClass( 'hidden' );
+			return;
+		}
+
+		if ( bool ) {
+			$( btn ).removeClass( 'hidden' );
+			$( inf ).addClass( 'hidden' );
+		} else {
+			$( btn ).addClass( 'hidden' );
+			$( inf ).removeClass( 'hidden' );
+		}
 	}
 	
-});
-wp.views.registerTemplate("posts");
+} );
+wp.views.registerTemplate( 'posts' );
 
 
-wp.views.Post = Backbone.View.extend({
-	model:null, 
+wp.views.Post = Backbone.View.extend( {
+	model: null, 
 	
-	template_name:"post",
+	template_name: 'post',
 	
-	events: _.extend({
-		"click div.post-body": "showPost",
-		"click div.photo": "showPost",
-		"click button.upload": "upload",
-		"click button.discard": "discard"
+	events: _.extend( {
+		'click div.photo-btn': 'showPost',
+		'click button.upload': 'upload',
+		'click button.discard': 'discard'
 	}),
 	
-	initialize:function(options) {
+	initialize: function( options ) {
 		this.model = options.model;
 		
-		this.listenTo(this.model, 'progress', this.render);
-		this.listenTo(this.model, "destroy", this.remove);
+		this.listenTo( this.model, 'progress', this.render );
+		this.listenTo( this.model, "destroy", this.remove );
 		this.render();
 	},
 	
-	render:function(progress) {
-		var div = document.createElement("div");
+	render: function( progress ) {
+		var div = document.createElement( 'div' );
 		div.innerHTML = wp.views.templates[this.template_name].text;
-		
-		var postTitle = this.model.get("post_title");
-		var content = div.querySelector(".post-body p");
-		
-		var ele = document.createElement("div");
-		ele.innerHTML = this.model.get("post_content");
-			
-		var caption_str = "";
-		var str = ele.textContent;
-		if(str.indexOf("[/caption]") != -1) {
-			var pos = str.indexOf("[/caption]") + 10;
 
-			caption_str = str.substring(0, str.indexOf("[/caption]"));
-			caption_str = caption_str.substring(caption_str.lastIndexOf("]") + 1).trim();
-			var cap_el = document.createElement("div");
-			cap_el.innerHTML = caption_str;
-			caption_str = cap_el.textContent;
-			
-			str = str.substr(pos);
-		};
-		
-		if (str.length > 160) {
-			str = str.substr(0, 160);
-			str = str.substr(0, str.lastIndexOf(" "));
-			str = str + " [...]";
-		};
-		
-		// Hide content (paragraph) if there is none
-		if (str.length == 0) {
-			content.className = "hidden";
+		var html = '';
+		var postContent;
+		var captionStr;
+
+		// Strip the HTML from the post content
+		var ele = document.createElement( 'div' );
+		ele.innerHTML = this.model.get( 'post_content' );
+		postContent = ele.textContent;
+
+		// Look for a caption
+		if( postContent.indexOf( '[/caption]' ) !== -1 ) {
+			var pos = postContent.indexOf( '[/caption]' ) + 10;
+
+			captionStr = postContent.substring( 0, postContent.indexOf( '[/caption]' ) );
+			captionStr = captionStr.substring( captionStr.lastIndexOf( ']' ) + 1 ).trim();
+
+			postContent = postContent.substr( pos );
+		}
+
+		if ( postContent.length > 160 ) {
+			postContent = postContent.substr( 0, 160 );
+			postContent = postContent.substr( 0, postContent.lastIndexOf( ' ' ) );
+			postContent = postContent + "...";
 		}
 		
-/*
-		var postDateGmt = this.model.get("post_date_gmt");
-		var formattedDate = this.formatGMTDate(postDateGmt);
-*/
-		var formattedDate = this.formatGMTDate(this.model.get("local_date"));
-
-		if (postTitle.length == 0 && str.length == 0) {
-			var postBody = div.querySelector(".post-body");
-			postBody.className += " hidden";
-			var noTitleDate = div.querySelector(".no-title-date");
-			noTitleDate.innerHTML = formattedDate;
+		// Caption
+		var captionEl = div.querySelector( '.caption' );
+		if ( captionStr ) {
+			captionEl.innerHTML = captionStr;
+		} else {
+			captionEl.className += ' hidden';
+			div.querySelector( '.photo' ).className += ' no-box-shadow';
 		}
 		
-		else {
-			var title = div.querySelector(".post-body h3");
-			title.innerHTML = this.model.get("post_title");
-			
-			// Hide Title if there is none
-			if (postTitle.length == 0) {
-				title.className += " hidden";
-			}
-
-			var date = div.querySelector(".post-body span");
-			date.innerHTML = formattedDate;
-
-			content.innerHTML = str;
-		};
-
-		var img = div.querySelector(".photo img");
-		var caption = div.querySelector(".caption");
+		// Title 
+		var postTitle = this.model.get( 'post_title' );
+		var titleEl = div.querySelector( '.post-title' );
+		if ( postTitle ) {
+			titleEl.innerHTML = postTitle;
+		} else {
+			titleEl.className += ' hidden';
+		}
 		
+		// Summary
+		var contentEl = div.querySelector( '.post-content' );
+		if ( postContent ) {
+			contentEl.innerHTML = postContent;
+		}
+		
+		// Date
+		var date = this.model.get( 'post_date_gmt' );
+		var dateEl = div.querySelector( '.post-date' );
+		dateEl.innerHTML = date.toLocaleDateString();
+		
+		// Photo
+		var img = div.querySelector( '.photo img' );
 		var image = this.model.image();
-		if(image && image.link) {
-			if(image.link.indexOf("data:image") == 0) {
+		if( image && image.link ) {
+			if( image.link.indexOf( 'data:image' ) === 0 ) {
 				// data url so don't use photon.
 				img.src = image.link;
-			} else {
-				img.src = 'http://i0.wp.com/' + image.link.replace(/.*?:\/\//g, '') + '?resize=320,214';
-			};
+			} else if ( wp.app.currentBlog.isPrivate() ) {
+				// We can't use photon with private blogs. 
+				// Try go grab a reasonably sized photo from the photo metadata.
+				// If that doesn't work, default to the image link. 
+				var file; 
+				try {
+					file = post.photo.metadata.sizes.medium.file;
+				} catch( ignore ){}
+				if ( file ) {
+					img.src = image.link.substr( 0, image.link.lastIndexOf('/') + 1 ) + file;
+				} else {
+					img.src = image.link;
+				}
 
-			if (image.caption != undefined && image.caption.length > 0) {
-				caption.innerHTML = image.caption;				
 			} else {
-				caption.innerHTML = caption_str;
-			};
-
+				// Public blog, use photon to grab an image that will fit the alloted space.
+				img.src = 'http://i0.wp.com/' + image.link.replace( /.*?:\/\//g, '' ) + '?w=' + $( '.photo' ).width();
+			}
 		} else {
 			img.src = "";
 			// Hide image and caption if there is no image
-			var photo = div.querySelector(".photo");
-			photo.className += " hidden";
-			caption.className += " hidden";
-			
+			var photo = div.querySelector( '.photo' );
+			photo.className += ' hidden';
+
 			// Enable no-image styling for posts
-			var postBody = div.querySelector(".post-body");
-			postBody.className += " noimage";
-		};
-		
+			var postBody = div.querySelector( '.post-content' );
+			postBody.className += ' noimage';
+		}
 
 		//if local draft
-		var mask = div.querySelector(".upload-mask");
-		if (this.model.isLocalDraft() || this.model.isSyncing()) {
-			$(mask).removeClass("hidden");
+		var mask = div.querySelector( '.upload-mask' );
+		if ( this.model.isLocalDraft() || this.model.isSyncing() ) {
+			$( mask ).removeClass( 'hidden' );
 			
-			var progressDiv = div.querySelector(".progress");
-			var buttonDiv = div.querySelector("div.upload");
+			var progressDiv = div.querySelector( '.progress' );
+			var buttonDiv = div.querySelector( 'div.upload' );
 			
-			if(this.model.isSyncing()) {
+			if( this.model.isSyncing() ) {
 				// If we're syncing show progress.
-				$(buttonDiv).addClass("hidden");
-				$(progressDiv).removeClass("hidden");
+				$(buttonDiv).addClass( 'hidden' );
+				$(progressDiv).removeClass( 'hidden' );
 				
-				var el = div.querySelector(".progress span");
+				var el = div.querySelector( '.progress span' );
 				var progressStr = this.model.sync_status;
-				if(progress) {
+				if( progress ) {
 					progressStr = progress.status;
-/*
-					if(progress.percent ) {
-						progressStr += (" " + progress.percent + "%");
-					}
-*/
-				};
+				}
 				el.innerHTML = progressStr;
 				
 			} else {
 				// Else show the upload button.
-				$(progressDiv).addClass("hidden");
-				$(buttonDiv).removeClass("hidden");
-			};
+				$( progressDiv ).addClass( "hidden" );
+				$( buttonDiv ).removeClass( "hidden" );
+			}
 			
 		} else {
-			$(mask).addClass("hidden");
-		};
+			$( mask ).addClass( "hidden" );
+		}
 
-		this.$el.html(div.querySelector("div"));
+		this.$el.html( div.querySelector( 'div' ) );
 	
 		return this;
 	},
 	
-	formatGMTDate:function(date) {
-		// Fix the gmt time.
-/*
-		var gmt = new Date();
-		var offset = date.getTimezoneOffset() * 60000;
-		gmt = new Date(gmt.valueOf() + offset);
-				
-		var diff = gmt - date.valueOf();
-*/
-		var diff = Date.now() - date.valueOf();
-				
-		var d = "";
-		if (diff < 60000) {
-		    // seconds
-		    d = Math.floor(diff / 1000) + "s";
-		} else if (diff < 3600000) {
-		    // minutes
-		    d = Math.floor(diff / 60000) + "m";
-		} else if (diff < 86400000) {
-		    // hours
-		    d = Math.floor(diff / 3600000) + "h";
-		} else {
-		    // days 
-		    d = Math.floor(diff / 86400000) + "d";
-		};
-		return d;
-	},
-	
-	showPost:function(evt) {
-		if (this.model.isLocalDraft()) {
+	showPost: function( evt ) {
+		if ( this.model.isLocalDraft() ) {
 			return;
-		};
-		this.model.collection.trigger("selected", this.model);
+		}
+		this.model.collection.trigger( 'selected', this.model );
 	},
 	
-	upload:function() {
+	upload: function() {
+		if( ! wp.app.isNetworkAvailable() ) {
+			alert( _s( 'prompt-network-missing' ) );
+			return;
+		}
 		this.model.uploadAndSave();		
 	},
 	
-	discard:function(){
-		if(confirm(_s("prompt-discard-post?"))){
+	discard: function() {
+		if ( confirm( _s( 'prompt-discard-post?' ) ) ) {
 			this.model.destroy();
-		};
+		}
 	},
-	
-});
-wp.views.registerTemplate("post");
+
+} );
+wp.views.registerTemplate( 'post' );

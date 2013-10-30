@@ -1,42 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width" />
-
-    <title data-l10n-id="title-wordpress">WordPress</title>
-
-    <link rel="stylesheet" href="../css/app.css" />
-
-  </head>
-  <body>
-  	<div id="stage">
-		<div id="template">
-			<div class="page page-start">
-				<section class="content">
-				  	<div id="start-slideshow">
-				  		<img class="img1" src="img/start/1.jpg" />
-				  		<img class="img2" src="img/start/2.jpg" />
-				  		<img class="img3" src="img/start/3.jpg" />
-				  		<img class="img4" src="img/start/4.jpg" />
-				  	</div>
-					<img id="wp-logo" src="img/icons/wp-logo.png" />
-					<header>
-						<h1 data-l10n-id="title-start">a fAst and fun way to post photos to any WordPress blog</h1>
-					</header>
-					<section class="controls">
-						<button class="login wide" data-l10n-id="control-login">lOg In</button>
-						<button class="createblog wide blue" data-l10n-id="control-create-blog">cReate New Blog</button>
-					</section>
-					<section class="by-line">
-						<div data-l10n-id="app-name">WP Photos 1.0</div>
-						<div data-l10n-id="app-author">bY WordPress.com</div>
-					</section>
-				</section>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width" />
+		<title data-l10n-id="title-wordpress">WordPress</title>
+		<link rel="stylesheet" href="../css/app.css" />		
+	</head>
+	<body>
+		<div id="stage">
+			<div id="template">
+				<div class="page page-start">
+					<div class="scroll">
+						<x-appbar></x-appbar>
+						<section class="content">
+							<header>
+								<img id="wp-logo" src="img/icons/wp-logo.png" />
+								<h1 data-l10n-id="title-welcome">wElcome</h1>
+							</header>
+							<section>
+								<h3 data-l10n-id="title-start">a fAst and fun way to post photos to any WordPress blog</h3>
+							</section>
+						</section>
+						<footer>
+							<button class="create-account push black" data-l10n-id="control-create-blog">cReate Account</button>
+							<button class="login push blue" data-l10n-id="control-login">sIgn In</button>
+						</footer>
+					</div>
+				</div>	
 			</div>
-		</div>  	
-  	</div>
-
-  </body>
+		</div>
+	</body>
 </html>

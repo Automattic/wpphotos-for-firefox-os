@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width" />
-
-    <title data-l10n-id="title-wordpress">WP Photos</title>
-
-    <link rel="stylesheet" href="../css/app.css" />
-
-  </head>
-  <body>
-	<div id="background"></div>
-  	<div id="stage">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width" />
+		<title data-l10n-id="title-wordpress">WP Photos</title>
+		<link rel="stylesheet" href="../css/app.css" />
+	</head>
+	<body>
+	<div id="stage">
 		<div id="template">
 			<div class="page page-login">
 				<div class="scroll">
-					<header>
-						<button class="back left"></button>
-					</header>
+					<x-appbar>
+						<button class="back"></button>
+					</x-appbar>
 					<section class="content">
-						<h1 data-l10n-id="title-login">lOg in to your existing WordPress blog.</h1>
-						<section class="controls">
-							<input id="username" type="text" data-l10n-id="control-username-email" placeholder="uSername or Email" />
-							<input id="password" type="password" data-l10n-id="control-password" placeholder="pAssword" />
-							<input id="url" type="text" data-l10n-id="control-blog-address" placeholder="bLog Address" />
-							<button class="login wide blue" data-l10n-id="control-login">lOg In</button>
-						</section>
-						<section class="by-line">
-							<div data-l10n-id="app-name">WP Photos 1.0</div>
-							<div data-l10n-id="app-author">bY WordPress.com</div>
-						</section>
+						<img src="img/icon-wp.png" />
+						<input id="username" type="text" data-l10n-id="control-username-email" placeholder="uSername or Email" />
+						<input id="password" type="password" data-l10n-id="control-password" placeholder="pAssword" />
+						<input id="url" type="text" data-l10n-id="control-blog-address" placeholder="sIte Address" />
+						<button id="login-btn" class="login push blue" disabled="true" data-l10n-id="control-login">sIgn In</button>
 					</section>
+					<footer>
+						<button class="create-account black" data-l10n-id="control-create-account">dOn't have an account? Create one!</button>
+					</footer>
 				</div>
 			</div>
-	  	</div>
-  	</div>
-
+		</div>
+	</div>
   </body>
 </html>

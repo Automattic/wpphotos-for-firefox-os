@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "name": "WP Photos",
   "type": "privileged",
   "description": "Publish and share photos to your WordPress blog.",
@@ -17,7 +17,6 @@
   "permissions": {
 	"systemXHR": {"description":"Required for remote syncing via XMLRPC."},
     "device-storage:pictures":{ "access": "readonly", "description":"Required for choosing photos to post to a blog." },
-    "camera":{"description":"Required for taking a photo to post to a blog."},
     "storage":{"description":"Required for storing synced data and images for offline use."}
   },
   "orientation": "portrait-primary",

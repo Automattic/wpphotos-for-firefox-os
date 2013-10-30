@@ -5,87 +5,85 @@
 
 "use strict";
 
-if(typeof(wp) == "undefined") { var wp = {} };
+if( typeof wp === 'undefined' ) {
+	var wp = {};
+}
 
-wp.Routes = Backbone.Router.extend({
+wp.Routes = Backbone.Router.extend( {
 
-	currentPage:null,
+	currentPage: null,
 	
-	stage:null,
+	stage: null,
 
-	initialize:function(options) {
-		this.stage = document.getElementById("stage");
+	initialize: function() {
+		this.stage = document.getElementById( 'stage' );
 	},
 		
 	routes: {
-		"start":"start",
-		"login":"login",
-		"about":"about",
-		"settings":"settings",
-		"posts":"posts",
-		"editor":"editor",
-		"goBack":"goBack"
+		'start': 'start',
+		'login': 'login',
+		'about': 'about',
+		'settings': 'settings',
+		'posts': 'posts',
+		'editor': 'editor',
+		'goBack': 'goBack'
 	},
 	
-	start:function() {
-console.log("wp.routes.start");
+	start: function() {
+		wp.log( 'wp.routes.start' );
 		var view = new wp.views.StartPage();
-		this.setView(view);
+		this.setView( view );
 	},
 	
-	login:function() {
-console.log("wp.routes.login");
+	login: function() {
+		wp.log( 'wp.routes.login' );
 		var view = new wp.views.LoginPage();
-		this.setView(view);
+		this.setView( view );
 	},
 	
-	about:function() {
-console.log("wp.routes.about");
+	about: function() {
+		wp.log( 'wp.routes.about' );
 		var view = new wp.views.AboutPage();
-		this.setView(view);
+		this.setView( view );
 	},
 
-	settings:function() {
-console.log("wp.routes.settings");
+	settings: function() {
+		wp.log( 'wp.routes.settings' );
 		var view = new wp.views.SettingsPage();
-		this.setView(view);
+		this.setView( view );
 	},
 	
-	posts:function() {
-console.log("wp.routes.posts");
+	posts: function() {
+		wp.log( 'wp.routes.posts' );
 		var view = new wp.views.PostsPage();
-		this.setView(view);
+		this.setView( view );
 	},
 	
-	editor:function() {
-console.log("wp.routes.editor");
+	editor: function() {
+		wp.log( 'wp.routes.editor' );
 		var view = new wp.views.EditorPage();
-		this.setView(view);
+		this.setView( view );
 	},
 	
-	goBack:function() {
-		window.history.go(-2);
-	},
-	
-	setView:function(view) {
-console.log("wp.routes.setView");
+	setView:function( view ) {
+		wp.log( 'wp.routes.setView' );
 		// 
-		if(this.currentPage) {
+		if( this.currentPage ) {
 			try {
 				// call remove on backbone views to clean up events.
 				this.currentPage.remove();
-			} catch(e){
-				console.log(e);
-			};
-		};
+			} catch( e ) {
+				wp.log( e );
+			}
+		}
 
 		// Just incase...
-		while (stage.firstChild) {
-		  stage.removeChild(stage.firstChild);
-		};
+		while ( this.stage.firstChild ) {
+			this.stage.removeChild( this.stage.firstChild );
+		}
 		
 		this.currentPage = view;
-		this.stage.appendChild(view.el);
-	}	
+		this.stage.appendChild( view.el );
+	}
 
 });

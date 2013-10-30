@@ -7,52 +7,66 @@
 
     <title data-l10n-id="title-wordpress">wOrdPress</title>
 
-	<!-- Localization -->
-	<link rel="resource" type="application/l10n" href="locales/locales.ini" />
-	<script type="text/javascript" src="js/lib/l10n.js"></script>
-
-	<!-- x-tags.  See http://x-tags.org/ -->
-	<script type="text/javascript" src="x-tags/x-tag.js"></script>
-	<script type="text/javascript" src="x-tags/alert-popup.js"></script>
-	<script type="text/javascript" src="x-tags/dialog-toast.js"></script>
-	<script type="text/javascript" src="x-tags/listview.js"></script>
-	<script type="text/javascript" src="x-tags/modal.js"></script>
-	<script type="text/javascript" src="x-tags/select-list.js"></script>
-	<script type="text/javascript" src="x-tags/toggle-switch.js"></script>	
-	<link rel="stylesheet" href="x-tags/alert-popup.css" />
-	<link rel="stylesheet" href="x-tags/dialog-toast.css" />
-	<link rel="stylesheet" href="x-tags/listview.css" />
-	<link rel="stylesheet" href="x-tags/modal.css" />
-	<link rel="stylesheet" href="x-tags/select-list.css" />
-	<link rel="stylesheet" href="x-tags/toggle-switch.css" />
-
+    <!-- Localization -->
+    <link rel="resource" type="application/l10n" href="locales/locales.ini" />
+    <script type="text/javascript" src="js/lib/l10n.js"></script>
+    
+    <!-- x-tags.  See http://x-tags.org/ -->
+    <link rel="stylesheet" href="x-tags/appbar.css" />
+    <link rel="stylesheet" href="x-tags/deck.css" />
+    <link rel="stylesheet" href="x-tags/modal.css" />
+    <link rel="stylesheet" href="x-tags/select-list.css" />
+    <link rel="stylesheet" href="x-tags/shiftbox.css" />
+    <link rel="stylesheet" href="x-tags/switch.css" />
+    
+    <link rel="stylesheet" href="css/noticons.css">
+    <link rel="stylesheet" href="css/dashicons.css">
     <link rel="stylesheet" href="css/app.css" />
 
   </head>
   <body>
-  	<div id="background"></div>
-	<div id="stage"></div>
+    <x-deck id="stage"><x-card></x-card></x-deck>
 	 
-	 <script src="js/lib/zepto.js"></script>
-	 <script src="js/lib/iscroll.js"></script>
-	 <script src="js/lib/underscore.js"></script>
-	 <script src="js/lib/backbone.js"></script>
-	 <script src="js/lib/aes.js"></script>
-	 <script src="js/wp.xhr.js"></script>
-	 <script src="js/wp.xmlrpc.js"></script>
-	 <script src="js/wp.api.js"></script>
-	 <script src="js/wp.promise.js"></script>
-	 <script src="js/wp.db.js"></script>
-	 <script src="js/wp.models.js"></script>
-	 <script src="js/wp.views.js"></script>
-	 <script src="js/wp.views.start.js"></script>
-	 <script src="js/wp.views.login.js"></script>
-	 <script src="js/wp.views.settings.js"></script>
-	 <script src="js/wp.views.about.js"></script>
-	 <script src="js/wp.views.posts.js"></script>
-	 <script src="js/wp.views.editor.js"></script>
-	 <script src="js/wp.routes.js"></script>
-	 <script src="js/wp.app.js"></script>
+    <!-- x-tags.  See http://x-tags.org/ -->
+<!--
+	  <script src="x-tags/x-tag-components.js"></script>
+	  <script src="x-tags/core.js"></script>
+-->
+    <script src="x-tags/x-tag-core.js"></script>
+    <script src="x-tags/request.js"></script>
+	<script src="x-tags/appbar.js"></script>
+	<script src="x-tags/deck.js"></script>
+    <script src="x-tags/modal.js"></script>
+    <script src="x-tags/select-list.js"></script>
+    <script src="x-tags/shiftbox.js"></script>
+    <script src="x-tags/switch.js"></script>
+    
+    <!-- third party -->
+    <script src="js/lib/zepto.js"></script>
+    <script src="js/lib/underscore.js"></script>
+    <script src="js/lib/backbone.js"></script>
+    <script src="js/lib/aes.js"></script>
+    
+    <!-- app -->
+    <script src="js/wp.xhr.js"></script>
+    <script src="js/wp.xmlrpc.js"></script>
+    <script src="js/wp.api.js"></script>
+    <script src="js/wp.promise.js"></script>
+    <script src="js/wp.db.js"></script>
+    <script src="js/wp.models.js"></script>
+    <script src="js/wp.views.js"></script>
+    <script src="js/wp.views.start.js"></script>
+    <script src="js/wp.views.login.js"></script>
+    <script src="js/wp.views.sites.js"></script>
+    <script src="js/wp.views.settings.js"></script>
+    <script src="js/wp.views.settings.site.js"></script>
+    <script src="js/wp.views.settings.publish.js"></script>
+    <script src="js/wp.views.about.js"></script>
+    <script src="js/wp.views.posts.js"></script>
+    <script src="js/wp.views.editor.js"></script>
+    <script src="js/wp.routes.js"></script>
+    <script src="js/wp.nav.js"></script>
+    <script src="js/wp.app.js"></script>
 
   </body>
 </html>
